@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+# Targets/Intermediates:
+Build/
+
+# Dev-studio stuff:
+*.sdf
+*.opensdf
+*.suo
