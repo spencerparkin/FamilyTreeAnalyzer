@@ -58,6 +58,14 @@ bool FtaClient::Authenticate( void )
 
 	do
 	{
+		wxString notice =
+			"FamilyTreeAnalyzer would like to know your basic FamilySearch profile information "
+			"and access data about your ancestors from the FamilySearch family tree.  "
+			"FamilyTreeAnalyzer will use this information in accordance with their respective terms "
+			"of service and privacy policies.  May FamilyTreeAnalyzer proceed?";
+		if( wxYES != wxMessageBox( notice, "Notice", wxYES_NO | wxICON_QUESTION ) )
+			break;
+
 		/*
 		wxString userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
 		if( userName.IsEmpty() )
@@ -66,6 +74,8 @@ bool FtaClient::Authenticate( void )
 		wxString passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
 		if( passWord.IsEmpty() )
 			break;
+
+		// See: https://familysearch.org/developers/docs/certification/authentication
 		*/
 
 		wxJSONValue blob;
