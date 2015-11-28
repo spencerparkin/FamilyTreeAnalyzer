@@ -13,7 +13,6 @@ FtaClient::FtaClient( void )
 
 /*virtual*/ FtaClient::~FtaClient( void )
 {
-
 }
 
 bool FtaClient::Initialize( void )
@@ -94,8 +93,10 @@ bool FtaClient::Authenticate( void )
 		headers = curl_slist_append( headers, "Content-Type: application/x-www-form-urlencoded" );
 		headers = curl_slist_append( headers, "Accept: application/json" );
 
+		const char* data = postFields.c_str();
+
 		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, postFields.c_str() );
+		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, data );
 		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
 
 		writeString = "";
