@@ -13,12 +13,18 @@
     <ClInclude Include="Code\FtaClient.h">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaFrame.h">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaClient.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaFrame.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

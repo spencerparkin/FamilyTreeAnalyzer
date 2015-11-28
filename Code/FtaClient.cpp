@@ -54,10 +54,15 @@ bool FtaClient::Shutdown( void )
 bool FtaClient::Authenticate( void )
 {
 	bool success = false;
-	curl_slist* header = nullptr;
+	curl_slist* headers = nullptr;
 
 	do
 	{
+		if( HasAccessToken() )
+			break;
+
+		// See https://familysearch.org/developers/docs/certification/authentication for more info.
+
 		wxString notice =
 			"FamilyTreeAnalyzer would like to know your basic FamilySearch profile information "
 			"and access data about your ancestors from the FamilySearch family tree.  "
@@ -66,32 +71,31 @@ bool FtaClient::Authenticate( void )
 		if( wxYES != wxMessageBox( notice, "Notice", wxYES_NO | wxICON_QUESTION ) )
 			break;
 
-		/*
-		wxString userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
+		wxString userName, passWord;
+#if 0
+		userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
 		if( userName.IsEmpty() )
 			break;
 
-		wxString passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
+		passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
 		if( passWord.IsEmpty() )
 			break;
+#else
+		userName = "tuf000140222";
+		passWord = "1234pass";
+#endif
 
-		// See: https://familysearch.org/developers/docs/certification/authentication
-		*/
+		wxString postFields;
+		postFields += "username=" + userName;
+		postFields += "&grant_type=password";
+		postFields += "&client_id=a02j000000BQrUOAA1";
+		postFields += "&password=" + passWord;
 
-		wxJSONValue blob;
-		blob[ "grant_type " ] = wxT( "password" );
-		blob[ "client_id" ] = wxT( "a02j000000BQrUOAA1" );		// This was registered at the FamilySearch developer site.
-		blob[ "username" ] = wxT( "tuf000140222" );
-		blob[ "password" ] = wxT( "1234pass" );
+		headers = curl_slist_append( headers, "Content-Type: application/x-www-form-urlencoded" );
+		headers = curl_slist_append( headers, "Accept: application/json" );
 
-		wxJSONWriter writer;
-		wxString jsonText;
-		writer.Write( blob, jsonText );
-
-		header = curl_slist_append( header, "Content-Type: text/json" );
-
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, jsonText.c_str() );
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDSIZE, jsonText.Length() );
+		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
+		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, postFields.c_str() );
 		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
 
 		writeString = "";
@@ -104,17 +108,35 @@ bool FtaClient::Authenticate( void )
 			break;
 
 		wxJSONReader reader;
-		if( 0 < reader.Parse( writeString, &blob ) )
+		wxJSONValue responseValue;
+		if( 0 < reader.Parse( writeString, &responseValue ) )
 			break;
 
-		// TODO: We need to capture the access token.
+		wxJSONValue errorValue = responseValue[ "error" ];
+		if( errorValue.IsString() )
+		{
+			wxJSONValue errorDescValue = responseValue[ "error_description" ];
+			if( errorValue.IsString() )
+				wxMessageBox( "Error: " + errorValue.AsString() + " -- " + errorDescValue.AsString(), "Error Response" );
+
+			break;
+		}
+
+		wxJSONValue accessTokenValue = responseValue[ "access_token" ];
+		if( accessTokenValue.IsNull() )
+			break;
+
+		accessToken = accessTokenValue.AsString();
+
+		if( !HasAccessToken() )
+			break;
 
 		success = true;
 	}
 	while( false );
 
-	if( header )
-		curl_slist_free_all( header );
+	if( headers )
+		curl_slist_free_all( headers );
 
 	return success;
 }
@@ -124,7 +146,7 @@ bool FtaClient::Authenticate( void )
 	FtaClient* client = ( FtaClient* )userPtr;
 	size_t totalBytes = size * nitems;
 	client->writeString.Append( ( const char* )buf, totalBytes );
-	return size;
+	return totalBytes;
 }
 
 /*static*/ size_t FtaClient::ReadFunction( void* buf, size_t size, size_t nitems, void* userPtr )
