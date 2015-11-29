@@ -16,11 +16,13 @@ private:
 	enum
 	{
 		ID_AcquireAccessToken = wxID_HIGHEST,
+		ID_WipeTreeCache,
 		ID_Exit,
 		ID_About,
 	};
 
 	void OnAcquireAccessToken( wxCommandEvent& event );
+	void OnWipeTreeCache( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );

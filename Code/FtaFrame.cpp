@@ -3,6 +3,7 @@
 #include "FtaFrame.h"
 #include "FtaApp.h"
 #include "FtaClient.h"
+#include "FtaTreeCache.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>
@@ -12,8 +13,10 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 {
 	wxMenu* programMenu = new wxMenu();
 	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with FamilySearch.org." );
+	wxMenuItem* wipeTreeCacheMenuItem = new wxMenuItem( programMenu, ID_WipeTreeCache, "Wipe Tree Cache", "Effectively invalidate all information obtained from FamilySearch.org." );
 	wxMenuItem* exitMenuItem = new wxMenuItem( programMenu, ID_Exit, "Exit", "Exit this program." );
 	programMenu->Append( acquireAccessTokenMenuItem );
+	programMenu->Append( wipeTreeCacheMenuItem );
 	programMenu->AppendSeparator();
 	programMenu->Append( exitMenuItem );
 
@@ -30,9 +33,11 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	SetStatusBar( statusBar );
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
+	Bind( wxEVT_MENU, &FtaFrame::OnWipeTreeCache, this, ID_WipeTreeCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnExit, this, ID_Exit );
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeTreeCache );
 }
 
 /*virtual*/ FtaFrame::~FtaFrame( void )
@@ -43,6 +48,11 @@ void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
 {
 	if( wxGetApp().GetClient()->Authenticate() )
 		wxMessageBox( "Authentication succeeded!" );
+}
+
+void FtaFrame::OnWipeTreeCache( wxCommandEvent& event )
+{
+	wxGetApp().GetTreeCache()->Wipe();
 }
 
 void FtaFrame::OnExit( wxCommandEvent& event )
@@ -69,6 +79,11 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 		case ID_AcquireAccessToken:
 		{
 			event.Enable( !wxGetApp().GetClient()->HasAccessToken() );
+			break;
+		}
+		case ID_WipeTreeCache:
+		{
+			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() );
 			break;
 		}
 	}

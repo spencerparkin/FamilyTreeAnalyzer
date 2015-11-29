@@ -3,6 +3,7 @@
 #include "FtaApp.h"
 #include "FtaClient.h"
 #include "FtaFrame.h"
+#include "FtaTreeCache.h"
 
 wxIMPLEMENT_APP( FtaApp );
 
@@ -10,15 +11,19 @@ FtaApp::FtaApp( void )
 {
 	client = nullptr;
 	frame = nullptr;
+	cache = nullptr;
 }
 
 /*virtual*/ FtaApp::~FtaApp( void )
 {
 	delete client;
+	delete cache;
 }
 
 /*virtual*/ bool FtaApp::OnInit( void )
 {
+	cache = new FtaTreeCache();
+
 	if( !wxApp::OnInit() )
 		return false;
 

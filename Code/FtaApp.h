@@ -7,6 +7,7 @@
 
 class FtaClient;
 class FtaFrame;
+class FtaTreeCache;
 
 class FtaApp : public wxApp
 {
@@ -20,11 +21,13 @@ public:
 
 	FtaClient* GetClient( void ) { return client; }
 	FtaFrame* GetFrame( void ) { return frame; }
+	FtaTreeCache* GetTreeCache( void ) { return cache; }
 
 private:
 
 	FtaClient* client;
 	FtaFrame* frame;
+	FtaTreeCache* cache;
 };
 
 wxDECLARE_APP( FtaApp );
