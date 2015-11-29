@@ -15,8 +15,6 @@
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaPerson.h" />
-    <ClInclude Include="Code\FtaPersonFemale.h" />
-    <ClInclude Include="Code\FtaPersonMale.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
   <ItemGroup>
@@ -24,8 +22,6 @@
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
-    <ClCompile Include="Code\FtaPersonFemale.cpp" />
-    <ClCompile Include="Code\FtaPersonMale.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

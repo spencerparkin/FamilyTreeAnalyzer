@@ -14,25 +14,6 @@ FtaTreeCache::~FtaTreeCache( void )
 	Wipe();
 }
 
-FtaPerson* FtaTreeCache::Lookup( const wxString& id, bool populateCacheAsNeeded /*= false*/ )
-{
-	FtaPerson* person = nullptr;
-
-	FtaPersonMap::iterator iter = personMap.find( id );
-	if( iter != personMap.end() )
-		person = iter->second;
-	else if( populateCacheAsNeeded )
-	{
-		FtaClient* client = wxGetApp().GetClient();
-		if( client )
-		{
-			// TODO: Use client to populate cache with the missing person.
-		}
-	}
-
-	return person;
-}
-
 void FtaTreeCache::Wipe( void )
 {
 	while( personMap.size() > 0 )

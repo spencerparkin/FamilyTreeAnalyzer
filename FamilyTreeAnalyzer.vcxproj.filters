@@ -22,12 +22,6 @@
     <ClInclude Include="Code\FtaPerson.h">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FtaPersonMale.h">
-      <Filter>Code</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\FtaPersonFemale.h">
-      <Filter>Code</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -40,12 +34,6 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaPerson.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaPersonFemale.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaPersonMale.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaTreeCache.cpp">
