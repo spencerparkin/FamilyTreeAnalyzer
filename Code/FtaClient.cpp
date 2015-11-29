@@ -43,7 +43,8 @@ bool FtaClient::Shutdown( void )
 {
 	if( curlHandle )
 	{
-		//...
+		curl_easy_cleanup( curlHandle );
+		curlHandle = nullptr;
 	}
 
 	curl_global_cleanup();
