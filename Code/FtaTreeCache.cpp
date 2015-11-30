@@ -52,12 +52,12 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 			{
 				case POPULATE_ON_CACHE_MISS:
 				{
-					wxGetApp().GetClient()->PopulateCacheAt( personId );
+					wxGetApp().GetClient()->PopulateTreeCacheAt( personId );
 					break;
 				}
 				case ALLOCATE_ON_CACHE_MISS:
 				{
-					person = new FtaPerson( personId, this );
+					person = new FtaPerson( personId );
 					personMap[ personId ] = person;
 					break;
 				}

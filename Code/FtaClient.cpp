@@ -171,17 +171,33 @@ bool FtaClient::Authenticate( void )
 	return 0;
 }
 
-bool FtaClient::PopulateCacheAt( const wxString& personId )
+bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 {
 	bool success = false;
 
 	do
 	{
-		if( !PopulateImmediateAncestryCacheAt( personId ) )
+		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+		if( !person )
 			break;
 
-		if( !PopulateImmediateDescendancyCacheAt( personId ) )
-			break;
+		if( !person->SetImmediateAncestry() )
+		{
+			if( !CacheAncestryFor( personId ) )
+				break;
+
+			if( !person->SetImmediateAncestry() )
+				break;
+		}
+
+		if( !person->SetImmediateDescendancy() )
+		{
+			if( !CacheDescendancyFor( personId ) )
+				break;
+
+			if( !person->SetImmediateDescendancy() )
+				break;
+		}
 
 		success = true;
 	}
@@ -193,8 +209,7 @@ bool FtaClient::PopulateCacheAt( const wxString& personId )
 	return success;
 }
 
-// TODO: Can I narrow the request to immediate ancestors?
-bool FtaClient::PopulateImmediateAncestryCacheAt( const wxString& personId )
+bool FtaClient::CacheAncestryFor( const wxString& personId )
 {
 	bool success = false;
 	curl_slist* headers = nullptr;
@@ -243,12 +258,7 @@ bool FtaClient::PopulateImmediateAncestryCacheAt( const wxString& personId )
 		if( 0 < reader.Parse( writeString, &responseValue ) )
 			break;
 
-		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
-		if( !person )
-			break;
-
-		if( !person->SetImmediateAncestry( responseValue ) )
-			break;
+		//...
 
 		success = true;
 	}
@@ -260,8 +270,7 @@ bool FtaClient::PopulateImmediateAncestryCacheAt( const wxString& personId )
 	return success;
 }
 
-// TODO: Can I narrow the request to immediate descendancy?
-bool FtaClient::PopulateImmediateDescendancyCacheAt( const wxString& personId )
+bool FtaClient::CacheDescendancyFor( const wxString& personId )
 {
 	bool success = false;
 

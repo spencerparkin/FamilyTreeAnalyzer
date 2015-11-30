@@ -16,12 +16,12 @@ public:
 	bool Shutdown( void );
 	bool Authenticate( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
-	bool PopulateCacheAt( const wxString& personId );
+	bool PopulateTreeCacheAt( const wxString& personId );
 
 private:
 
-	bool PopulateImmediateAncestryCacheAt( const wxString& personId );
-	bool PopulateImmediateDescendancyCacheAt( const wxString& personId );
+	bool CacheAncestryFor( const wxString& personId );
+	bool CacheDescendancyFor( const wxString& personId );
 
 	static int DebugFunction( CURL* curlHandle, curl_infotype type, char* data, size_t size, void* userPtr );
 	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );

@@ -4,6 +4,7 @@
 #include "FtaApp.h"
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
+#include "FtaMiscCache.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>
@@ -14,15 +15,20 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 {
 	wxMenu* programMenu = new wxMenu();
 	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with FamilySearch.org." );
-	wxMenuItem* populateCacheAtPersonMenuItem = new wxMenuItem( programMenu, ID_PopulateCacheAtPerson, "Populate Cache At Person", "Update the tree cache at the given person." );
-	wxMenuItem* wipeTreeCacheMenuItem = new wxMenuItem( programMenu, ID_WipeTreeCache, "Wipe Tree Cache", "Effectively invalidate all information obtained from FamilySearch.org." );
 	wxMenuItem* exitMenuItem = new wxMenuItem( programMenu, ID_Exit, "Exit", "Exit this program." );
 	programMenu->Append( acquireAccessTokenMenuItem );
 	programMenu->AppendSeparator();
-	programMenu->Append( populateCacheAtPersonMenuItem );
-	programMenu->Append( wipeTreeCacheMenuItem );
-	programMenu->AppendSeparator();
 	programMenu->Append( exitMenuItem );
+
+	wxMenu* cacheMenu = new wxMenu();
+	wxMenuItem* populateTreeCacheAtPersonMenuItem = new wxMenuItem( programMenu, ID_PopulateTreeCacheAtPerson, "Populate Tree Cache At Person", "Update the tree cache at the given person." );
+	wxMenuItem* wipeAllCacheMenuItem = new wxMenuItem( programMenu, ID_WipeAllCache, "Wipe All Cache", "Effectively invalidate all information obtained from FamilySearch.org." );
+	cacheMenu->Append( populateTreeCacheAtPersonMenuItem );
+	cacheMenu->AppendSeparator();
+	cacheMenu->Append( wipeAllCacheMenuItem );
+
+	wxMenu* analysisMenu = new wxMenu();
+	//...
 
 	wxMenu* helpMenu = new wxMenu();
 	wxMenuItem* aboutMenuItem = new wxMenuItem( helpMenu, ID_About, "About", "Show the about-box." );
@@ -30,6 +36,8 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 
 	wxMenuBar* menuBar = new wxMenuBar();
 	menuBar->Append( programMenu, "Program" );
+	menuBar->Append( cacheMenu, "Cache" );
+	menuBar->Append( analysisMenu, "Analysis" );
 	menuBar->Append( helpMenu, "Help" );
 	SetMenuBar( menuBar );
 
@@ -37,13 +45,13 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	SetStatusBar( statusBar );
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
-	Bind( wxEVT_MENU, &FtaFrame::OnPopulateCacheAtPerson, this, ID_PopulateCacheAtPerson );
-	Bind( wxEVT_MENU, &FtaFrame::OnWipeTreeCache, this, ID_WipeTreeCache );
+	Bind( wxEVT_MENU, &FtaFrame::OnPopulateTreeCacheAtPerson, this, ID_PopulateTreeCacheAtPerson );
+	Bind( wxEVT_MENU, &FtaFrame::OnWipeAllCache, this, ID_WipeAllCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnExit, this, ID_Exit );
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
-	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_PopulateCacheAtPerson );
-	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeTreeCache );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_PopulateTreeCacheAtPerson );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeAllCache );
 }
 
 /*virtual*/ FtaFrame::~FtaFrame( void )
@@ -56,18 +64,19 @@ void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
 		wxMessageBox( "Authentication succeeded!" );
 }
 
-void FtaFrame::OnWipeTreeCache( wxCommandEvent& event )
+void FtaFrame::OnWipeAllCache( wxCommandEvent& event )
 {
 	wxGetApp().GetTreeCache()->Wipe();
+	wxGetApp().GetMiscCache()->Wipe();
 }
 
-void FtaFrame::OnPopulateCacheAtPerson( wxCommandEvent& event )
+void FtaFrame::OnPopulateTreeCacheAtPerson( wxCommandEvent& event )
 {
 	wxString personId = wxGetTextFromUser( "Enter person-ID.", "Person-ID", wxEmptyString, nullptr );
 	if( personId.IsEmpty() )
 		return;
 
-	wxGetApp().GetClient()->PopulateCacheAt( personId );
+	wxGetApp().GetClient()->PopulateTreeCacheAt( personId );
 }
 
 void FtaFrame::OnExit( wxCommandEvent& event )
@@ -96,14 +105,14 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 			event.Enable( !wxGetApp().GetClient()->HasAccessToken() );
 			break;
 		}
-		case ID_PopulateCacheAtPerson:
+		case ID_PopulateTreeCacheAtPerson:
 		{
 			event.Enable( wxGetApp().GetClient()->HasAccessToken() );
 			break;
 		}
-		case ID_WipeTreeCache:
+		case ID_WipeAllCache:
 		{
-			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() );
+			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() || !wxGetApp().GetMiscCache()->IsEmpty() );
 			break;
 		}
 	}

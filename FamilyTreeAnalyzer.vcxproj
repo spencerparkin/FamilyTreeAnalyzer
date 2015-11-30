@@ -14,6 +14,7 @@
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaMiscCache.h" />
     <ClInclude Include="Code\FtaPerson.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
@@ -21,6 +22,7 @@
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaMiscCache.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>

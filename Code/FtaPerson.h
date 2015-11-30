@@ -20,7 +20,7 @@ class FtaPerson
 {
 public:
 
-	FtaPerson( const wxString& personId, FtaTreeCache* cache );
+	FtaPerson( const wxString& personId );
 	virtual ~FtaPerson( void );
 
 	const wxString& GetPersonId( void ) const { return personId; }
@@ -34,16 +34,12 @@ public:
 	// These are all those with whom this person had biological children, regardless of marriage.
 	bool GetSpouses( FtaPersonSet& spouses );
 
-	// Unfortunately, we're not making the most efficient use of the response data here
-	// as familysearch.org may return to us much more information than we consume.
-	// To keep things simpler, however, we focus on caching one and only one person at a time.
-	bool SetImmediateAncestry( const wxJSONValue& responseValue );
-	bool SetImmediateDescendancy( const wxJSONValue& responseValue );
-	bool SetSpouses( const wxJSONValue& responseValue );
+	// These pull from the miscellaneous cache.
+	bool SetImmediateAncestry( void );
+	bool SetImmediateDescendancy( void );
+	bool SetSpouses( void );
 
 private:
-
-	FtaTreeCache* cache;
 
 	wxString personId;
 	wxString biologicalFatherId;
