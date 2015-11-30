@@ -14,10 +14,18 @@ public:
 	FtaTreeCache( void );
 	~FtaTreeCache( void );
 
-	//...
+	enum LookupDisposition
+	{
+		FAIL_ON_CACHE_MISS,
+		POPULATE_ON_CACHE_MISS,
+		ALLOCATE_ON_CACHE_MISS,
+	};
+
+	FtaPerson* Lookup( const wxString& personId, LookupDisposition disposition );
 
 	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
-	void Wipe( void );
+	bool Wipe( void );
+	bool Wipe( const wxString& personId );
 
 private:
 

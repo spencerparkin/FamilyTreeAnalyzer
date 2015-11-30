@@ -14,7 +14,7 @@ FtaTreeCache::~FtaTreeCache( void )
 	Wipe();
 }
 
-void FtaTreeCache::Wipe( void )
+bool FtaTreeCache::Wipe( void )
 {
 	while( personMap.size() > 0 )
 	{
@@ -23,6 +23,55 @@ void FtaTreeCache::Wipe( void )
 		delete person;
 		personMap.erase( iter );
 	}
+
+	return true;
+}
+
+bool FtaTreeCache::Wipe( const wxString& personId )
+{
+	FtaPersonMap::iterator iter = personMap.find( personId );
+	if( iter == personMap.end() )
+		return false;
+
+	FtaPerson* person = iter->second;
+	delete person;
+	personMap.erase( iter );
+	return true;
+}
+
+FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition disposition )
+{
+	FtaPerson* person = nullptr;
+
+	if( personId != "unknown" )
+	{
+		FtaPersonMap::iterator iter = personMap.find( personId );
+		if( iter == personMap.end() )
+		{
+			switch( disposition )
+			{
+				case POPULATE_ON_CACHE_MISS:
+				{
+					wxGetApp().GetClient()->PopulateCacheAt( personId );
+					break;
+				}
+				case ALLOCATE_ON_CACHE_MISS:
+				{
+					person = new FtaPerson( personId, this );
+					personMap[ personId ] = person;
+					break;
+				}
+			}
+
+			if( disposition != FAIL_ON_CACHE_MISS )
+				iter = personMap.find( personId );
+		}
+
+		if( iter != personMap.end() )
+			person = iter->second;
+	}
+
+	return person;
 }
 
 // FtaTreeCache.cpp

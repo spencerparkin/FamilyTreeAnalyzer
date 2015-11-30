@@ -1,10 +1,13 @@
 // FtaClient.cpp
 
 #include "FtaClient.h"
+#include "FtaTreeCache.h"
+#include "FtaApp.h"
 #include <wx/textdlg.h>
 #include <wx/jsonval.h>
 #include <wx/jsonreader.h>
 #include <wx/jsonwriter.h>
+#include <wx/utils.h>
 
 FtaClient::FtaClient( void )
 {
@@ -28,11 +31,11 @@ bool FtaClient::Initialize( void )
 	if( !curlHandle )
 		return false;
 
-	curl_easy_setopt( curlHandle, CURLOPT_DEBUGFUNCTION, &FtaClient::DebugFunction );
-	curl_easy_setopt( curlHandle, CURLOPT_DEBUGDATA, this );
-	curl_easy_setopt( curlHandle, CURLOPT_ERRORBUFFER, errorBuf );
-	curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
-	curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
+	//curl_easy_setopt( curlHandle, CURLOPT_DEBUGFUNCTION, &FtaClient::DebugFunction );
+	//curl_easy_setopt( curlHandle, CURLOPT_DEBUGDATA, this );
+	//curl_easy_setopt( curlHandle, CURLOPT_ERRORBUFFER, errorBuf );
+	//curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
+	//curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
 	//curl_easy_setopt( curlHandle, CURLOPT_READFUNCTION, &FtaClient::ReadFunction );
 	//curl_easy_setopt( curlHandle, CURLOPT_READDATA, this );
 
@@ -61,8 +64,12 @@ bool FtaClient::Authenticate( void )
 		if( HasAccessToken() )
 			break;
 
-		// See https://familysearch.org/developers/docs/certification/authentication for more info.
+		wxBusyCursor busyCursor;
 
+		curl_easy_reset( curlHandle );
+
+		// See https://familysearch.org/developers/docs/certification/authentication for more info.
+#if !defined SANDBOX
 		wxString notice =
 			"FamilyTreeAnalyzer would like to know your basic FamilySearch profile information "
 			"and access data about your ancestors from the FamilySearch family tree.  "
@@ -71,18 +78,16 @@ bool FtaClient::Authenticate( void )
 		if( wxYES != wxMessageBox( notice, "Notice", wxYES_NO | wxICON_QUESTION ) )
 			break;
 
-		wxString userName, passWord;
-#if 0
-		userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
+		wxString userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
 		if( userName.IsEmpty() )
 			break;
 
-		passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
+		wxString passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
 		if( passWord.IsEmpty() )
 			break;
 #else
-		userName = "tuf000140222";
-		passWord = "1234pass";
+		wxString userName = "tuf000140222";
+		wxString passWord = "1234pass";
 #endif
 
 		wxString postFields;
@@ -90,15 +95,16 @@ bool FtaClient::Authenticate( void )
 		postFields += "&grant_type=password";
 		postFields += "&client_id=a02j000000BQrUOAA1";
 		postFields += "&password=" + passWord;
+		const char* postFieldsData = postFields.c_str();
 
 		headers = curl_slist_append( headers, "Content-Type: application/x-www-form-urlencoded" );
 		headers = curl_slist_append( headers, "Accept: application/json" );
 
-		const char* data = postFields.c_str();
-
 		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, data );
+		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, postFieldsData );
 		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
+		curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
+		curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
 
 		writeString = "";
 
@@ -163,6 +169,114 @@ bool FtaClient::Authenticate( void )
 	FtaClient* client = ( FtaClient* )userPtr;
 
 	return 0;
+}
+
+bool FtaClient::PopulateCacheAt( const wxString& personId )
+{
+	bool success = false;
+
+	do
+	{
+		if( !PopulateImmediateAncestryCacheAt( personId ) )
+			break;
+
+		if( !PopulateImmediateDescendancyCacheAt( personId ) )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	if( !success )
+		wxGetApp().GetTreeCache()->Wipe( personId );
+
+	return success;
+}
+
+// TODO: Can I narrow the request to immediate ancestors?
+bool FtaClient::PopulateImmediateAncestryCacheAt( const wxString& personId )
+{
+	bool success = false;
+	curl_slist* headers = nullptr;
+
+	do
+	{
+		if( !HasAccessToken() )
+			break;
+
+		wxBusyCursor busyCursor;
+
+		curl_easy_reset( curlHandle );
+
+		wxString authorization = "Authorization: Bearer " + accessToken;
+		const char* authorizationData = authorization.c_str();
+
+		headers = curl_slist_append( headers, authorizationData );
+		headers = curl_slist_append( headers, "Accept: application/x-fs-v1+json" );
+
+		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
+		curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
+		curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
+
+#if defined SANDBOX
+		wxString url = "https://sandbox.familysearch.org";
+#else
+		wxString url = "https://www.familysearch.org";
+#endif
+
+		url += "/platform/tree/ancestry?person=" + personId;
+		const char* urlData = url.c_str();
+
+		curl_easy_setopt( curlHandle, CURLOPT_URL, urlData );
+
+		writeString = "";
+
+		CURLcode curlCode = curl_easy_perform( curlHandle );
+		if( curlCode != CURLE_OK )
+			break;
+
+		if( writeString.IsEmpty() )
+			break;
+
+		wxJSONReader reader;
+		wxJSONValue responseValue;
+		if( 0 < reader.Parse( writeString, &responseValue ) )
+			break;
+
+		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+		if( !person )
+			break;
+
+		if( !person->SetImmediateAncestry( responseValue ) )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	if( headers )
+		curl_slist_free_all( headers );
+
+	return success;
+}
+
+// TODO: Can I narrow the request to immediate descendancy?
+bool FtaClient::PopulateImmediateDescendancyCacheAt( const wxString& personId )
+{
+	bool success = false;
+
+	do
+	{
+		if( !HasAccessToken() )
+			break;
+
+		//...
+
+		success = true;
+	}
+	while( false );
+
+	return success;
 }
 
 // FtaClient.cpp

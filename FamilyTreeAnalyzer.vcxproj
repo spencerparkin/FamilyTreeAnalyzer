@@ -69,7 +69,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;SANDBOX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -87,7 +87,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;SANDBOX;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds\libcurl-vc14-x86-release-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

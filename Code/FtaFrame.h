@@ -16,12 +16,14 @@ private:
 	enum
 	{
 		ID_AcquireAccessToken = wxID_HIGHEST,
+		ID_PopulateCacheAtPerson,
 		ID_WipeTreeCache,
 		ID_Exit,
 		ID_About,
 	};
 
 	void OnAcquireAccessToken( wxCommandEvent& event );
+	void OnPopulateCacheAtPerson( wxCommandEvent& event );
 	void OnWipeTreeCache( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
