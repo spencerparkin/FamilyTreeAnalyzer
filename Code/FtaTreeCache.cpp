@@ -16,14 +16,7 @@ FtaTreeCache::~FtaTreeCache( void )
 
 bool FtaTreeCache::Wipe( void )
 {
-	while( personMap.size() > 0 )
-	{
-		FtaPersonMap::iterator iter = personMap.begin();
-		FtaPerson* person = iter->second;
-		delete person;
-		personMap.erase( iter );
-	}
-
+	FtaDeletePersonMap( personMap );
 	return true;
 }
 

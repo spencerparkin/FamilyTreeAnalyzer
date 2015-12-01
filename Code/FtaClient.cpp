@@ -2,6 +2,7 @@
 
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
+#include "FtaMiscCache.h"
 #include "FtaApp.h"
 #include <wx/textdlg.h>
 #include <wx/jsonval.h>
@@ -258,7 +259,8 @@ bool FtaClient::CacheAncestryFor( const wxString& personId )
 		if( 0 < reader.Parse( writeString, &responseValue ) )
 			break;
 
-		//...
+		if( !wxGetApp().GetMiscCache()->ConsumeAncestry( responseValue ) )
+			break;
 
 		success = true;
 	}

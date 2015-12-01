@@ -2,16 +2,9 @@
 
 #pragma once
 
-#include <wx/string.h>
-#include <wx/arrstr.h>
-#include <wx/hashset.h>
-#include <wx/jsonval.h>
+#include "FtaContainers.h"
 
-class FtaPerson;
 class FtaTreeCache;
-
-WX_DECLARE_HASH_SET( FtaPerson*, wxPointerHash, wxPointerEqual, FtaPersonSet );
-WX_DECLARE_HASH_SET( wxString, wxStringHash, wxStringEqual, FtaPersonIdSet );
 
 // To keep things simpler, a person appearing in the tree cache must have
 // complete (as apposed to partial) information (i.e., all known information
@@ -28,11 +21,15 @@ public:
 	FtaPerson* GetBiologicalFather( void );
 	FtaPerson* GetBiologicalMother( void );
 
-	// If no spouse is given here, all biological children are returned.
-	bool GetBiologicalChildren( const FtaPerson* spouse, FtaPersonSet& children );
-
 	// These are all those with whom this person had biological children, regardless of marriage.
-	bool GetSpouses( FtaPersonSet& spouses );
+	// But it must also include those spouses with which this person may not have had any biological children.
+	bool GetSpouses( FtaPersonSet& spousesSet );
+
+	// These are the biological off-spring of this person.
+	bool GetBiologicalChildren( FtaPersonSet& childrenSet );
+
+	// For each spouse is given the set of children had with that spouse.
+	bool GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChildrenMap );
 
 	// These pull from the miscellaneous cache.
 	bool SetImmediateAncestry( void );
@@ -44,8 +41,8 @@ private:
 	wxString personId;
 	wxString biologicalFatherId;
 	wxString biologicalMotherId;
-
-	// TODO: Know spouses by id.  Know children by spouses by id.
+	FtaPersonIdSet childrenIdSet;
+	FtaPersonIdSet spousesIdSet;
 
 	// TODO: Know ordinance information.
 };

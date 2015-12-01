@@ -3,9 +3,7 @@
 #pragma once
 
 #include "FtaPerson.h"
-#include <wx/hashmap.h>
-
-WX_DECLARE_STRING_HASH_MAP( FtaPerson*, FtaPersonMap );
+#include "FtaContainers.h"
 
 class FtaTreeCache
 {
