@@ -8,6 +8,9 @@
 FtaPerson::FtaPerson( const wxString& personId )
 {
 	this->personId = personId;
+
+	childrenIdSet = nullptr;
+	spousesIdSet = nullptr;
 }
 
 /*virtual*/ FtaPerson::~FtaPerson( void )
@@ -30,8 +33,8 @@ bool FtaPerson::GetSpouses( FtaPersonSet& spousesSet )
 {
 	spousesSet.clear();
 
-	FtaPersonIdSet::iterator iter = spousesIdSet.begin();
-	while( iter != spousesIdSet.end() )
+	FtaPersonIdSet::iterator iter = spousesIdSet->begin();
+	while( iter != spousesIdSet->end() )
 	{
 		wxString spouseId = *iter;
 		FtaPerson* spouse = wxGetApp().GetTreeCache()->Lookup( spouseId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
@@ -49,8 +52,8 @@ bool FtaPerson::GetBiologicalChildren( FtaPersonSet& childrenSet )
 {
 	childrenSet.clear();
 
-	FtaPersonIdSet::iterator iter = childrenIdSet.begin();
-	while( iter != childrenIdSet.end() )
+	FtaPersonIdSet::iterator iter = childrenIdSet->begin();
+	while( iter != childrenIdSet->end() )
 	{
 		wxString childId = *iter;
 		FtaPerson* child = wxGetApp().GetTreeCache()->Lookup( childId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
@@ -68,8 +71,8 @@ bool FtaPerson::GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChil
 {
 	FtaDeleteRelationshipMap( spouseToChildrenMap );
 
-	FtaPersonIdSet::iterator spouseIter = spousesIdSet.begin();
-	while( spouseIter != spousesIdSet.end() )
+	FtaPersonIdSet::iterator spouseIter = spousesIdSet->begin();
+	while( spouseIter != spousesIdSet->end() )
 	{
 		wxString spouseId = *spouseIter;
 		FtaPerson* spouse = wxGetApp().GetTreeCache()->Lookup( spouseId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
@@ -86,8 +89,8 @@ bool FtaPerson::GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChil
 			spouseToChildrenMap[ spouseId ] = childSet;
 		}
 
-		FtaPersonIdSet::iterator childIter = spouse->childrenIdSet.begin();
-		while( childIter != spouse->childrenIdSet.end() )
+		FtaPersonIdSet::iterator childIter = spouse->childrenIdSet->begin();
+		while( childIter != spouse->childrenIdSet->end() )
 		{
 			wxString childId = *childIter;
 			FtaPerson* child = wxGetApp().GetTreeCache()->Lookup( childId, FtaTreeCache::POPULATE_ON_CACHE_MISS );

@@ -16,9 +16,6 @@
       "descendancy" : {
         "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7R8"
       },
-      "self" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7R8"
-      },
       "child-relationships" : {
         "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7R8/child-relationships"
       }
@@ -43,7 +40,6 @@
       "name" : "Andrew Toolson",
       "gender" : "Male",
       "lifespan" : "1824-1920",
-      "ascendancyNumber" : "1",
       "descendancyNumber" : "1"
     }
   }, {
@@ -57,9 +53,6 @@
       },
       "descendancy" : {
         "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7RD"
-      },
-      "self" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7RD"
       },
       "child-relationships" : {
         "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7RD/child-relationships"
@@ -86,6 +79,82 @@
       "gender" : "Female",
       "lifespan" : "1827-1874",
       "descendancyNumber" : "1-S"
+    }
+  }, {
+    "id" : "KWZH-7PY",
+    "links" : {
+      "ancestry" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7PY"
+      },
+      "person" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PY"
+      },
+      "descendancy" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7PY"
+      },
+      "child-relationships" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PY/child-relationships"
+      }
+    },
+    "living" : false,
+    "gender" : {
+      "type" : "http://gedcomx.org/Male"
+    },
+    "names" : [ {
+      "nameForms" : [ {
+        "fullText" : "James Duncan Henrie",
+        "parts" : [ {
+          "type" : "http://gedcomx.org/Given",
+          "value" : "James Duncan"
+        }, {
+          "type" : "http://gedcomx.org/Surname",
+          "value" : "Henrie"
+        } ]
+      } ]
+    } ],
+    "display" : {
+      "name" : "James Duncan Henrie",
+      "gender" : "Male",
+      "lifespan" : "1857-1922",
+      "descendancyNumber" : "1.1-S"
+    }
+  }, {
+    "id" : "KWZH-7PB",
+    "links" : {
+      "ancestry" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7PB"
+      },
+      "person" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PB"
+      },
+      "descendancy" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7PB"
+      },
+      "child-relationships" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PB/child-relationships"
+      }
+    },
+    "living" : false,
+    "gender" : {
+      "type" : "http://gedcomx.org/Female"
+    },
+    "names" : [ {
+      "nameForms" : [ {
+        "fullText" : "Ghena Christena Toolson",
+        "parts" : [ {
+          "type" : "http://gedcomx.org/Given",
+          "value" : "Ghena Christena"
+        }, {
+          "type" : "http://gedcomx.org/Surname",
+          "value" : "Toolson"
+        } ]
+      } ]
+    } ],
+    "display" : {
+      "name" : "Ghena Christena Toolson",
+      "gender" : "Female",
+      "lifespan" : "1867-1912",
+      "descendancyNumber" : "1.1"
     }
   } ]
 }

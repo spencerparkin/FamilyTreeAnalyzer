@@ -325,13 +325,9 @@ bool FtaClient::CacheFor( const wxString& personId, CacheWhat what )
 		switch( what )
 		{
 			case CACHE_ANCESTRY:
-			{
-				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumeAncestry( responseValue );
-				break;
-			}
 			case CACHE_DESCENDANCY:
 			{
-				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumeDescendancy( responseValue );
+				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumePedigree( responseValue );
 				break;
 			}
 		}

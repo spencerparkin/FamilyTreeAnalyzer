@@ -41,8 +41,8 @@ private:
 	wxString personId;
 	wxString biologicalFatherId;
 	wxString biologicalMotherId;
-	FtaPersonIdSet childrenIdSet;
-	FtaPersonIdSet spousesIdSet;
+	FtaPersonIdSet* childrenIdSet;
+	FtaPersonIdSet* spousesIdSet;
 
 	// TODO: Know ordinance information.
 };

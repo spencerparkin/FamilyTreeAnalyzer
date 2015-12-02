@@ -75,6 +75,9 @@ void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
 
 void FtaFrame::OnWipeAllCache( wxCommandEvent& event )
 {
+	// Note that the tree cache may point into the misc. cache,
+	// so if the latter goes away, so must the former.  In fact,
+	// it's best to wipe the tree cache before the misc. cache.
 	wxGetApp().GetTreeCache()->Wipe();
 	wxGetApp().GetMiscCache()->Wipe();
 }

@@ -37,7 +37,7 @@ bool FtaMiscCache::IsEmpty( void ) const
 	return true;
 }
 
-bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
+bool FtaMiscCache::ConsumePedigree( const wxJSONValue& responseValue )
 {
 	bool success = false;
 
@@ -62,16 +62,21 @@ bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
 				if( !ascendancyNumberString.ToLong( &ascendancyNumber ) )
 					break;
 
-				wxJSONValue fatherValue = FindAscendancyNumber( 2 * ascendancyNumber, personsArrayValue );
+				wxJSONValue fatherValue = FindNumber( 2 * ascendancyNumber, "ascendancyNumber", personsArrayValue );
 				if( !fatherValue.IsNull() )
+				{
 					CacheFather( personValue[ "id" ].AsString(), fatherValue[ "id" ].AsString() );
+					CacheChild( fatherValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
+				}
 
-				wxJSONValue motherValue = FindAscendancyNumber( 2 * ascendancyNumber + 1, personsArrayValue );
+				wxJSONValue motherValue = FindNumber( 2 * ascendancyNumber + 1, "ascendancyNumber", personsArrayValue );
 				if( !motherValue.IsNull() )
+				{
 					CacheMother( personValue[ "id" ].AsString(), motherValue[ "id" ].AsString() );
+					CacheChild( motherValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
+				}
 			}
 
-			// Oddly, we find these types of numbers when we asked for ancestry, not descendancy.
 			if( descendancyNumberValue.IsString() )
 			{
 				wxString descendancyNumberString = descendancyNumberValue.AsString();
@@ -79,16 +84,27 @@ bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
 				if( j >= 0 )
 				{
 					descendancyNumberString.Remove( j, j + 2 );
-					long descendancyNumber;
-					if( !descendancyNumberString.ToLong( &descendancyNumber ) )
-						break;
-
-					// Yes, pass in the descendancy number here as the ascendancy number.
-					wxJSONValue spouseValue = FindAscendancyNumber( descendancyNumber, personsArrayValue );
+					
+					wxJSONValue spouseValue = FindNumberString( descendancyNumberString, "descendancyNumber", personsArrayValue );
 					if( !spouseValue.IsNull() )
 					{
 						CacheSpouse( personValue[ "id" ].AsString(), spouseValue[ "id" ].AsString() );
 						CacheSpouse( spouseValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
+					}
+				}
+				else
+				{
+					FtaIndexArray indexArray;
+					GatherNumbersWithPrefix( descendancyNumberString, "descendancyNumber", personsArrayValue, indexArray, true );
+
+					for( j = 0; j < ( signed )indexArray.size(); j++ )
+					{
+						int k = indexArray[j];
+						if( k == i )
+							continue;
+
+						wxJSONValue childValue = personsArrayValue[k];
+						CacheChild( personValue[ "id" ].AsString(), childValue[ "id" ].AsString() );
 					}
 				}
 			}
@@ -104,24 +120,49 @@ bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
 	return success;
 }
 
-wxJSONValue FtaMiscCache::FindAscendancyNumber( long givenAscendancyNumber, const wxJSONValue& personsArrayValue )
+wxJSONValue FtaMiscCache::FindNumber( long givenNumber, const wxString& type, const wxJSONValue& personsArrayValue )
 {
 	int size = personsArrayValue.Size();
 	for( int i = 0; i < size; i++ )
 	{
 		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
-		long ascendancyNumber;
-		if( personValue[ "display" ][ "ascendancyNumber" ].AsString().ToLong( &ascendancyNumber ) )
-			if( ascendancyNumber == givenAscendancyNumber )
+		long number;
+		if( personValue[ "display" ][ type ].AsString().ToLong( &number ) )
+			if( number == givenNumber )
 				return personValue;
 	}
 
 	return wxJSONValue();
 }
 
-bool FtaMiscCache::ConsumeDescendancy( const wxJSONValue& responseValue )
+wxJSONValue FtaMiscCache::FindNumberString( const wxString& givenNumberString, const wxString& type, wxJSONValue& personsArrayValue )
 {
-	return true;
+	int size = personsArrayValue.Size();
+	for( int i = 0; i < size; i++ )
+	{
+		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
+		wxString numberString = personValue[ "display" ][ type ].AsString();
+		if( numberString == givenNumberString )
+			return personValue;
+	}
+
+	return wxJSONValue();
+}
+
+void FtaMiscCache::GatherNumbersWithPrefix( const wxString& prefix, const wxString& type, const wxJSONValue& personsArrayValue, FtaIndexArray& indexArray, bool excludeSpouses )
+{
+	indexArray.clear();
+
+	int size = personsArrayValue.Size();
+	for( int i = 0; i < size; i++ )
+	{
+		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
+		wxString numberString = personValue[ "display" ][ type ].AsString();
+		if( excludeSpouses && numberString.Find( "-S" ) >= 0 )
+			continue;
+		if( numberString.find( prefix ) == 0 )
+			indexArray.push_back(i);
+	}
 }
 
 void FtaMiscCache::CacheSpouse( const wxString& spouseId, const wxString& otherSpouseId )
@@ -147,6 +188,19 @@ void FtaMiscCache::CacheMother( const wxString& childId, const wxString& motherI
 	childToMotherMap[ childId ] = motherId;
 }
 
+void FtaMiscCache::CacheChild( const wxString& parentId, const wxString& childId )
+{
+	FtaOneToManyRelationshipIdMap::iterator iter = parentToChildrenMap.find( parentId );
+	if( iter == parentToChildrenMap.end() )
+	{
+		parentToChildrenMap[ parentId ] = new FtaPersonIdSet();
+		iter = parentToChildrenMap.find( parentId );
+	}
+
+	FtaPersonIdSet* personIdSet = iter->second;
+	personIdSet->insert( childId );
+}
+
 bool FtaMiscCache::LookupFather( const wxString& childId, wxString& fatherId )
 {
 	FtaOneToOneRelationshipIdMap::iterator iter = childToFatherMap.find( childId );
@@ -167,23 +221,23 @@ bool FtaMiscCache::LookupMother( const wxString& childId, wxString& motherId )
 	return true;
 }
 
-bool FtaMiscCache::LookupChildren( const wxString& parentId, FtaPersonIdSet& childrenIdSet )
+bool FtaMiscCache::LookupChildren( const wxString& parentId, FtaPersonIdSet*& childrenIdSet )
 {
 	FtaOneToManyRelationshipIdMap::iterator iter = parentToChildrenMap.find( parentId );
 	if( iter == parentToChildrenMap.end() )
 		return false;
 
-	childrenIdSet = *iter->second;
+	childrenIdSet = &( *iter->second );
 	return true;
 }
 
-bool FtaMiscCache::LookupSpouses( const wxString& spouseId, FtaPersonIdSet& spousesIdSet )
+bool FtaMiscCache::LookupSpouses( const wxString& spouseId, FtaPersonIdSet*& spousesIdSet )
 {
 	FtaOneToManyRelationshipIdMap::iterator iter = spouseToSpousesMap.find( spouseId );
 	if( iter == spouseToSpousesMap.end() )
 		return false;
 
-	spousesIdSet = *iter->second;
+	spousesIdSet = &( *iter->second );
 	return true;
 }
 
