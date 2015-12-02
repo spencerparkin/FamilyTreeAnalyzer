@@ -15,6 +15,7 @@ public:
 	bool Initialize( void );
 	bool Shutdown( void );
 	bool Authenticate( void );
+	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
 	bool PopulateTreeCacheAt( const wxString& personId );
 

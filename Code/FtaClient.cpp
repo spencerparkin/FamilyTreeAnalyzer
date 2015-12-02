@@ -17,6 +17,7 @@ FtaClient::FtaClient( void )
 
 /*virtual*/ FtaClient::~FtaClient( void )
 {
+	( void )Shutdown();
 }
 
 bool FtaClient::Initialize( void )
@@ -45,6 +46,9 @@ bool FtaClient::Initialize( void )
 
 bool FtaClient::Shutdown( void )
 {
+	if( HasAccessToken() )
+		( void )DeleteAccessToken();
+
 	if( curlHandle )
 	{
 		curl_easy_cleanup( curlHandle );
@@ -139,6 +143,43 @@ bool FtaClient::Authenticate( void )
 
 		if( !HasAccessToken() )
 			break;
+
+		success = true;
+	}
+	while( false );
+
+	if( headers )
+		curl_slist_free_all( headers );
+
+	return success;
+}
+
+bool FtaClient::DeleteAccessToken( void )
+{
+	bool success = false;
+	curl_slist* headers = nullptr;
+
+	do
+	{
+		if( !HasAccessToken() || !curlHandle )
+			break;
+
+		curl_easy_reset( curlHandle );
+
+		wxString authorization = "Authorization: Bearer " + accessToken;
+		const char* authorizationData = authorization.c_str();
+
+		headers = curl_slist_append( headers, authorizationData );
+
+		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
+		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, "POST /platform/logout" );
+		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org" );
+
+		CURLcode curlCode = curl_easy_perform( curlHandle );
+		if( curlCode != CURLE_OK )
+			break;
+
+		accessToken = "";
 
 		success = true;
 	}

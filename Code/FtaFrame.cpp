@@ -15,8 +15,10 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 {
 	wxMenu* programMenu = new wxMenu();
 	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with FamilySearch.org." );
+	wxMenuItem* deleteAccessTokenMenuItem = new wxMenuItem( programMenu, ID_DeleteAccessToken, "Delete Access Token", "Logout of FamilySearch.org." );
 	wxMenuItem* exitMenuItem = new wxMenuItem( programMenu, ID_Exit, "Exit", "Exit this program." );
 	programMenu->Append( acquireAccessTokenMenuItem );
+	programMenu->Append( deleteAccessTokenMenuItem );
 	programMenu->AppendSeparator();
 	programMenu->Append( exitMenuItem );
 
@@ -45,11 +47,13 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	SetStatusBar( statusBar );
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
+	Bind( wxEVT_MENU, &FtaFrame::OnDeleteAccessToken, this, ID_DeleteAccessToken );
 	Bind( wxEVT_MENU, &FtaFrame::OnPopulateTreeCacheAtPerson, this, ID_PopulateTreeCacheAtPerson );
 	Bind( wxEVT_MENU, &FtaFrame::OnWipeAllCache, this, ID_WipeAllCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnExit, this, ID_Exit );
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DeleteAccessToken );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_PopulateTreeCacheAtPerson );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeAllCache );
 }
@@ -62,6 +66,11 @@ void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
 {
 	if( wxGetApp().GetClient()->Authenticate() )
 		wxMessageBox( "Authentication succeeded!" );
+}
+
+void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
+{
+	( void )wxGetApp().GetClient()->DeleteAccessToken();
 }
 
 void FtaFrame::OnWipeAllCache( wxCommandEvent& event )
@@ -105,6 +114,7 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 			event.Enable( !wxGetApp().GetClient()->HasAccessToken() );
 			break;
 		}
+		case ID_DeleteAccessToken:
 		case ID_PopulateTreeCacheAtPerson:
 		{
 			event.Enable( wxGetApp().GetClient()->HasAccessToken() );
