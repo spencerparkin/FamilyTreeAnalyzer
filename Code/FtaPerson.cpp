@@ -9,6 +9,8 @@ FtaPerson::FtaPerson( const wxString& personId )
 {
 	this->personId = personId;
 
+	visitationData.key = -1;
+
 	childrenIdSet = nullptr;
 	spousesIdSet = nullptr;
 }
@@ -33,6 +35,9 @@ bool FtaPerson::GetSpouses( FtaPersonSet& spousesSet )
 {
 	spousesSet.clear();
 
+	if( !spousesIdSet )
+		return false;
+
 	FtaPersonIdSet::iterator iter = spousesIdSet->begin();
 	while( iter != spousesIdSet->end() )
 	{
@@ -51,6 +56,9 @@ bool FtaPerson::GetSpouses( FtaPersonSet& spousesSet )
 bool FtaPerson::GetBiologicalChildren( FtaPersonSet& childrenSet )
 {
 	childrenSet.clear();
+
+	if( !childrenIdSet )
+		return false;
 
 	FtaPersonIdSet::iterator iter = childrenIdSet->begin();
 	while( iter != childrenIdSet->end() )
@@ -71,6 +79,9 @@ bool FtaPerson::GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChil
 {
 	FtaDeleteRelationshipMap( spouseToChildrenMap );
 
+	if( !spousesIdSet )
+		return false;
+
 	FtaPersonIdSet::iterator spouseIter = spousesIdSet->begin();
 	while( spouseIter != spousesIdSet->end() )
 	{
@@ -89,18 +100,21 @@ bool FtaPerson::GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChil
 			spouseToChildrenMap[ spouseId ] = childSet;
 		}
 
-		FtaPersonIdSet::iterator childIter = spouse->childrenIdSet->begin();
-		while( childIter != spouse->childrenIdSet->end() )
+		if( spouse->childrenIdSet )
 		{
-			wxString childId = *childIter;
-			FtaPerson* child = wxGetApp().GetTreeCache()->Lookup( childId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
-			if( !child )
-				return false;
+			FtaPersonIdSet::iterator childIter = spouse->childrenIdSet->begin();
+			while( childIter != spouse->childrenIdSet->end() )
+			{
+				wxString childId = *childIter;
+				FtaPerson* child = wxGetApp().GetTreeCache()->Lookup( childId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
+				if( !child )
+					return false;
 
-			if( child->biologicalFatherId == personId || child->biologicalMotherId == personId )
-				childSet->insert( child );
+				if( child->biologicalFatherId == personId || child->biologicalMotherId == personId )
+					childSet->insert( child );
 
-			childIter++;
+				childIter++;
+			}
 		}
 
 		spouseIter++;

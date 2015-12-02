@@ -18,6 +18,7 @@
     <ClInclude Include="Code\FtaMiscCache.h" />
     <ClInclude Include="Code\FtaPerson.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
+    <ClInclude Include="Code\FtaTreeWalker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="Code\FtaMiscCache.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
+    <ClCompile Include="Code\FtaTreeWalker.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F4255D73-F7A5-49E7-94CC-97B5DA4C39B1}</ProjectGuid>

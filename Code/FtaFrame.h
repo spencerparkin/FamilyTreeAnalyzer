@@ -3,6 +3,7 @@
 #pragma once
 
 #include <wx/frame.h>
+#include <wx/stc/stc.h>
 
 class FtaFrame : public wxFrame
 {
@@ -19,6 +20,7 @@ private:
 		ID_DeleteAccessToken,
 		ID_PopulateTreeCacheAtPerson,
 		ID_WipeAllCache,
+		ID_WarmCache,
 		ID_Exit,
 		ID_About,
 	};
@@ -26,10 +28,13 @@ private:
 	void OnAcquireAccessToken( wxCommandEvent& event );
 	void OnDeleteAccessToken( wxCommandEvent& event );
 	void OnPopulateTreeCacheAtPerson( wxCommandEvent& event );
+	void OnWarmCache( wxCommandEvent& event );
 	void OnWipeAllCache( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );
+
+	wxStyledTextCtrl* textCtrl;
 };
 
 // FtaFrame.h

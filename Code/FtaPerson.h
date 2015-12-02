@@ -36,12 +36,21 @@ public:
 	bool SetImmediateDescendancy( void );
 	bool SetSpouses( void );
 
+	struct VisitationData
+	{
+		int key;
+		int generation;
+		int spouseJumpCount;
+	};
+
+	mutable VisitationData visitationData;
+
 private:
 
 	wxString personId;
-	wxString biologicalFatherId;
+	wxString biologicalFatherId;	// Point these into the misc. cache too?
 	wxString biologicalMotherId;
-	FtaPersonIdSet* childrenIdSet;
+	FtaPersonIdSet* childrenIdSet;	// Stale pointer warning: these point into the misc. cache.
 	FtaPersonIdSet* spousesIdSet;
 
 	// TODO: Know ordinance information.
