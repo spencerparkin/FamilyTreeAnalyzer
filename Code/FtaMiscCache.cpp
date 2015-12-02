@@ -53,26 +53,12 @@ bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
 		{
 			wxJSONValue personValue = personsArrayValue[i];
 			wxJSONValue ascendancyNumberValue = personValue[ "display" ][ "ascendancyNumber" ];
-			wxString ascendancyNumberString = ascendancyNumberValue.AsString();
-			long ascendancyNumber;
+			wxJSONValue descendancyNumberValue = personValue[ "display" ][ "descendancyNumber" ];
 
-			int j = ascendancyNumberString.Find( "-S" );
-			if( j >= 0 )
+			if( ascendancyNumberValue.IsString() )
 			{
-				ascendancyNumberString.Remove( j, j + 2 );
-
-				if( !ascendancyNumberString.ToLong( &ascendancyNumber ) )
-					break;
-
-				wxJSONValue spouseValue = FindAscendancyNumber( ascendancyNumber, personsArrayValue );
-				if( !spouseValue.IsNull() )
-				{
-					CacheSpouse( personValue[ "id" ].AsString(), spouseValue[ "id" ].AsString() );
-					CacheSpouse( spouseValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
-				}
-			}
-			else
-			{
+				wxString ascendancyNumberString = ascendancyNumberValue.AsString();
+				long ascendancyNumber;
 				if( !ascendancyNumberString.ToLong( &ascendancyNumber ) )
 					break;
 
@@ -83,6 +69,28 @@ bool FtaMiscCache::ConsumeAncestry( const wxJSONValue& responseValue )
 				wxJSONValue motherValue = FindAscendancyNumber( 2 * ascendancyNumber + 1, personsArrayValue );
 				if( !motherValue.IsNull() )
 					CacheMother( personValue[ "id" ].AsString(), motherValue[ "id" ].AsString() );
+			}
+
+			// Oddly, we find these types of numbers when we asked for ancestry, not descendancy.
+			if( descendancyNumberValue.IsString() )
+			{
+				wxString descendancyNumberString = descendancyNumberValue.AsString();
+				int j = descendancyNumberString.Find( "-S" );
+				if( j >= 0 )
+				{
+					descendancyNumberString.Remove( j, j + 2 );
+					long descendancyNumber;
+					if( !descendancyNumberString.ToLong( &descendancyNumber ) )
+						break;
+
+					// Yes, pass in the descendancy number here as the ascendancy number.
+					wxJSONValue spouseValue = FindAscendancyNumber( descendancyNumber, personsArrayValue );
+					if( !spouseValue.IsNull() )
+					{
+						CacheSpouse( personValue[ "id" ].AsString(), spouseValue[ "id" ].AsString() );
+						CacheSpouse( spouseValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
+					}
+				}
 			}
 		}
 

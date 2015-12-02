@@ -21,8 +21,13 @@ public:
 
 private:
 
-	bool CacheAncestryFor( const wxString& personId );
-	bool CacheDescendancyFor( const wxString& personId );
+	enum CacheWhat
+	{
+		CACHE_ANCESTRY,
+		CACHE_DESCENDANCY,
+	};
+
+	bool CacheFor( const wxString& personId, CacheWhat what );
 
 	static int DebugFunction( CURL* curlHandle, curl_infotype type, char* data, size_t size, void* userPtr );
 	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );

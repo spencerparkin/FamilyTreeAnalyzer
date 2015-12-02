@@ -108,29 +108,35 @@ bool FtaPerson::GetBiologicalChildren( FtaOneToManyRelationshipMap& spouseToChil
 
 bool FtaPerson::SetImmediateAncestry( void )
 {
+	bool success = true;
+
 	if( !wxGetApp().GetMiscCache()->LookupFather( personId, biologicalFatherId ) )
-		return false;
+		success = false;
 		
 	if( !wxGetApp().GetMiscCache()->LookupMother( personId, biologicalMotherId ) )
-		return false;
+		success = false;
 
-	return true;
+	return success;
 }
 
 bool FtaPerson::SetImmediateDescendancy( void )
 {
-	if( !wxGetApp().GetMiscCache()->LookupChildren( personId, childrenIdSet ) )
-		return false;
+	bool success = true;
 
-	return true;
+	if( !wxGetApp().GetMiscCache()->LookupChildren( personId, childrenIdSet ) )
+		success = false;
+
+	return success;
 }
 
 bool FtaPerson::SetSpouses( void )
 {
-	if( !wxGetApp().GetMiscCache()->LookupSpouses( personId, spousesIdSet ) )
-		return false;
+	bool success = true;
 
-	return true;
+	if( !wxGetApp().GetMiscCache()->LookupSpouses( personId, spousesIdSet ) )
+		success = false;
+
+	return success;
 }
 
 // FtaPerson.cpp

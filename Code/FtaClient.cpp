@@ -225,21 +225,25 @@ bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 
 		if( !person->SetImmediateAncestry() )
 		{
-			if( !CacheAncestryFor( personId ) )
+			if( !CacheFor( personId, CACHE_ANCESTRY ) )
 				break;
 
-			if( !person->SetImmediateAncestry() )
-				break;
+			// Since the caching succeeded, we interpret any possible failure here as
+			// an indication that we don't know some or all of the person's ancestry.
+			( void )person->SetImmediateAncestry();
 		}
 
 		if( !person->SetImmediateDescendancy() )
 		{
-			if( !CacheDescendancyFor( personId ) )
+			if( !CacheFor( personId, CACHE_DESCENDANCY ) )
 				break;
 
-			if( !person->SetImmediateDescendancy() )
-				break;
+			// Since the caching succeeded, we interpret any possible failure here as
+			// an indication that we don't know some or all of the person's descendancy.
+			( void )person->SetImmediateDescendancy();
 		}
+
+		// TODO: Cache more stuff here?  May want to use multi-curl handle later.
 
 		success = true;
 	}
@@ -251,7 +255,7 @@ bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 	return success;
 }
 
-bool FtaClient::CacheAncestryFor( const wxString& personId )
+bool FtaClient::CacheFor( const wxString& personId, CacheWhat what )
 {
 	bool success = false;
 	curl_slist* headers = nullptr;
@@ -281,9 +285,26 @@ bool FtaClient::CacheAncestryFor( const wxString& personId )
 		wxString url = "https://www.familysearch.org";
 #endif
 
-		url += "/platform/tree/ancestry?person=" + personId;
-		const char* urlData = url.c_str();
+		wxString appendUrl;
+		switch( what )
+		{
+			case CACHE_ANCESTRY:
+			{
+				appendUrl = "/platform/tree/ancestry?person=" + personId;
+				break;
+			}
+			case CACHE_DESCENDANCY:
+			{
+				appendUrl = "/platform/tree/descendancy?person=" + personId;
+				break;
+			}
+		}
 
+		if( appendUrl.IsEmpty() )
+			break;
+
+		url += appendUrl;
+		const char* urlData = url.c_str();
 		curl_easy_setopt( curlHandle, CURLOPT_URL, urlData );
 
 		writeString = "";
@@ -300,7 +321,22 @@ bool FtaClient::CacheAncestryFor( const wxString& personId )
 		if( 0 < reader.Parse( writeString, &responseValue ) )
 			break;
 
-		if( !wxGetApp().GetMiscCache()->ConsumeAncestry( responseValue ) )
+		bool processedResponseSuccessfully = false;
+		switch( what )
+		{
+			case CACHE_ANCESTRY:
+			{
+				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumeAncestry( responseValue );
+				break;
+			}
+			case CACHE_DESCENDANCY:
+			{
+				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumeDescendancy( responseValue );
+				break;
+			}
+		}
+
+		if( !processedResponseSuccessfully )
 			break;
 
 		success = true;
@@ -309,24 +345,6 @@ bool FtaClient::CacheAncestryFor( const wxString& personId )
 
 	if( headers )
 		curl_slist_free_all( headers );
-
-	return success;
-}
-
-bool FtaClient::CacheDescendancyFor( const wxString& personId )
-{
-	bool success = false;
-
-	do
-	{
-		if( !HasAccessToken() )
-			break;
-
-		//...
-
-		success = true;
-	}
-	while( false );
 
 	return success;
 }
