@@ -18,18 +18,16 @@ private:
 	{
 		ID_AcquireAccessToken = wxID_HIGHEST,
 		ID_DeleteAccessToken,
-		ID_PopulateTreeCacheAtPerson,
-		ID_WipeAllCache,
-		ID_WarmCache,
+		ID_FillCache,
+		ID_WipeCache,
 		ID_Exit,
 		ID_About,
 	};
 
 	void OnAcquireAccessToken( wxCommandEvent& event );
 	void OnDeleteAccessToken( wxCommandEvent& event );
-	void OnPopulateTreeCacheAtPerson( wxCommandEvent& event );
-	void OnWarmCache( wxCommandEvent& event );
-	void OnWipeAllCache( wxCommandEvent& event );
+	void OnFillCache( wxCommandEvent& event );
+	void OnWipeCache( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );

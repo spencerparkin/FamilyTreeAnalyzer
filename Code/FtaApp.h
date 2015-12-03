@@ -23,14 +23,12 @@ public:
 	FtaClient* GetClient( void ) { return client; }
 	FtaFrame* GetFrame( void ) { return frame; }
 	FtaTreeCache* GetTreeCache( void ) { return treeCache; }
-	FtaMiscCache* GetMiscCache( void ) { return miscCache; }
 
 private:
 
 	FtaClient* client;
 	FtaFrame* frame;
 	FtaTreeCache* treeCache;
-	FtaMiscCache* miscCache;
 };
 
 wxDECLARE_APP( FtaApp );

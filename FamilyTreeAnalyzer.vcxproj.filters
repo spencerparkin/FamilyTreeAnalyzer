@@ -22,13 +22,7 @@
     <ClInclude Include="Code\FtaPerson.h">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FtaMiscCache.h">
-      <Filter>Code</Filter>
-    </ClInclude>
     <ClInclude Include="Code\FtaContainers.h">
-      <Filter>Code</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\FtaTreeWalker.h">
       <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
@@ -48,13 +42,7 @@
     <ClCompile Include="Code\FtaTreeCache.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="Code\FtaMiscCache.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
     <ClCompile Include="Code\FtaContainers.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaTreeWalker.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

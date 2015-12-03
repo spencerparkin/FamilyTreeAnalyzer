@@ -2,7 +2,6 @@
 
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
-#include "FtaMiscCache.h"
 #include "FtaApp.h"
 #include <wx/textdlg.h>
 #include <wx/jsonval.h>
@@ -12,7 +11,7 @@
 
 FtaClient::FtaClient( void )
 {
-	curlHandle = nullptr;
+	curlHandleEasy = nullptr;
 }
 
 /*virtual*/ FtaClient::~FtaClient( void )
@@ -29,17 +28,9 @@ bool FtaClient::Initialize( void )
 	curl_version_info_data* data = curl_version_info( CURLVERSION_NOW );
 	data = nullptr;
 
-	curlHandle = curl_easy_init();
-	if( !curlHandle )
+	curlHandleEasy = curl_easy_init();
+	if( !curlHandleEasy )
 		return false;
-
-	//curl_easy_setopt( curlHandle, CURLOPT_DEBUGFUNCTION, &FtaClient::DebugFunction );
-	//curl_easy_setopt( curlHandle, CURLOPT_DEBUGDATA, this );
-	//curl_easy_setopt( curlHandle, CURLOPT_ERRORBUFFER, errorBuf );
-	//curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
-	//curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
-	//curl_easy_setopt( curlHandle, CURLOPT_READFUNCTION, &FtaClient::ReadFunction );
-	//curl_easy_setopt( curlHandle, CURLOPT_READDATA, this );
 
 	return true;
 }
@@ -49,10 +40,10 @@ bool FtaClient::Shutdown( void )
 	if( HasAccessToken() )
 		( void )DeleteAccessToken();
 
-	if( curlHandle )
+	if( curlHandleEasy )
 	{
-		curl_easy_cleanup( curlHandle );
-		curlHandle = nullptr;
+		curl_easy_cleanup( curlHandleEasy );
+		curlHandleEasy = nullptr;
 	}
 
 	curl_global_cleanup();
@@ -71,7 +62,7 @@ bool FtaClient::Authenticate( void )
 
 		wxBusyCursor busyCursor;
 
-		curl_easy_reset( curlHandle );
+		curl_easy_reset( curlHandleEasy );
 
 		// See https://familysearch.org/developers/docs/certification/authentication for more info.
 #if !defined SANDBOX
@@ -105,15 +96,15 @@ bool FtaClient::Authenticate( void )
 		headers = curl_slist_append( headers, "Content-Type: application/x-www-form-urlencoded" );
 		headers = curl_slist_append( headers, "Accept: application/json" );
 
-		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, postFieldsData );
-		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
-		curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
-		curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_HTTPHEADER, headers );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_POSTFIELDS, postFieldsData );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, this );
 
 		writeString = "";
 
-		CURLcode curlCode = curl_easy_perform( curlHandle );
+		CURLcode curlCode = curl_easy_perform( curlHandleEasy );
 		if( curlCode != CURLE_OK )
 			break;
 
@@ -161,21 +152,21 @@ bool FtaClient::DeleteAccessToken( void )
 
 	do
 	{
-		if( !HasAccessToken() || !curlHandle )
+		if( !HasAccessToken() || !curlHandleEasy )
 			break;
 
-		curl_easy_reset( curlHandle );
+		curl_easy_reset( curlHandleEasy );
 
 		wxString authorization = "Authorization: Bearer " + accessToken;
 		const char* authorizationData = authorization.c_str();
 
 		headers = curl_slist_append( headers, authorizationData );
 
-		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
-		curl_easy_setopt( curlHandle, CURLOPT_POSTFIELDS, "POST /platform/logout" );
-		curl_easy_setopt( curlHandle, CURLOPT_URL, "https://sandbox.familysearch.org" );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_HTTPHEADER, headers );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_POSTFIELDS, "POST /platform/logout" );
+		curl_easy_setopt( curlHandleEasy, CURLOPT_URL, "https://sandbox.familysearch.org" );
 
-		CURLcode curlCode = curl_easy_perform( curlHandle );
+		CURLcode curlCode = curl_easy_perform( curlHandleEasy );
 		if( curlCode != CURLE_OK )
 			break;
 
@@ -206,167 +197,16 @@ bool FtaClient::DeleteAccessToken( void )
 	return 0;
 }
 
-/*static*/ int FtaClient::DebugFunction( CURL* curlHandle, curl_infotype type, char* data, size_t size, void* userPtr )
+/*static*/ int FtaClient::DebugFunction( CURL* curlHandleEasy, curl_infotype type, char* data, size_t size, void* userPtr )
 {
 	FtaClient* client = ( FtaClient* )userPtr;
 
 	return 0;
 }
 
-bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
+bool FtaClient::MakeAsyncRequest( const ResponseRequest& request, ResponseProcessor* processor )
 {
-	bool success = false;
-
-	do
-	{
-		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
-		if( !person )
-			break;
-
-		wxBusyCursor busyCursor;
-
-		if( !person->SetSpouses() )
-		{
-			if( !CacheFor( personId, CACHE_SPOUSES ) )
-				break;
-
-			( void )person->SetSpouses();
-		}
-
-		if( !person->SetImmediateAncestry() )
-		{
-			if( !CacheFor( personId, CACHE_ANCESTRY ) )
-				break;
-
-			// Since the caching succeeded, we interpret any possible failure here as
-			// an indication that we don't know some or all of the person's ancestry.
-			// TODO: There has to be a better way to detect boundary conditions of the graph.
-			//       In other words, right now we can't distinguish between the idea of
-			//       not knowing someone's father with simply not having the father cached.
-			( void )person->SetImmediateAncestry();
-		}
-
-		if( !person->SetImmediateDescendancy() )
-		{
-			if( !CacheFor( personId, CACHE_DESCENDANCY ) )
-				break;
-
-			// Since the caching succeeded, we interpret any possible failure here as
-			// an indication that we don't know some or all of the person's descendancy.
-			( void )person->SetImmediateDescendancy();
-		}
-
-		//if( !person->SetDetails() )
-		{
-			//...
-		}
-
-		success = true;
-	}
-	while( false );
-
-	if( !success )
-		wxGetApp().GetTreeCache()->Wipe( personId );
-
-	return success;
-}
-
-bool FtaClient::CacheFor( const wxString& personId, CacheWhat what )
-{
-	bool success = false;
-	curl_slist* headers = nullptr;
-
-	do
-	{
-		if( !HasAccessToken() )
-			break;
-
-		curl_easy_reset( curlHandle );
-
-		wxString authorization = "Authorization: Bearer " + accessToken;
-		const char* authorizationData = authorization.c_str();
-
-		headers = curl_slist_append( headers, authorizationData );
-		headers = curl_slist_append( headers, "Accept: application/x-fs-v1+json" );
-
-		curl_easy_setopt( curlHandle, CURLOPT_HTTPHEADER, headers );
-		curl_easy_setopt( curlHandle, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
-		curl_easy_setopt( curlHandle, CURLOPT_WRITEDATA, this );
-
-#if defined SANDBOX
-		wxString url = "https://sandbox.familysearch.org";
-#else
-		wxString url = "https://www.familysearch.org";
-#endif
-
-		wxString appendUrl;
-		switch( what )
-		{
-			case CACHE_ANCESTRY:
-			{
-				appendUrl = "/platform/tree/ancestry?person=" + personId;
-				break;
-			}
-			case CACHE_DESCENDANCY:
-			{
-				appendUrl = "/platform/tree/descendancy?person=" + personId;
-				break;
-			}
-			case CACHE_SPOUSES:
-			{
-				appendUrl = "/platform/tree/persons/" + personId + "/spouses";
-				break;
-			}
-			case CACHE_PERSON_DETAILS:
-			{
-				appendUrl = "/platform/tree/persons/" + personId;
-				break;
-			}
-		}
-
-		if( appendUrl.IsEmpty() )
-			break;
-
-		url += appendUrl;
-		const char* urlData = url.c_str();
-		curl_easy_setopt( curlHandle, CURLOPT_URL, urlData );
-
-		writeString = "";
-
-		CURLcode curlCode = curl_easy_perform( curlHandle );
-		if( curlCode != CURLE_OK )
-			break;
-
-		if( writeString.IsEmpty() )
-			break;
-
-		wxJSONReader reader;
-		wxJSONValue responseValue;
-		if( 0 < reader.Parse( writeString, &responseValue ) )
-			break;
-
-		bool processedResponseSuccessfully = false;
-		switch( what )
-		{
-			case CACHE_ANCESTRY:
-			case CACHE_DESCENDANCY:
-			{
-				processedResponseSuccessfully = wxGetApp().GetMiscCache()->ConsumePedigree( responseValue );
-				break;
-			}
-		}
-
-		if( !processedResponseSuccessfully )
-			break;
-
-		success = true;
-	}
-	while( false );
-
-	if( headers )
-		curl_slist_free_all( headers );
-
-	return success;
+	return true;
 }
 
 // FtaClient.cpp

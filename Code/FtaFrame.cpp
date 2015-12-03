@@ -4,8 +4,6 @@
 #include "FtaApp.h"
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
-#include "FtaMiscCache.h"
-#include "FtaTreeWalker.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>
@@ -26,12 +24,9 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	programMenu->Append( exitMenuItem );
 
 	wxMenu* cacheMenu = new wxMenu();
-	wxMenuItem* populateTreeCacheAtPersonMenuItem = new wxMenuItem( programMenu, ID_PopulateTreeCacheAtPerson, "Populate Tree Cache At Person", "Update the tree cache at the given person." );
-	wxMenuItem* wipeAllCacheMenuItem = new wxMenuItem( programMenu, ID_WipeAllCache, "Wipe All Cache", "Effectively invalidate all information obtained from FamilySearch.org." );
-	wxMenuItem* warmCacheMenuItem = new wxMenuItem( programMenu, ID_WarmCache, "Warm Cache", "Perform a tree walk for the sake of warming the cache." );
-	cacheMenu->Append( populateTreeCacheAtPersonMenuItem );
-	cacheMenu->Append( warmCacheMenuItem );
-	cacheMenu->AppendSeparator();
+	wxMenuItem* fillCacheMenuItem = new wxMenuItem( programMenu, ID_FillCache, "Fill Cache", "Fill the cache with information obtained from www.familysearch.org." );
+	wxMenuItem* wipeAllCacheMenuItem = new wxMenuItem( programMenu, ID_WipeCache, "Wipe Cache", "Wipe the cache of all information obtained from www.familysearch.org." );
+	cacheMenu->Append( fillCacheMenuItem );
 	cacheMenu->Append( wipeAllCacheMenuItem );
 
 	wxMenu* analysisMenu = new wxMenu();
@@ -59,16 +54,14 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
 	Bind( wxEVT_MENU, &FtaFrame::OnDeleteAccessToken, this, ID_DeleteAccessToken );
-	Bind( wxEVT_MENU, &FtaFrame::OnPopulateTreeCacheAtPerson, this, ID_PopulateTreeCacheAtPerson );
-	Bind( wxEVT_MENU, &FtaFrame::OnWipeAllCache, this, ID_WipeAllCache );
-	Bind( wxEVT_MENU, &FtaFrame::OnWarmCache, this, ID_WarmCache );
+	Bind( wxEVT_MENU, &FtaFrame::OnFillCache, this, ID_FillCache );
+	Bind( wxEVT_MENU, &FtaFrame::OnWipeCache, this, ID_WipeCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnExit, this, ID_Exit );
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DeleteAccessToken );
-	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_PopulateTreeCacheAtPerson );
-	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeAllCache );
-	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WarmCache );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_FillCache );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeCache );
 }
 
 /*virtual*/ FtaFrame::~FtaFrame( void )
@@ -83,62 +76,26 @@ void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
 
 void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
 {
-	( void )wxGetApp().GetClient()->DeleteAccessToken();
+	if( wxGetApp().GetClient()->DeleteAccessToken() )
+		wxMessageBox( "Logged out!" );
 }
 
-void FtaFrame::OnWipeAllCache( wxCommandEvent& event )
+void FtaFrame::OnWipeCache( wxCommandEvent& event )
 {
-	// Note that the tree cache may point into the misc. cache,
-	// so if the latter goes away, so must the former.  In fact,
-	// it's best to wipe the tree cache before the misc. cache.
-	wxGetApp().GetTreeCache()->Wipe();
-	wxGetApp().GetMiscCache()->Wipe();
+	( void )wxGetApp().GetTreeCache()->Wipe();
 }
 
-void FtaFrame::OnPopulateTreeCacheAtPerson( wxCommandEvent& event )
+void FtaFrame::OnFillCache( wxCommandEvent& event )
 {
-	wxString personId = wxGetTextFromUser( "Enter person-ID.", "Person-ID", wxEmptyString, nullptr );
-	if( personId.IsEmpty() )
+	int personCount = ( int )wxGetNumberFromUser( "", "Fill cache with how many persons?", "Person Count", 100 );
+	if( personCount == -1 )
 		return;
 
-	wxGetApp().GetClient()->PopulateTreeCacheAt( personId );
-}
-
-void FtaFrame::OnWarmCache( wxCommandEvent& event )
-{
-	class TreeWalker : public FtaTreeWalker
-	{
-	public:
-		virtual void VisitPerson( FtaPerson* person ) override
-		{
-			textCtrl->AddText( person->GetPersonId() + "\n" );
-			textCtrl->Refresh();
-		}
-
-		wxStyledTextCtrl* textCtrl;
-	};
-
-	TreeWalker treeWalker;
-	treeWalker.textCtrl = textCtrl;
-
-	treeWalker.rootPersonId = wxGetTextFromUser( "Enter root person-ID", "Root Person-ID", wxEmptyString, nullptr );
-	if( treeWalker.rootPersonId.IsEmpty() )
+	wxString rootPersonId = wxGetTextFromUser( "Enter root person-ID", "Root Person-ID", wxEmptyString, nullptr );
+	if( rootPersonId.IsEmpty() )
 		return;
 
-	treeWalker.maxAncestorGenerations = ( int )wxGetNumberFromUser( "", "Max ancestral generations we can traverse?", "Max ancestral generations", treeWalker.maxAncestorGenerations );
-	if( treeWalker.maxAncestorGenerations == -1 )
-		return;
-
-	treeWalker.maxDescendancyGenerations = ( int )wxGetNumberFromUser( "", "Max descendant generations we can traverse?", "Max descendant generations", treeWalker.maxDescendancyGenerations );
-	if( treeWalker.maxDescendancyGenerations == -1 )
-		return;
-
-	treeWalker.maxSpouseJumps = ( int )wxGetNumberFromUser( "", "Max spouse jumps we can make?", "Max spouse jumps", treeWalker.maxSpouseJumps );
-	if( treeWalker.maxSpouseJumps == -1 )
-		return;
-
-	textCtrl->SetText( "" );
-	treeWalker.PerformWalk();
+	( void )wxGetApp().GetTreeCache()->Fill( rootPersonId, personCount );
 }
 
 void FtaFrame::OnExit( wxCommandEvent& event )
@@ -168,15 +125,14 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 			break;
 		}
 		case ID_DeleteAccessToken:
-		case ID_PopulateTreeCacheAtPerson:
-		case ID_WarmCache:
+		case ID_FillCache:
 		{
 			event.Enable( wxGetApp().GetClient()->HasAccessToken() );
 			break;
 		}
-		case ID_WipeAllCache:
+		case ID_WipeCache:
 		{
-			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() || !wxGetApp().GetMiscCache()->IsEmpty() );
+			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() );
 			break;
 		}
 	}

@@ -4,26 +4,20 @@
 
 #include "FtaPerson.h"
 #include "FtaContainers.h"
+#include "FtaClient.h"
 
-class FtaTreeCache
+class FtaTreeCache : public FtaClient::ResponseProcessor
 {
 public:
 
 	FtaTreeCache( void );
 	~FtaTreeCache( void );
 
-	enum LookupDisposition
-	{
-		FAIL_ON_CACHE_MISS,
-		POPULATE_ON_CACHE_MISS,
-		ALLOCATE_ON_CACHE_MISS,
-	};
-
-	FtaPerson* Lookup( const wxString& personId, LookupDisposition disposition );
-
-	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
 	bool Wipe( void );
-	bool Wipe( const wxString& personId );
+	bool Fill( const wxString& rootPersonId, int personCount );
+	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
+
+	virtual void ProcessResponse( const FtaClient::ResponseRequest& request, wxJSONValue& responseValue ) override;
 
 private:
 
