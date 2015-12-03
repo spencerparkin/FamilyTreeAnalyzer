@@ -38,7 +38,8 @@ public:
 
 	struct VisitationData
 	{
-		int key;
+		int visitKey;
+		int queueKey;
 		int generation;
 		int spouseJumpCount;
 	};

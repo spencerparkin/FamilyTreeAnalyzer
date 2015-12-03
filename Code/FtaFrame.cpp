@@ -112,6 +112,7 @@ void FtaFrame::OnWarmCache( wxCommandEvent& event )
 		virtual void VisitPerson( FtaPerson* person ) override
 		{
 			textCtrl->AddText( person->GetPersonId() + "\n" );
+			textCtrl->Refresh();
 		}
 
 		wxStyledTextCtrl* textCtrl;
@@ -136,7 +137,7 @@ void FtaFrame::OnWarmCache( wxCommandEvent& event )
 	if( treeWalker.maxSpouseJumps == -1 )
 		return;
 
-	textCtrl->Clear();
+	textCtrl->SetText( "" );
 	treeWalker.PerformWalk();
 }
 

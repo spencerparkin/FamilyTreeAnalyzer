@@ -5,7 +5,7 @@
 #include "FtaTreeCache.h"
 #include "FtaApp.h"
 
-int FtaTreeWalker::visitationKey = -1;
+int FtaTreeWalker::key = -1;
 
 FtaTreeWalker::FtaTreeWalker( void )
 {
@@ -20,7 +20,7 @@ FtaTreeWalker::FtaTreeWalker( void )
 
 /*virtual*/ void FtaTreeWalker::PerformWalk( void )
 {
-	visitationKey++;
+	key++;
 
 	FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( rootPersonId, FtaTreeCache::POPULATE_ON_CACHE_MISS );
 	if( !person )
@@ -37,7 +37,9 @@ FtaTreeWalker::FtaTreeWalker( void )
 		person = *iter;
 		personQueue.erase( iter );
 
-		person->visitationData.key = visitationKey;
+		wxASSERT( person->visitationData.visitKey != key );
+
+		person->visitationData.visitKey = key;
 
 		VisitPerson( person );
 
@@ -92,13 +94,16 @@ FtaTreeWalker::FtaTreeWalker( void )
 			}
 		}
 
-		// Enqueue all unvisited and qualified adjacencies.
+		// Enqueue all unvisited, unqueued and qualified adjacencies.
 		FtaPersonList::iterator candidateIter = candidateList.begin();
 		while( candidateIter != candidateList.end() )
 		{
 			FtaPerson* candidate = *candidateIter;
-			if( candidate->visitationData.key != visitationKey )
+			if( candidate->visitationData.visitKey != key && candidate->visitationData.queueKey != key )
+			{
 				personQueue.push_back( candidate );
+				candidate->visitationData.queueKey = key;
+			}
 
 			candidateIter++;
 		}

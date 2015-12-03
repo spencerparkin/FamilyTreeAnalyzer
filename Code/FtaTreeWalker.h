@@ -13,7 +13,7 @@ class FtaTreeWalker
 {
 public:
 
-	static int visitationKey;
+	static int key;
 
 	FtaTreeWalker( void );
 	virtual ~FtaTreeWalker( void );

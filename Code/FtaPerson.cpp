@@ -9,7 +9,10 @@ FtaPerson::FtaPerson( const wxString& personId )
 {
 	this->personId = personId;
 
-	visitationData.key = -1;
+	visitationData.visitKey = -1;
+	visitationData.queueKey = -1;
+	visitationData.generation = 0;
+	visitationData.spouseJumpCount = 0;
 
 	childrenIdSet = nullptr;
 	spousesIdSet = nullptr;
