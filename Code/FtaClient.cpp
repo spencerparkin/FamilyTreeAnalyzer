@@ -223,6 +223,16 @@ bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 		if( !person )
 			break;
 
+		wxBusyCursor busyCursor;
+
+		if( !person->SetSpouses() )
+		{
+			if( !CacheFor( personId, CACHE_SPOUSES ) )
+				break;
+
+			( void )person->SetSpouses();
+		}
+
 		if( !person->SetImmediateAncestry() )
 		{
 			if( !CacheFor( personId, CACHE_ANCESTRY ) )
@@ -230,6 +240,9 @@ bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 
 			// Since the caching succeeded, we interpret any possible failure here as
 			// an indication that we don't know some or all of the person's ancestry.
+			// TODO: There has to be a better way to detect boundary conditions of the graph.
+			//       In other words, right now we can't distinguish between the idea of
+			//       not knowing someone's father with simply not having the father cached.
 			( void )person->SetImmediateAncestry();
 		}
 
@@ -243,7 +256,10 @@ bool FtaClient::PopulateTreeCacheAt( const wxString& personId )
 			( void )person->SetImmediateDescendancy();
 		}
 
-		// TODO: Cache more stuff here?  May want to use multi-curl handle later.
+		//if( !person->SetDetails() )
+		{
+			//...
+		}
 
 		success = true;
 	}
@@ -264,8 +280,6 @@ bool FtaClient::CacheFor( const wxString& personId, CacheWhat what )
 	{
 		if( !HasAccessToken() )
 			break;
-
-		wxBusyCursor busyCursor;
 
 		curl_easy_reset( curlHandle );
 
@@ -296,6 +310,16 @@ bool FtaClient::CacheFor( const wxString& personId, CacheWhat what )
 			case CACHE_DESCENDANCY:
 			{
 				appendUrl = "/platform/tree/descendancy?person=" + personId;
+				break;
+			}
+			case CACHE_SPOUSES:
+			{
+				appendUrl = "/platform/tree/persons/" + personId + "/spouses";
+				break;
+			}
+			case CACHE_PERSON_DETAILS:
+			{
+				appendUrl = "/platform/tree/persons/" + personId;
 				break;
 			}
 		}

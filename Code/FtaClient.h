@@ -25,6 +25,8 @@ private:
 	{
 		CACHE_ANCESTRY,
 		CACHE_DESCENDANCY,
+		CACHE_SPOUSES,
+		CACHE_PERSON_DETAILS,
 	};
 
 	bool CacheFor( const wxString& personId, CacheWhat what );

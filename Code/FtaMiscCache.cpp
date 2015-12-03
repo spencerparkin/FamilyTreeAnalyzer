@@ -1,6 +1,8 @@
 // FtaMiscCache.cpp
 
 #include "FtaMiscCache.h"
+#include "FtaTreeCache.h"
+#include "FtaApp.h"
 
 FtaMiscCache::FtaMiscCache( void )
 {
@@ -13,6 +15,10 @@ FtaMiscCache::~FtaMiscCache( void )
 
 bool FtaMiscCache::Wipe( void )
 {
+	//FtaTreeCache* treeCache = wxGetApp().GetTreeCache();
+	//if( treeCache )
+	//	treeCache->Wipe();		// The tree cache points into our cache, so prevent stale pointers.
+
 	childToFatherMap.clear();
 	childToMotherMap.clear();
 	FtaDeleteRelationshipIdMap( parentToChildrenMap );
@@ -68,6 +74,8 @@ bool FtaMiscCache::ConsumePedigree( const wxJSONValue& responseValue )
 					CacheFather( personValue[ "id" ].AsString(), fatherValue[ "id" ].AsString() );
 					CacheChild( fatherValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
 				}
+				else if( ascendancyNumber == 1 )
+					CacheFather( personValue[ "id" ].AsString(), "unknown" );
 
 				wxJSONValue motherValue = FindNumber( 2 * ascendancyNumber + 1, "ascendancyNumber", personsArrayValue );
 				if( !motherValue.IsNull() )
@@ -75,6 +83,8 @@ bool FtaMiscCache::ConsumePedigree( const wxJSONValue& responseValue )
 					CacheMother( personValue[ "id" ].AsString(), motherValue[ "id" ].AsString() );
 					CacheChild( motherValue[ "id" ].AsString(), personValue[ "id" ].AsString() );
 				}
+				else if( ascendancyNumber == 1 )
+					CacheFather( personValue[ "id" ].AsString(), "unknown" );
 			}
 
 			if( descendancyNumberValue.IsString() )
@@ -97,6 +107,7 @@ bool FtaMiscCache::ConsumePedigree( const wxJSONValue& responseValue )
 					FtaIndexArray indexArray;
 					GatherNumbersWithPrefix( descendancyNumberString, "descendancyNumber", personsArrayValue, indexArray, true );
 
+					int count = 0;
 					for( j = 0; j < ( signed )indexArray.size(); j++ )
 					{
 						int k = indexArray[j];
@@ -105,7 +116,11 @@ bool FtaMiscCache::ConsumePedigree( const wxJSONValue& responseValue )
 
 						wxJSONValue childValue = personsArrayValue[k];
 						CacheChild( personValue[ "id" ].AsString(), childValue[ "id" ].AsString() );
+						count++;
 					}
+
+					if( count == 0 && descendancyNumberString == "1" )
+						CacheChild( personValue[ "id" ].AsString(), "unknown" );
 				}
 			}
 		}

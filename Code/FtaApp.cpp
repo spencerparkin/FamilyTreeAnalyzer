@@ -19,8 +19,13 @@ FtaApp::FtaApp( void )
 /*virtual*/ FtaApp::~FtaApp( void )
 {
 	delete client;
+	client = nullptr;
+
 	delete treeCache;
+	treeCache = nullptr;
+
 	delete miscCache;
+	miscCache = nullptr;
 }
 
 /*virtual*/ bool FtaApp::OnInit( void )
