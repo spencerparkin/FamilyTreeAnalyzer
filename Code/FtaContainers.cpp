@@ -5,6 +5,7 @@
 #include <wx/listimpl.cpp>
 
 WX_DEFINE_LIST( FtaPersonList );
+WX_DEFINE_LIST( FtaAsyncRequestList );
 
 void FtaDeletePersonMap( FtaPersonMap& personMap )
 {

@@ -25,6 +25,9 @@
     <ClInclude Include="Code\FtaContainers.h">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaAsyncRequest.h">
+      <Filter>Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -43,6 +46,9 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaContainers.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaAsyncRequest.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

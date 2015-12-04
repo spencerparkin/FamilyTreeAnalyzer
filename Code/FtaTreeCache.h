@@ -4,9 +4,9 @@
 
 #include "FtaPerson.h"
 #include "FtaContainers.h"
-#include "FtaClient.h"
+#include "FtaAsyncRequest.h"
 
-class FtaTreeCache : public FtaClient::ResponseProcessor
+class FtaTreeCache : public FtaAsyncRequest::ResponseProcessor
 {
 public:
 
@@ -17,7 +17,7 @@ public:
 	bool Fill( const wxString& rootPersonId, int personCount );
 	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
 
-	virtual void ProcessResponse( const FtaClient::ResponseRequest& request, wxJSONValue& responseValue ) override;
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
 
 private:
 

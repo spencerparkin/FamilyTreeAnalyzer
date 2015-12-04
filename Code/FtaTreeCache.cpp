@@ -22,14 +22,20 @@ bool FtaTreeCache::Wipe( void )
 
 bool FtaTreeCache::Fill( const wxString& rootPersonId, int personCount )
 {
-	// TODO: Use the curl multi interface to asynchronously build the tree in breadth-first fasion about the given person.
+	FtaClient* client = wxGetApp().GetClient();
+
+	// Make initial request...(request responses will triger subsequent requests)
+
+	while( client->AsyncRequestsPending() )
+		if( !client->ServiceAllAsyncRequests( true ) )
+			return false;
 
 	return true;
 }
 
-/*virtual*/ void FtaTreeCache::ProcessResponse( const FtaClient::ResponseRequest& request, wxJSONValue& responseValue )
+/*virtual*/ bool FtaTreeCache::ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue )
 {
-	// TODO: Build up the tree.  Make further requests here as needed.
+	return true;
 }
 
 // FtaTreeCache.cpp

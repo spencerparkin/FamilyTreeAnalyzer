@@ -11,11 +11,13 @@
 #include <wx/jsonval.h>
 
 class FtaPerson;
+class FtaAsyncRequest;
 
 WX_DECLARE_STRING_HASH_MAP( FtaPerson*, FtaPersonMap );
 WX_DECLARE_HASH_SET( FtaPerson*, wxPointerHash, wxPointerEqual, FtaPersonSet );
 WX_DECLARE_HASH_SET( wxString, wxStringHash, wxStringEqual, FtaPersonIdSet );
 WX_DECLARE_LIST( FtaPerson, FtaPersonList );
+WX_DECLARE_LIST( FtaAsyncRequest, FtaAsyncRequestList );
 WX_DEFINE_ARRAY_INT( int, FtaOffsetArray );
 
 void FtaDeletePersonMap( FtaPersonMap& personMap );

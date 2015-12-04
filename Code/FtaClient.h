@@ -5,6 +5,9 @@
 #include <wx/string.h>
 #include <wx/jsonval.h>
 #include <curl/curl.h>
+#include "FtaContainers.h"
+
+class FtaAsyncRequest;
 
 class FtaClient
 {
@@ -18,40 +21,23 @@ public:
 	bool Authenticate( void );
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
+	bool AddAsyncRequest( FtaAsyncRequest* request );
+	bool ServiceAllAsyncRequests( bool waitOnSockets );
+	bool AsyncRequestsPending( void ) { return( asyncRequestList.size() > 0 ? true : false ); }
 
-	struct ResponseRequest
-	{
-		enum Type
-		{
-			TYPE_ANCESTRY,
-			TYPE_DESCENDANCY,
-			TYPE_SPOUSES,
-			TYPE_PERSONAL_DETAILS,
-		};
-
-		Type type;
-		wxString personId;
-	};
-
-	class ResponseProcessor
-	{
-	public:
-		virtual void ProcessResponse( const ResponseRequest& request, wxJSONValue& responseValue ) = 0;
-	};
-	
-	bool MakeAsyncRequest( const ResponseRequest& request, ResponseProcessor* processor );
+	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );
+	static size_t ReadFunction( void* buf, size_t size, size_t nitems, void* userPtr );
+	static int DebugFunction( CURL* curlHandle, curl_infotype type, char* data, size_t size, void* userPtr );
 
 private:
 
-	static int DebugFunction( CURL* curlHandle, curl_infotype type, char* data, size_t size, void* userPtr );
-	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );
-	static size_t ReadFunction( void* buf, size_t size, size_t nitems, void* userPtr );
+	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
 
 	CURL* curlHandleEasy;
+	CURLM* curlHandleMulti;
 	wxString accessToken;
 	char errorBuf[ CURL_ERROR_SIZE ];
-	wxString writeString;
-	wxString readString;
+	FtaAsyncRequestList asyncRequestList;
 };
 
 // FtaClient.h

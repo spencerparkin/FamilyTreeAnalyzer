@@ -2,6 +2,7 @@
 
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
+#include "FtaAsyncRequest.h"
 #include "FtaApp.h"
 #include <wx/textdlg.h>
 #include <wx/jsonval.h>
@@ -12,6 +13,7 @@
 FtaClient::FtaClient( void )
 {
 	curlHandleEasy = nullptr;
+	curlHandleMulti = nullptr;
 }
 
 /*virtual*/ FtaClient::~FtaClient( void )
@@ -32,6 +34,10 @@ bool FtaClient::Initialize( void )
 	if( !curlHandleEasy )
 		return false;
 
+	curlHandleMulti = curl_multi_init();
+	if( !curlHandleMulti )
+		return false;
+
 	return true;
 }
 
@@ -44,6 +50,14 @@ bool FtaClient::Shutdown( void )
 	{
 		curl_easy_cleanup( curlHandleEasy );
 		curlHandleEasy = nullptr;
+	}
+
+	if( curlHandleMulti )
+	{
+		// TODO: Empty the multi-stack here if needed.
+
+		curl_multi_cleanup( curlHandleMulti );
+		curlHandleMulti = nullptr;
 	}
 
 	curl_global_cleanup();
@@ -96,24 +110,24 @@ bool FtaClient::Authenticate( void )
 		headers = curl_slist_append( headers, "Content-Type: application/x-www-form-urlencoded" );
 		headers = curl_slist_append( headers, "Accept: application/json" );
 
+		wxString responseString;
+
 		curl_easy_setopt( curlHandleEasy, CURLOPT_HTTPHEADER, headers );
 		curl_easy_setopt( curlHandleEasy, CURLOPT_POSTFIELDS, postFieldsData );
 		curl_easy_setopt( curlHandleEasy, CURLOPT_URL, "https://sandbox.familysearch.org/cis-web/oauth2/v3/token" );
 		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
-		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, this );
-
-		writeString = "";
+		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, &responseString );
 
 		CURLcode curlCode = curl_easy_perform( curlHandleEasy );
 		if( curlCode != CURLE_OK )
 			break;
 
-		if( writeString.IsEmpty() )
+		if( responseString.IsEmpty() )
 			break;
 
 		wxJSONReader reader;
 		wxJSONValue responseValue;
-		if( 0 < reader.Parse( writeString, &responseValue ) )
+		if( 0 < reader.Parse( responseString, &responseValue ) )
 			break;
 
 		wxJSONValue errorValue = responseValue[ "error" ];
@@ -184,29 +198,112 @@ bool FtaClient::DeleteAccessToken( void )
 
 /*static*/ size_t FtaClient::WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr )
 {
-	FtaClient* client = ( FtaClient* )userPtr;
+	wxString* responseString = ( wxString* )userPtr;
 	size_t totalBytes = size * nitems;
-	client->writeString.Append( ( const char* )buf, totalBytes );
+	responseString->Append( ( const char* )buf, totalBytes );
 	return totalBytes;
 }
 
 /*static*/ size_t FtaClient::ReadFunction( void* buf, size_t size, size_t nitems, void* userPtr )
 {
-	FtaClient* client = ( FtaClient* )userPtr;
-
 	return 0;
 }
 
 /*static*/ int FtaClient::DebugFunction( CURL* curlHandleEasy, curl_infotype type, char* data, size_t size, void* userPtr )
 {
-	FtaClient* client = ( FtaClient* )userPtr;
-
 	return 0;
 }
 
-bool FtaClient::MakeAsyncRequest( const ResponseRequest& request, ResponseProcessor* processor )
+bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request )
 {
+	if( !request->FormulateRequest() )
+	{
+		delete request;
+		return false;
+	}
+
+	CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
+	if( curlmCode != CURLM_OK )
+	{
+		delete request;
+		return false;
+	}
+
+	asyncRequestList.push_back( request );
 	return true;
+}
+
+bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
+{
+	CURLMcode curlmCode;
+
+	if( waitOnSockets )
+	{
+		fd_set fdread, fdwrite, fdexcep;
+		FD_ZERO( &fdread );
+		FD_ZERO( &fdwrite );
+		FD_ZERO( &fdexcep );
+
+		int maxfd = -1;
+		curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+		if( curlmCode != CURLM_OK )
+			return false;
+
+		if( -1 == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, NULL ) )
+			return false;
+	}
+
+	int runningHandles = 0;
+	curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
+	if( curlmCode != CURLM_OK )
+		return false;
+
+	struct CURLMsg* curlMsg = nullptr;
+	while( true )
+	{
+		int queuedMessageCount = 0;
+		curlMsg = curl_multi_info_read( curlHandleMulti, &queuedMessageCount );
+		if( !curlMsg )
+			break;
+
+		if( curlMsg->msg != CURLMSG_DONE )
+			continue;
+		
+		FtaAsyncRequestList::iterator iter = FindAsyncRequest( curlMsg->easy_handle );
+		wxASSERT( iter != asyncRequestList.end() );
+			
+		FtaAsyncRequest* request = *iter;
+		request->SetCurlCode( curlMsg->data.result );
+
+		if( curlMsg->data.result == CURLE_OK )
+		{
+			bool processed = request->ProcessResponse();
+			wxASSERT( processed );
+		}
+
+		curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+		wxASSERT( curlmCode == CURLM_OK );
+
+		delete request;
+		asyncRequestList.erase( iter );
+	}
+
+	return true;
+}
+
+FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( CURL* curlHandleEasy )
+{
+	FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
+	while( iter != asyncRequestList.end() )
+	{
+		FtaAsyncRequest* request = *iter;
+		if( request->GetCurlHandle() == curlHandleEasy )
+			break;
+
+		iter++;
+	}
+
+	return iter;
 }
 
 // FtaClient.cpp
