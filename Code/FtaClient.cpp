@@ -214,6 +214,15 @@ bool FtaClient::DeleteAccessToken( void )
 	return 0;
 }
 
+bool FtaClient::CompleteAllAsyncRequests( void )
+{
+	while( AsyncRequestsPending() )
+		if( !ServiceAllAsyncRequests( true ) )
+			return false;
+
+	return true;
+}
+
 bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request )
 {
 	if( !request->FormulateRequest() )

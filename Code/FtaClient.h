@@ -23,7 +23,10 @@ public:
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
 	bool AddAsyncRequest( FtaAsyncRequest* request );
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
+	bool CompleteAllAsyncRequests( void );
 	bool AsyncRequestsPending( void ) { return( asyncRequestList.size() > 0 ? true : false ); }
+
+	const wxString& GetAccessToken( void ) { return accessToken; }
 
 	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );
 	static size_t ReadFunction( void* buf, size_t size, size_t nitems, void* userPtr );

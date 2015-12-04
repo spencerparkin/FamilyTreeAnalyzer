@@ -87,15 +87,17 @@ void FtaFrame::OnWipeCache( wxCommandEvent& event )
 
 void FtaFrame::OnFillCache( wxCommandEvent& event )
 {
-	int personCount = ( int )wxGetNumberFromUser( "", "Fill cache with how many persons?", "Person Count", 100 );
-	if( personCount == -1 )
+	int personCount = wxGetApp().GetTreeCache()->GetPersonCount();
+
+	int personCountThreshold = ( int )wxGetNumberFromUser( "", "Fill cache with as many as how many persons?", "Person Count Threshold", personCount );
+	if( personCountThreshold == -1 )
 		return;
 
 	wxString rootPersonId = wxGetTextFromUser( "Enter root person-ID", "Root Person-ID", wxEmptyString, nullptr );
 	if( rootPersonId.IsEmpty() )
 		return;
 
-	( void )wxGetApp().GetTreeCache()->Fill( rootPersonId, personCount );
+	( void )wxGetApp().GetTreeCache()->Fill( rootPersonId, personCountThreshold );
 }
 
 void FtaFrame::OnExit( wxCommandEvent& event )

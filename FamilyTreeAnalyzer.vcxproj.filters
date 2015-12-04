@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Code\AsyncRequests">
+      <UniqueIdentifier>{6ce83bbf-0769-4ae6-94b5-f963c2d9f70e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -28,6 +31,12 @@
     <ClInclude Include="Code\FtaAsyncRequest.h">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaPedigreeRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaPersonInfoRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -50,6 +59,12 @@
     </ClCompile>
     <ClCompile Include="Code\FtaAsyncRequest.cpp">
       <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaPedigreeRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaPersonInfoRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

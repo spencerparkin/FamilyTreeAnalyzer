@@ -13,14 +13,28 @@ public:
 	FtaTreeCache( void );
 	~FtaTreeCache( void );
 
+	enum LookupDisposition
+	{
+		FAIL_ON_CACHE_MISS,
+		ALLOCATE_ON_CACHE_MISS,
+		POPULATE_ON_CACHE_MISS,
+	};
+
+	FtaPerson* Lookup( const wxString& personId, LookupDisposition disposition );
+
 	bool Wipe( void );
-	bool Fill( const wxString& rootPersonId, int personCount );
+	bool Fill( const wxString& rootPersonId, int personCountThreshold );
 	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
 
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
 
+	int GetPersonCount( void ) { return personMap.size(); }
+
 private:
 
+	bool RequestPerson( const wxString& personId );
+
+	int personCountThreshold;
 	FtaPersonMap personMap;
 };
 

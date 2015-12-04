@@ -16,7 +16,9 @@
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaPedigreeRequest.h" />
     <ClInclude Include="Code\FtaPerson.h" />
+    <ClInclude Include="Code\FtaPersonInfoRequest.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
   <ItemGroup>
@@ -25,7 +27,9 @@
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaPedigreeRequest.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
+    <ClCompile Include="Code\FtaPersonInfoRequest.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

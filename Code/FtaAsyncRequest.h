@@ -17,6 +17,7 @@ public:
 
 	virtual bool FormulateRequest( void );
 	virtual bool ProcessResponse( void );
+	virtual bool MakeUrl( wxString& url );
 
 	class ResponseProcessor
 	{
@@ -39,6 +40,7 @@ protected:
 	wxString responseValueString;
 	CURL* curlHandleEasy;
 	CURLcode curlCode;
+	curl_slist* headers;
 };
 
 // FtaAsyncRequest.h
