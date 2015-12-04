@@ -20,7 +20,7 @@ public:
 	virtual bool FormulateRequest( void ) override;
 	virtual bool MakeUrl( wxString& url ) override;
 
-	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue, FtaPersonList& adjacentPersonList ) override;
+	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) override;
 
 private:
 

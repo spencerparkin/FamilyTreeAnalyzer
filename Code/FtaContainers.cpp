@@ -2,6 +2,7 @@
 
 #include "FtaContainers.h"
 #include "FtaPerson.h"
+#include "FtaAsyncRequest.h"
 #include <wx/listimpl.cpp>
 
 WX_DEFINE_LIST( FtaPersonList );

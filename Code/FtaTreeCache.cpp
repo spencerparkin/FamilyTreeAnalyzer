@@ -20,30 +20,33 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 {
 	FtaPerson* person = nullptr;
 
-	FtaPersonMap::iterator iter = personMap.find( personId );
-	if( iter == personMap.end() )
+	if( !personId.IsEmpty() )
 	{
-		switch( disposition )
+		FtaPersonMap::iterator iter = personMap.find( personId );
+		if( iter == personMap.end() )
 		{
-			case ALLOCATE_ON_CACHE_MISS:
+			switch( disposition )
 			{
-				personMap[ personId ] = new FtaPerson( personId );
-				break;
+				case ALLOCATE_ON_CACHE_MISS:
+				{
+					personMap[ personId ] = new FtaPerson( personId );
+					break;
+				}
+				case POPULATE_ON_CACHE_MISS:
+				{
+					personCountThreshold = 0;
+					if( RequestPerson( personId ) )
+						wxGetApp().GetClient()->CompleteAllAsyncRequests();
+					break;
+				}
 			}
-			case POPULATE_ON_CACHE_MISS:
-			{
-				personCountThreshold = 0;
-				if( RequestPerson( personId ) )
-					wxGetApp().GetClient()->CompleteAllAsyncRequests();
-				break;
-			}
+
+			iter = personMap.find( personId );
 		}
 
-		iter = personMap.find( personId );
+		if( iter != personMap.end() )
+			person = iter->second;
 	}
-
-	if( iter != personMap.end() )
-		person = iter->second;
 
 	return person;
 }
@@ -77,9 +80,8 @@ bool FtaTreeCache::Fill( const wxString& rootPersonId, int personCountThreshold 
 	FtaPersonInfoRequest* personInfoRequest = ( FtaPersonInfoRequest* )request;
 	if( !personInfoRequest )
 		return false;
-
-	FtaPersonList adjacentPersonList;
-	if( !personInfoRequest->AccumulateInfoInCache( responseValue, adjacentPersonList ) )
+	
+	if( !personInfoRequest->AccumulateInfoInCache( responseValue ) )
 		return false;
 
 	wxString personId = personInfoRequest->GetPersonId();
@@ -89,6 +91,9 @@ bool FtaTreeCache::Fill( const wxString& rootPersonId, int personCountThreshold 
 
 	if( ( signed )personMap.size() < personCountThreshold )
 	{
+		FtaPersonList adjacentPersonList;
+		person->GatherNearestRelations( adjacentPersonList );
+
 		FtaPersonList::iterator iter = adjacentPersonList.begin();
 		while( iter != adjacentPersonList.end() )
 		{

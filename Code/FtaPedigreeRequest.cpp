@@ -40,7 +40,7 @@ FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, Res
 	return true;
 }
 
-/*virtual*/ bool FtaPedigreeRequest::AccumulateInfoInCache( wxJSONValue& responseValue, FtaPersonList& adjacentPersonList )
+/*virtual*/ bool FtaPedigreeRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
 {
 	return true;
 }

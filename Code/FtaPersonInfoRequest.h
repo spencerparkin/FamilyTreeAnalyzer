@@ -12,8 +12,7 @@ public:
 	FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor );
 	virtual ~FtaPersonInfoRequest( void );
 
-	// While also updating the cache, here a list of nearest relations should be returned.
-	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue, FtaPersonList& adjacentPersonList ) = 0;
+	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) = 0;
 
 	const wxString& GetPersonId( void ) const { return personId; }
 

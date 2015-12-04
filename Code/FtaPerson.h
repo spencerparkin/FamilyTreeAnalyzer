@@ -25,6 +25,8 @@ public:
 
 	const wxString& GetPersonId( void ) const { return personId; }
 
+	void GatherNearestRelations( FtaPersonList& personList );
+
 private:
 
 	InfoState infoState;
