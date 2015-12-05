@@ -9,6 +9,7 @@
 #include <wx/jsonreader.h>
 #include <wx/jsonwriter.h>
 #include <wx/utils.h>
+#include <wx/progdlg.h>
 
 FtaClient::FtaClient( void )
 {
@@ -214,11 +215,63 @@ bool FtaClient::DeleteAccessToken( void )
 	return 0;
 }
 
-bool FtaClient::CompleteAllAsyncRequests( void )
+bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 {
+	bool success = true;
+
+	wxGenericProgressDialog* progressDialog = nullptr;
+	wxBusyCursor* busyCursor = nullptr;
+
+	if( showWorkingDialog )
+		progressDialog = new wxGenericProgressDialog( "Requests Pending...", "Working...", asyncRequestList.size(), nullptr, wxPD_APP_MODAL | wxPD_CAN_ABORT );
+	else
+		busyCursor = new wxBusyCursor();
+
 	while( AsyncRequestsPending() )
+	{
 		if( !ServiceAllAsyncRequests( true ) )
-			return false;
+		{
+			success = false;
+			break;
+		}
+
+		if( progressDialog )
+		{
+			if( progressDialog->WasCancelled() )
+				break;
+
+			// We can't set the range as the true high water-mark, because the progress dialog
+			// goes into a blocking modal message pump loop thinger if we let it hit 100%.
+			if( ( signed )asyncRequestList.size() >= progressDialog->GetRange() )
+				progressDialog->SetRange( asyncRequestList.size() + 1 );
+
+			progressDialog->Update( asyncRequestList.size(), wxString::Format( "%d requests pending...", asyncRequestList.size() ) );
+		}
+	}
+
+	if( AsyncRequestsPending() )
+		CancelAllAsyncRequests();
+
+	delete progressDialog;
+	delete busyCursor;
+
+	return success;
+}
+
+bool FtaClient::CancelAllAsyncRequests( void )
+{
+	while( asyncRequestList.size() > 0 )
+	{
+		FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
+		FtaAsyncRequest* request = *iter;
+
+		CURLMcode curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+		wxASSERT( curlmCode == CURLM_OK );
+
+		delete request;
+
+		asyncRequestList.erase( iter );
+	}
 
 	return true;
 }

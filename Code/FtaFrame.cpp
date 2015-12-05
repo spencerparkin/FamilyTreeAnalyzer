@@ -112,8 +112,6 @@ void FtaFrame::OnFillCache( wxCommandEvent& event )
 	if( rootPersonId.IsEmpty() )
 		return;
 
-	wxBusyCursor busyCursor;
-
 	( void )wxGetApp().GetTreeCache()->Fill( rootPersonId, personCountThreshold );
 }
 

@@ -23,7 +23,8 @@ public:
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
 	bool AddAsyncRequest( FtaAsyncRequest* request );
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
-	bool CompleteAllAsyncRequests( void );
+	bool CompleteAllAsyncRequests( bool showWorkingDialog );
+	bool CancelAllAsyncRequests( void );
 	bool AsyncRequestsPending( void ) { return( asyncRequestList.size() > 0 ? true : false ); }
 
 	const wxString& GetAccessToken( void ) { return accessToken; }

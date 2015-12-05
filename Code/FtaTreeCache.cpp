@@ -38,7 +38,7 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 				{
 					personCountThreshold = 0;
 					if( RequestPerson( personId ) )
-						wxGetApp().GetClient()->CompleteAllAsyncRequests();
+						wxGetApp().GetClient()->CompleteAllAsyncRequests( false );
 					break;
 				}
 			}
@@ -70,7 +70,7 @@ bool FtaTreeCache::Fill( const wxString& rootPersonId, int personCountThreshold 
 	if( !RequestPerson( rootPersonId ) )
 		return false;
 
-	if( !client->CompleteAllAsyncRequests() )
+	if( !client->CompleteAllAsyncRequests( true ) )
 		return false;
 
 	return true;
