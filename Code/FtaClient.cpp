@@ -53,10 +53,10 @@ bool FtaClient::Shutdown( void )
 		curlHandleEasy = nullptr;
 	}
 
+	CancelAllAsyncRequests();
+
 	if( curlHandleMulti )
 	{
-		// TODO: Empty the multi-stack here if needed.
-
 		curl_multi_cleanup( curlHandleMulti );
 		curlHandleMulti = nullptr;
 	}
@@ -260,6 +260,9 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 
 bool FtaClient::CancelAllAsyncRequests( void )
 {
+	if( !curlHandleMulti )
+		return false;
+
 	while( asyncRequestList.size() > 0 )
 	{
 		FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
@@ -313,6 +316,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 		if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
 		{
+			// TODO: Find suitable time-out if we're using the progress dialog.
 			if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, NULL ) )
 			{
 				int error = WSAGetLastError();
