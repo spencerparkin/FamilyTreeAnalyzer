@@ -13,6 +13,7 @@ public:
 	virtual ~FtaFrame( void );
 
 	void AddLogMessage( const wxString& message );
+	void ClearLog( void );
 
 private:
 
@@ -23,6 +24,7 @@ private:
 		ID_FillCache,
 		ID_WipeCache,
 		ID_DumpCache,
+		ID_ClearLog,
 		ID_Exit,
 		ID_About,
 	};
@@ -32,6 +34,7 @@ private:
 	void OnFillCache( wxCommandEvent& event );
 	void OnWipeCache( wxCommandEvent& event );
 	void OnDumpCache( wxCommandEvent& event );
+	void OnClearLog( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );

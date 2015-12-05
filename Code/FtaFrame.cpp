@@ -17,9 +17,12 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	wxMenu* programMenu = new wxMenu();
 	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with FamilySearch.org." );
 	wxMenuItem* deleteAccessTokenMenuItem = new wxMenuItem( programMenu, ID_DeleteAccessToken, "Delete Access Token", "Logout of FamilySearch.org." );
+	wxMenuItem* clearLogMenuItem = new wxMenuItem( programMenu, ID_ClearLog, "Clear Log", "Clear the log." );
 	wxMenuItem* exitMenuItem = new wxMenuItem( programMenu, ID_Exit, "Exit", "Exit this program." );
 	programMenu->Append( acquireAccessTokenMenuItem );
 	programMenu->Append( deleteAccessTokenMenuItem );
+	programMenu->AppendSeparator();
+	programMenu->Append( clearLogMenuItem );
 	programMenu->AppendSeparator();
 	programMenu->Append( exitMenuItem );
 
@@ -57,6 +60,7 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
 	Bind( wxEVT_MENU, &FtaFrame::OnDeleteAccessToken, this, ID_DeleteAccessToken );
+	Bind( wxEVT_MENU, &FtaFrame::OnClearLog, this, ID_ClearLog );
 	Bind( wxEVT_MENU, &FtaFrame::OnFillCache, this, ID_FillCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnWipeCache, this, ID_WipeCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnDumpCache, this, ID_DumpCache );
@@ -64,6 +68,7 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DeleteAccessToken );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_ClearLog );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_FillCache );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeCache );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DumpCache );
@@ -76,6 +81,16 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 void FtaFrame::AddLogMessage( const wxString& message )
 {
 	textCtrl->AddText( message + "\n" );
+}
+
+void FtaFrame::ClearLog( void )
+{
+	textCtrl->SetText( "" );
+}
+
+void FtaFrame::OnClearLog( wxCommandEvent& event )
+{
+	ClearLog();
 }
 
 void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
@@ -104,7 +119,7 @@ void FtaFrame::OnFillCache( wxCommandEvent& event )
 {
 	int personCount = wxGetApp().GetTreeCache()->GetPersonCount();
 
-	int personCountThreshold = ( int )wxGetNumberFromUser( "", "Fill cache with as many as how many persons?", "Person Count Threshold", personCount );
+	int personCountThreshold = ( int )wxGetNumberFromUser( "", "Try to fill cache with as many as how many persons?", "Person Count Threshold", personCount );
 	if( personCountThreshold == -1 )
 		return;
 
@@ -151,6 +166,11 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 		case ID_WipeCache:
 		{
 			event.Enable( !wxGetApp().GetTreeCache()->IsEmpty() );
+			break;
+		}
+		case ID_ClearLog:
+		{
+			event.Enable( !textCtrl->IsEmpty() );
 			break;
 		}
 	}
