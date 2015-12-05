@@ -1,6 +1,8 @@
 // FtaPedigreeRequest.cpp
 
 #include "FtaPedigreeRequest.h"
+#include "FtaTreeCache.h"
+#include "FtaApp.h"
 
 FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
 {
@@ -21,7 +23,8 @@ FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, Res
 
 /*virtual*/ bool FtaPedigreeRequest::MakeUrl( wxString& url )
 {
-	FtaAsyncRequest::MakeUrl( url );
+	if( !FtaAsyncRequest::MakeUrl( url ) )
+		return false;
 
 	switch( type )
 	{
@@ -42,7 +45,145 @@ FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, Res
 
 /*virtual*/ bool FtaPedigreeRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
 {
-	return true;
+	bool success = false;
+
+	do
+	{
+		FtaTreeCache* cache = wxGetApp().GetTreeCache();
+		if( !cache )
+			break;
+
+		wxJSONValue personsArrayValue = responseValue.Get( "persons", wxJSONValue() );
+		if( !personsArrayValue.IsArray() )
+			break;
+
+		int size = personsArrayValue.Size();
+		int i;
+		for( i = 0; i < size; i++ )
+		{
+			wxJSONValue personValue = personsArrayValue[i];
+			wxJSONValue personIdValue = personValue[ "id" ];
+			if( !personIdValue.IsString() )
+				break;
+
+			wxString personId = personIdValue.AsString();
+			FtaPerson* person = cache->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+			if( !person )
+				break;
+
+			wxJSONValue ascendancyNumberValue = personValue[ "display" ][ "ascendancyNumber" ];
+			if( ascendancyNumberValue.IsString() )
+			{
+				wxString ascendancyNumberString = ascendancyNumberValue.AsString();
+				long ascendancyNumber;
+				if( !ascendancyNumberString.ToLong( &ascendancyNumber ) )
+					break;
+
+				wxJSONValue fatherValue = FindNumber( 2 * ascendancyNumber, "ascendancyNumber", personsArrayValue );
+				if( !fatherValue.IsNull() )
+				{
+					wxString fatherId = fatherValue[ "id" ].AsString();
+					person->SetFatherId( fatherId );
+				}
+
+				wxJSONValue motherValue = FindNumber( 2 * ascendancyNumber + 1, "ascendancyNumber", personsArrayValue );
+				if( !motherValue.IsNull() )
+				{
+					wxString motherId = motherValue[ "id" ].AsString();
+					person->SetMotherId( motherId );
+				}
+			}
+
+			wxJSONValue descendancyNumberValue = personValue[ "display" ][ "descendancyNumber" ];
+			if( descendancyNumberValue.IsString() )
+			{
+				wxString descendancyNumberString = descendancyNumberValue.AsString();
+				int j = descendancyNumberString.Find( "-S" );
+				if( j >= 0 )
+				{
+					descendancyNumberString.Remove( j, j + 2 );
+
+					wxJSONValue spouseValue = FindNumberString( descendancyNumberString, "descendancyNumber", personsArrayValue );
+					if( !spouseValue.IsNull() )
+					{
+						wxString spouseId = spouseValue[ "id" ].AsString();
+						FtaPerson* spouse = cache->Lookup( spouseId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+						person->GetSpousesIdSet().insert( spouse->GetPersonId() );
+						spouse->GetSpousesIdSet().insert( person->GetPersonId() );
+					}
+				}
+				else
+				{
+					FtaOffsetArray offsetArray;
+					GatherNumbersWithPrefix( descendancyNumberString, "descendancyNumber", personsArrayValue, offsetArray, true );
+
+					for( j = 0; j < ( signed )offsetArray.size(); j++ )
+					{
+						int k = offsetArray[j];
+						if( k == i )
+							continue;
+
+						wxJSONValue childValue = personsArrayValue[k];
+						wxString childId = childValue[ "id" ].AsString();
+						person->GetChildrenIdSet().insert( childId );
+					}
+				}
+			}
+		}
+
+		if( i < size )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	return success;
+}
+
+wxJSONValue FtaPedigreeRequest::FindNumber( long givenNumber, const wxString& type, const wxJSONValue& personsArrayValue )
+{
+	int size = personsArrayValue.Size();
+	for( int i = 0; i < size; i++ )
+	{
+		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
+		long number;
+		if( personValue[ "display" ][ type ].AsString().ToLong( &number ) )
+			if( number == givenNumber )
+				return personValue;
+	}
+
+	return wxJSONValue();
+}
+
+wxJSONValue FtaPedigreeRequest::FindNumberString( const wxString& givenNumberString, const wxString& type, wxJSONValue& personsArrayValue )
+{
+	int size = personsArrayValue.Size();
+	for( int i = 0; i < size; i++ )
+	{
+		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
+		wxString numberString = personValue[ "display" ][ type ].AsString();
+		if( numberString == givenNumberString )
+			return personValue;
+	}
+
+	return wxJSONValue();
+}
+
+void FtaPedigreeRequest::GatherNumbersWithPrefix( const wxString& prefix, const wxString& type, const wxJSONValue& personsArrayValue, FtaOffsetArray& offsetArray, bool excludeSpouses )
+{
+	offsetArray.clear();
+
+	int size = personsArrayValue.Size();
+	for( int i = 0; i < size; i++ )
+	{
+		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
+		wxString numberString = personValue[ "display" ][ type ].AsString();
+		if( excludeSpouses && numberString.Find( "-S" ) >= 0 )
+			continue;
+		if( numberString.find( prefix ) == 0 )
+			offsetArray.push_back(i);
+	}
 }
 
 // FtaPedigreeRequest.cpp

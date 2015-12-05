@@ -38,6 +38,7 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	wxString authorization = "Authorization: Bearer " + accessToken;
 	const char* authorizationData = authorization.c_str();
 
+	wxASSERT( headers == nullptr );
 	headers = curl_slist_append( headers, authorizationData );
 	headers = curl_slist_append( headers, "Accept: application/x-fs-v1+json" );
 

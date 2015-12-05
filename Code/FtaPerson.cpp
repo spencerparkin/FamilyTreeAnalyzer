@@ -2,6 +2,7 @@
 
 #include "FtaPerson.h"
 #include "FtaTreeCache.h"
+#include "FtaFrame.h"
 #include "FtaApp.h"
 
 FtaPerson::FtaPerson( const wxString& personId )
@@ -34,6 +35,38 @@ bool FtaPerson::IsInfoComplete( void )
 		return false;
 
 	// TODO: Check other details too, such as ordinances, etc...
+
+	return true;
+}
+
+bool FtaPerson::DumpInfo( void )
+{
+	FtaFrame* frame = wxGetApp().GetFrame();
+
+	frame->AddLogMessage( "-------------------------------------" );
+	frame->AddLogMessage( "Person-ID: " + personId );
+	frame->AddLogMessage( "Mother-ID: " + ( motherId.IsEmpty() ? wxString( "Unknown" ) : motherId ) );
+	frame->AddLogMessage( "Father-ID: " + ( fatherId.IsEmpty() ? wxString( "Unknown" ) : fatherId ) );
+
+	frame->AddLogMessage( wxString::Format( "%d child(ren)...", childrenIdSet.size() ) );
+	int i = 0;
+	FtaPersonIdSet::iterator iter = childrenIdSet.begin();
+	while( iter != childrenIdSet.end() )
+	{
+			wxString childId = *iter;
+		frame->AddLogMessage( wxString::Format( "%d: ", ++i ) + childId );
+		iter++;
+	}
+
+	frame->AddLogMessage( wxString::Format( "%d spouse(s)...", spousesIdSet.size() ) );
+	i = 0;
+	iter = spousesIdSet.begin();
+	while( iter != spousesIdSet.end() )
+	{
+		wxString spouseId = *iter;
+		frame->AddLogMessage( wxString::Format( "%d: ", ++i ) + spouseId );
+		iter++;
+	}
 
 	return true;
 }

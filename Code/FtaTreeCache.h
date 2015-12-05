@@ -22,6 +22,7 @@ public:
 
 	FtaPerson* Lookup( const wxString& personId, LookupDisposition disposition );
 
+	bool Dump( void );
 	bool Wipe( void );
 	bool Fill( const wxString& rootPersonId, int personCountThreshold );
 	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }

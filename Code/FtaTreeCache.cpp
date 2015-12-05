@@ -2,6 +2,7 @@
 
 #include "FtaTreeCache.h"
 #include "FtaPerson.h"
+#include "FtaFrame.h"
 #include "FtaClient.h"
 #include "FtaApp.h"
 #include "FtaPedigreeRequest.h"
@@ -29,6 +30,7 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 			{
 				case ALLOCATE_ON_CACHE_MISS:
 				{
+					wxGetApp().GetFrame()->AddLogMessage( "Created person " + personId );
 					personMap[ personId ] = new FtaPerson( personId );
 					break;
 				}
@@ -70,6 +72,21 @@ bool FtaTreeCache::Fill( const wxString& rootPersonId, int personCountThreshold 
 
 	if( !client->CompleteAllAsyncRequests() )
 		return false;
+
+	return true;
+}
+
+bool FtaTreeCache::Dump( void )
+{
+	wxGetApp().GetFrame()->AddLogMessage( wxString::Format( "%d person(s) in the cache...", personMap.size() ) );
+
+	FtaPersonMap::iterator iter = personMap.begin();
+	while( iter != personMap.end() )
+	{
+		FtaPerson* person = iter->second;
+		person->DumpInfo();
+		iter++;
+	}
 
 	return true;
 }
@@ -118,7 +135,7 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 
 	FtaClient* client = wxGetApp().GetClient();
 
-	// If all of the following requests complete, then the person's information will become known.
+	// If all of the following requests complete, then the person's information on www.familysearch.com will become fully known.
 	client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ) );
 	client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ) );
 	//...

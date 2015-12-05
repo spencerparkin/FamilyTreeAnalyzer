@@ -258,8 +258,14 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 		if( curlmCode != CURLM_OK )
 			return false;
 
-		if( -1 == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, NULL ) )
-			return false;
+		if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
+		{
+			if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, NULL ) )
+			{
+				int error = WSAGetLastError();
+				return false;
+			}
+		}
 	}
 
 	int runningHandles = 0;

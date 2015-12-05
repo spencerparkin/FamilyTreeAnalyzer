@@ -19,11 +19,24 @@ public:
 	};
 
 	bool IsInfoComplete( void );
+	bool DumpInfo( void );
 
 	InfoState GetInfoState( void ) const { return infoState; }
 	void SetInfoState( InfoState infoState ) { this->infoState = infoState; }
 
 	const wxString& GetPersonId( void ) const { return personId; }
+
+	const wxString& GetMotherId( void ) const { return motherId; }
+	void SetMotherId( const wxString& motherId ) { this->motherId = motherId; }
+
+	const wxString& GetFatherId( void ) const { return fatherId; }
+	void SetFatherId( const wxString& fatherId ) { this->fatherId = fatherId; }
+
+	const FtaPersonIdSet& GetChildrenIdSet( void ) const { return childrenIdSet; }
+	FtaPersonIdSet& GetChildrenIdSet( void ) { return childrenIdSet; }
+
+	const FtaPersonIdSet& GetSpousesIdSet( void ) const { return spousesIdSet; }
+	FtaPersonIdSet& GetSpousesIdSet( void ) { return spousesIdSet; }
 
 	void GatherNearestRelations( FtaPersonList& personList );
 

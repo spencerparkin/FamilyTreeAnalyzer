@@ -12,6 +12,8 @@ public:
 	FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size );
 	virtual ~FtaFrame( void );
 
+	void AddLogMessage( const wxString& message );
+
 private:
 
 	enum
@@ -20,6 +22,7 @@ private:
 		ID_DeleteAccessToken,
 		ID_FillCache,
 		ID_WipeCache,
+		ID_DumpCache,
 		ID_Exit,
 		ID_About,
 	};
@@ -28,6 +31,7 @@ private:
 	void OnDeleteAccessToken( wxCommandEvent& event );
 	void OnFillCache( wxCommandEvent& event );
 	void OnWipeCache( wxCommandEvent& event );
+	void OnDumpCache( wxCommandEvent& event );
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );
