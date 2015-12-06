@@ -304,23 +304,35 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 	if( waitOnSockets )
 	{
-		fd_set fdread, fdwrite, fdexcep;
-		FD_ZERO( &fdread );
-		FD_ZERO( &fdwrite );
-		FD_ZERO( &fdexcep );
-
-		int maxfd = -1;
-		curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+		long waitTimeMilliseconds;
+		curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
 		if( curlmCode != CURLM_OK )
 			return false;
 
-		if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
+		if( waitTimeMilliseconds > 0 )
 		{
-			// TODO: Find suitable time-out if we're using the progress dialog.
-			if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, NULL ) )
-			{
-				int error = WSAGetLastError();
+			long waitTimeMicroseconds = waitTimeMilliseconds * 1000;
+			timeval waitTime;
+			waitTime.tv_sec = 0;
+			waitTime.tv_usec = waitTimeMicroseconds;
+
+			fd_set fdread, fdwrite, fdexcep;
+			FD_ZERO( &fdread );
+			FD_ZERO( &fdwrite );
+			FD_ZERO( &fdexcep );
+
+			int maxfd = -1;
+			curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+			if( curlmCode != CURLM_OK )
 				return false;
+
+			if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
+			{
+				if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, &waitTime ) )
+				{
+					int error = WSAGetLastError();
+					return false;
+				}
 			}
 		}
 	}
