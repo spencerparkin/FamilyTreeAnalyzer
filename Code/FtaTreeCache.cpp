@@ -7,6 +7,7 @@
 #include "FtaApp.h"
 #include "FtaPedigreeRequest.h"
 #include "FtaPersonDetailsRequest.h"
+#include "FtaPersonPortraitRequest.h"
 
 FtaTreeCache::FtaTreeCache( void )
 {
@@ -131,7 +132,7 @@ bool FtaTreeCache::Dump( void )
 bool FtaTreeCache::RequestPerson( const wxString& personId )
 {
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
-	if( person->GetInfoState() == FtaPerson::INFO_COMPLETE )
+	if( person->GetInfoState() == FtaPerson::INFO_COMPLETE || person->GetInfoState() == FtaPerson::INFO_REQUESTED )
 		return false;
 
 	FtaClient* client = wxGetApp().GetClient();
@@ -146,6 +147,11 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_PERSONAL_DETAILS ) == 0 )
 		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ) );
+
+	// It's okay to request this, because we don't actually get the image data; we just get a URL for it.
+	// Then, when we actually want to render the person, we know where to go get the image.
+	//if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
+	//	client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ) );
 
 	person->SetInfoState( FtaPerson::INFO_REQUESTED );
 

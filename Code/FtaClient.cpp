@@ -361,6 +361,8 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 		if( curlMsg->data.result == CURLE_OK )
 		{
+			// TODO: How do I get the "GET Status Codes" returned from a request?
+
 			bool processed = request->ProcessResponse();
 			wxASSERT( processed );
 		}

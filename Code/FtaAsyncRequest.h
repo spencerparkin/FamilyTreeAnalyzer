@@ -37,7 +37,7 @@ protected:
 
 	void* userData;
 	ResponseProcessor* processor;
-	wxString responseValueString;
+	wxString responseValueString;		// Typically JSON.
 	CURL* curlHandleEasy;
 	CURLcode curlCode;
 	curl_slist* headers;
