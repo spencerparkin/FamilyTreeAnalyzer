@@ -43,6 +43,9 @@
     <ClInclude Include="Code\FtaPersonPortraitRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaPersonOrdinancesRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -76,6 +79,9 @@
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaPersonOrdinancesRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
   </ItemGroup>

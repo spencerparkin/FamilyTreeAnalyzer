@@ -8,6 +8,7 @@
 #include "FtaPedigreeRequest.h"
 #include "FtaPersonDetailsRequest.h"
 #include "FtaPersonPortraitRequest.h"
+#include "FtaPersonOrdinancesRequest.h"
 
 FtaTreeCache::FtaTreeCache( void )
 {
@@ -152,6 +153,9 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	// Then, when we actually want to render the person, we know where to go get the image.
 	//if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
 	//	client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ) );
+
+	if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
+		client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ) );
 
 	person->SetInfoState( FtaPerson::INFO_REQUESTED );
 
