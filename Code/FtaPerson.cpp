@@ -8,7 +8,9 @@
 FtaPerson::FtaPerson( const wxString& personId )
 {
 	this->personId = personId;
-	infoState = INFO_UNKNOWN;
+	infoState = INFO_INCOMPLETE;
+	flags = 0;
+	gender = GENDER_UNKNOWN;
 }
 
 /*virtual*/ FtaPerson::~FtaPerson( void )
@@ -17,26 +19,24 @@ FtaPerson::FtaPerson( const wxString& personId )
 
 bool FtaPerson::IsInfoComplete( void )
 {
-	if( motherId.IsEmpty() )
-		return false;
+	int infoCompleteMask = FLAG_ANCESTRY | FLAG_DESCENDANCY | FLAG_PERSONAL_DETAILS;
 
-	if( fatherId.IsEmpty() )
+	if( ( flags & infoCompleteMask ) != infoCompleteMask )
 		return false;
-
-	// As far as the children and spouses go, we really have no way
-	// of knowing if the information is complete.  We assume here that
-	// whatever response we get from a request to find out the children
-	// or spouses gives us enough information.
-	
-	if( childrenIdSet.size() == 0 )
-		return false;
-
-	if( spousesIdSet.size() == 0 )
-		return false;
-
-	// TODO: Check other details too, such as ordinances, etc...
 
 	return true;
+}
+
+wxString FtaPerson::GetGenderString( void ) const
+{
+	switch( gender )
+	{
+		case GENDER_UNKNOWN:	return "Unknown";	break;
+		case GENDER_MALE:		return "Male";		break;
+		case GENDER_FEMALE:		return "Female";	break;
+	}
+
+	return "???";
 }
 
 bool FtaPerson::DumpInfo( void )
@@ -44,6 +44,10 @@ bool FtaPerson::DumpInfo( void )
 	FtaFrame* frame = wxGetApp().GetFrame();
 
 	frame->AddLogMessage( "-------------------------------------" );
+	frame->AddLogMessage( "Name: " + name );
+	frame->AddLogMessage( "Gender: " + GetGenderString() );
+	frame->AddLogMessage( "Life-span: " + lifeSpan );
+	frame->AddLogMessage( "Birth-place: " + birthPlace );
 	frame->AddLogMessage( "Person-ID: " + personId );
 	frame->AddLogMessage( "Mother-ID: " + ( motherId.IsEmpty() ? wxString( "Unknown" ) : motherId ) );
 	frame->AddLogMessage( "Father-ID: " + ( fatherId.IsEmpty() ? wxString( "Unknown" ) : fatherId ) );

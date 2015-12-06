@@ -24,11 +24,6 @@ public:
 
 private:
 
-	wxJSONValue FindNumber( long givenNumber, const wxString& type, const wxJSONValue& personsArrayValue );
-	wxJSONValue FindNumberString( const wxString& givenNumberString, const wxString& type, wxJSONValue& personsArrayValue );
-
-	void GatherNumbersWithPrefix( const wxString& prefix, const wxString& type, const wxJSONValue& personsArrayValue, FtaOffsetArray& offsetArray, bool excludeSpouses );
-
 	Type type;
 };
 

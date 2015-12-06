@@ -37,6 +37,9 @@
     <ClInclude Include="Code\FtaPersonInfoRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaPersonDetailsRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -64,6 +67,9 @@
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaPersonInfoRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaPersonDetailsRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
   </ItemGroup>

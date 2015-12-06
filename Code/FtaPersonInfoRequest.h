@@ -18,6 +18,12 @@ public:
 
 protected:
 
+	wxJSONValue FindPersonId( const wxString& personId, const wxJSONValue& personsArrayValue );
+	wxJSONValue FindNumber( long givenNumber, const wxString& type, const wxJSONValue& personsArrayValue );
+	wxJSONValue FindNumberString( const wxString& givenNumberString, const wxString& type, wxJSONValue& personsArrayValue );
+
+	void GatherNumbersWithPrefix( const wxString& prefix, const wxString& type, const wxJSONValue& personsArrayValue, FtaOffsetArray& offsetArray, bool excludeSpouses );
+
 	wxString personId;
 };
 

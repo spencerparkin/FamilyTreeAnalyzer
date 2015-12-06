@@ -1,160 +1,438 @@
 {
-  "links" : {
-    "collection" : {
-      "href" : "https://sandbox.familysearch.org/platform/collections/tree"
-    }
-  },
   "persons" : [ {
-    "id" : "KWZH-7R8",
+    "id" : "KWZC-XN7",
     "links" : {
+      "spouses" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/spouses"
+      },
       "ancestry" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7R8"
+        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZC-XN7"
       },
       "person" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7R8"
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7"
+      },
+      "parents" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/parents"
+      },
+      "person-with-relationships" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons-with-relationships?person=KWZC-XN7"
       },
       "descendancy" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7R8"
+        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZC-XN7"
+      },
+      "discussion-references" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/discussion-references"
+      },
+      "merge" : {
+        "template" : "https://sandbox.familysearch.org/platform/tree/persons/{pid}/merges/{dpid}{?filter,access_token}",
+        "type" : "application/json,application/x-fs-v1+json,application/x-fs-v1+xml,application/xml,text/html",
+        "accept" : "application/x-fs-v1+json,application/x-fs-v1+xml",
+        "allow" : "OPTIONS,GET,POST",
+        "title" : "Person Merge"
+      },
+      "change-history" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/changes"
+      },
+      "children" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/children"
+      },
+      "evidence-references" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/memory-references"
+      },
+      "spouse-relationships" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/spouse-relationships"
       },
       "child-relationships" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7R8/child-relationships"
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/child-relationships"
+      },
+      "collection" : {
+        "href" : "https://sandbox.familysearch.org/platform/collections/tree"
+      },
+      "ordinance-reservations" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/reservations"
+      },
+      "portrait" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/portrait"
+      },
+      "parent-relationships" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/parent-relationships"
+      },
+      "artifacts" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/memories"
+      },
+      "source-references" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/source-references"
+      },
+      "matches" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/matches"
+      },
+      "non-matches" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/not-a-match"
+      },
+      "portraits" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/portraits"
+      },
+      "notes" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/notes"
+      },
+      "source-descriptions" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/sources"
       }
+    },
+    "sortKey" : "0002417582",
+    "identifiers" : {
+      "http://gedcomx.org/Persistent" : [ "https://sandbox.familysearch.org/ark:/61903/4:1:KWZC-XN7" ]
     },
     "living" : false,
     "gender" : {
-      "type" : "http://gedcomx.org/Male"
-    },
-    "names" : [ {
-      "nameForms" : [ {
-        "fullText" : "Andrew Toolson",
-        "parts" : [ {
-          "type" : "http://gedcomx.org/Given",
-          "value" : "Andrew"
-        }, {
-          "type" : "http://gedcomx.org/Surname",
-          "value" : "Toolson"
-        } ]
-      } ]
-    } ],
-    "display" : {
-      "name" : "Andrew Toolson",
-      "gender" : "Male",
-      "lifespan" : "1824-1920",
-      "descendancyNumber" : "1"
-    }
-  }, {
-    "id" : "KWZH-7RD",
-    "links" : {
-      "ancestry" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7RD"
+      "id" : "V.777-777N",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/V.777-777N"
+        }
       },
-      "person" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7RD"
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
       },
-      "descendancy" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7RD"
-      },
-      "child-relationships" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7RD/child-relationships"
-      }
-    },
-    "living" : false,
-    "gender" : {
       "type" : "http://gedcomx.org/Female"
     },
     "names" : [ {
+      "id" : "V.777-777H",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/V.777-777H"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/BirthName",
       "nameForms" : [ {
-        "fullText" : "Jorgine Kirstine Funk",
+        "fullText" : "Mary Moss",
         "parts" : [ {
           "type" : "http://gedcomx.org/Given",
-          "value" : "Jorgine Kirstine"
+          "value" : "Mary"
         }, {
           "type" : "http://gedcomx.org/Surname",
-          "value" : "Funk"
+          "value" : "Moss"
         } ]
-      } ]
+      } ],
+      "preferred" : true
+    }, {
+      "id" : "N.777-777P",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-777P"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/MarriedName",
+      "nameForms" : [ {
+        "fullText" : "Mary Parkin",
+        "parts" : [ {
+          "type" : "http://gedcomx.org/Given",
+          "value" : "Mary"
+        }, {
+          "type" : "http://gedcomx.org/Surname",
+          "value" : "Parkin"
+        } ]
+      } ],
+      "preferred" : false
+    } ],
+    "facts" : [ {
+      "id" : "V.777-7771",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/V.777-7771"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/Birth",
+      "date" : {
+        "original" : "19070106",
+        "formal" : "+1907-01-06",
+        "normalized" : [ {
+          "value" : "6 January 1907"
+        } ]
+      },
+      "place" : {
+        "original" : "Woods Cross, Davis, Utah",
+        "description" : "#744647544",
+        "normalized" : [ {
+          "value" : "Woods Cross, Davis, Utah, United States"
+        } ]
+      }
+    }, {
+      "id" : "V.777-777P",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/V.777-777P"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/Death",
+      "date" : {
+        "original" : "20011208",
+        "formal" : "+2001-12-08",
+        "normalized" : [ {
+          "value" : "8 December 2001"
+        } ]
+      }
+    }, {
+      "id" : "V.777-7774",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/V.777-7774"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325,
+        "changeMessage" : "She was my beloved grandmother. Mary passed away at my husband, Kolyn W. Stanley and my home in Farmington, Utah on 8 December 2001. I made her final arrangements with the help of my brother, Greg H. Parkin and other family members."
+      },
+      "type" : "http://gedcomx.org/Burial",
+      "date" : {
+        "original" : "11 December 2001",
+        "formal" : "+2001-12-11",
+        "normalized" : [ {
+          "value" : "11 December 2001"
+        } ]
+      },
+      "place" : {
+        "original" : "Bountiful, Davis, Utah, United States",
+        "description" : "#1180569948",
+        "normalized" : [ {
+          "value" : "Bountiful, Davis, Utah, United States"
+        } ]
+      }
+    }, {
+      "id" : "N.777-7774",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-7774"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325,
+        "changeMessage" : "1940 Census"
+      },
+      "type" : "http://gedcomx.org/Residence",
+      "date" : {
+        "original" : "1940",
+        "formal" : "+1940",
+        "normalized" : [ {
+          "value" : "1940"
+        } ]
+      },
+      "place" : {
+        "original" : "South Bountiful Election Precinct, Woods Cross, Davis, Utah",
+        "description" : "#744647544",
+        "normalized" : [ {
+          "value" : "Woods Cross, Davis, Utah, United States"
+        } ]
+      }
+    }, {
+      "id" : "N.777-7771",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-7771"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325,
+        "changeMessage" : "1940 Census"
+      },
+      "type" : "http://gedcomx.org/Residence",
+      "date" : {
+        "original" : "1935",
+        "formal" : "+1935",
+        "normalized" : [ {
+          "value" : "1935"
+        } ]
+      },
+      "place" : {
+        "original" : "Same House, , "
+      }
+    }, {
+      "id" : "N.777-777N",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-777N"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325,
+        "changeMessage" : "1930 Census"
+      },
+      "type" : "http://gedcomx.org/Residence",
+      "date" : {
+        "original" : "1930",
+        "formal" : "+1930",
+        "normalized" : [ {
+          "value" : "1930"
+        } ]
+      },
+      "place" : {
+        "original" : "West Bountiful, Davis, Utah",
+        "description" : "#426689811",
+        "normalized" : [ {
+          "value" : "West Bountiful, Davis, Utah, United States"
+        } ]
+      }
+    }, {
+      "id" : "N.777-777H",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-777H"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/Residence",
+      "date" : {
+        "original" : "1920",
+        "formal" : "+1920",
+        "normalized" : [ {
+          "value" : "1920"
+        } ]
+      },
+      "place" : {
+        "original" : "South Bountiful, Davis, Utah, United States",
+        "description" : "#2068098638",
+        "normalized" : [ {
+          "value" : "Davis, Utah, United States"
+        } ]
+      }
+    }, {
+      "id" : "N.777-777L",
+      "links" : {
+        "conclusion" : {
+          "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZC-XN7/conclusions/N.777-777L"
+        }
+      },
+      "attribution" : {
+        "contributor" : {
+          "resource" : "https://sandbox.familysearch.org/platform/users/agents/MMXY-D47",
+          "resourceId" : "MMXY-D47"
+        },
+        "modified" : 1449117127325
+      },
+      "type" : "http://gedcomx.org/Residence",
+      "date" : {
+        "original" : "1910",
+        "formal" : "+1910",
+        "normalized" : [ {
+          "value" : "1910"
+        } ]
+      },
+      "place" : {
+        "original" : "South Bountiful, , Utah",
+        "description" : "#2068098638",
+        "normalized" : [ {
+          "value" : "Davis, Utah, United States"
+        } ]
+      }
     } ],
     "display" : {
-      "name" : "Jorgine Kirstine Funk",
+      "name" : "Mary Moss",
       "gender" : "Female",
-      "lifespan" : "1827-1874",
-      "descendancyNumber" : "1-S"
+      "lifespan" : "1907-2001",
+      "birthDate" : "6 January 1907",
+      "birthPlace" : "Woods Cross, Davis, Utah, United States",
+      "deathDate" : "8 December 2001"
     }
-  }, {
-    "id" : "KWZH-7PY",
+  } ],
+  "relationships" : [ ],
+  "sourceDescriptions" : [ {
+    "id" : "SD-KWZC-XN7",
     "links" : {
-      "ancestry" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7PY"
-      },
-      "person" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PY"
-      },
-      "descendancy" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7PY"
-      },
-      "child-relationships" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PY/child-relationships"
+      "description" : {
+        "href" : "https://sandbox.familysearch.org/platform/sources/descriptions/SD-KWZC-XN7"
       }
     },
-    "living" : false,
-    "gender" : {
-      "type" : "http://gedcomx.org/Male"
-    },
-    "names" : [ {
-      "nameForms" : [ {
-        "fullText" : "James Duncan Henrie",
-        "parts" : [ {
-          "type" : "http://gedcomx.org/Given",
-          "value" : "James Duncan"
-        }, {
-          "type" : "http://gedcomx.org/Surname",
-          "value" : "Henrie"
-        } ]
-      } ]
+    "citations" : [ {
+      "lang" : "en",
+      "value" : "\"Family Tree,\" database, <i>FamilySearch</i> (http://familysearch.org : modified 03 December 2015, 04:32), entry for Mary Moss(PID https://sandbox.familysearch.org/ark:/61903/4:1:KWZC-XN7); contributed by various users."
     } ],
-    "display" : {
-      "name" : "James Duncan Henrie",
-      "gender" : "Male",
-      "lifespan" : "1857-1922",
-      "descendancyNumber" : "1.1-S"
-    }
+    "about" : "#KWZC-XN7",
+    "componentOf" : {
+      "description" : "https://sandbox.familysearch.org/platform/collections/tree"
+    },
+    "titles" : [ {
+      "value" : "Mary Moss"
+    } ],
+    "resourceType" : "http://gedcomx.org/Person",
+    "identifiers" : {
+      "http://gedcomx.org/Persistent" : [ "https://sandbox.familysearch.org/ark:/61903/4:1:KWZC-XN7" ]
+    },
+    "modified" : 1449117127000
+  } ],
+  "places" : [ {
+    "id" : "744647544",
+    "names" : [ {
+      "value" : "Woods Cross, Davis, Utah, United States"
+    } ]
   }, {
-    "id" : "KWZH-7PB",
-    "links" : {
-      "ancestry" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/ancestry?person=KWZH-7PB"
-      },
-      "person" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PB"
-      },
-      "descendancy" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/descendancy?person=KWZH-7PB"
-      },
-      "child-relationships" : {
-        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PB/child-relationships"
-      }
-    },
-    "living" : false,
-    "gender" : {
-      "type" : "http://gedcomx.org/Female"
-    },
+    "id" : "1180569948",
     "names" : [ {
-      "nameForms" : [ {
-        "fullText" : "Ghena Christena Toolson",
-        "parts" : [ {
-          "type" : "http://gedcomx.org/Given",
-          "value" : "Ghena Christena"
-        }, {
-          "type" : "http://gedcomx.org/Surname",
-          "value" : "Toolson"
-        } ]
-      } ]
-    } ],
-    "display" : {
-      "name" : "Ghena Christena Toolson",
-      "gender" : "Female",
-      "lifespan" : "1867-1912",
-      "descendancyNumber" : "1.1"
-    }
-  } ]
+      "value" : "Bountiful, Davis, Utah, United States"
+    } ]
+  }, {
+    "id" : "426689811",
+    "names" : [ {
+      "value" : "West Bountiful, Davis, Utah, United States"
+    } ]
+  }, {
+    "id" : "2068098638",
+    "names" : [ {
+      "value" : "Davis, Utah, United States"
+    } ]
+  } ],
+  "description" : "#SD-KWZC-XN7"
 }

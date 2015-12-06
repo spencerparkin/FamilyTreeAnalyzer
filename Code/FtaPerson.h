@@ -13,13 +13,32 @@ public:
 
 	enum InfoState
 	{
-		INFO_UNKNOWN,
+		INFO_INCOMPLETE,
 		INFO_REQUESTED,
-		INFO_KNOWN,
+		INFO_COMPLETE,		// This doesn't mean all info is known about the person; only that we sucked it all down from familysearch.org.
+	};
+
+	enum Flags
+	{
+		FLAG_ANCESTRY				= 0x00000001,
+		FLAG_DESCENDANCY			= 0x00000002,
+		FLAG_PERSONAL_DETAILS		= 0x00000004,
+		FLAG_ORDINANCES				= 0x00000008,
+		FLAG_PORTRAIT				= 0x00000010,
+	};
+	
+	enum Gender
+	{
+		GENDER_UNKNOWN,
+		GENDER_MALE,
+		GENDER_FEMALE,
 	};
 
 	bool IsInfoComplete( void );
 	bool DumpInfo( void );
+
+	int GetFlags( void ) const { return flags; }
+	void SetFlags( int flags ) { this->flags = flags; }
 
 	InfoState GetInfoState( void ) const { return infoState; }
 	void SetInfoState( InfoState infoState ) { this->infoState = infoState; }
@@ -38,15 +57,34 @@ public:
 	const FtaPersonIdSet& GetSpousesIdSet( void ) const { return spousesIdSet; }
 	FtaPersonIdSet& GetSpousesIdSet( void ) { return spousesIdSet; }
 
+	Gender GetGender( void ) const { return gender; }
+	void SetGender( Gender gender ) { this->gender = gender; }
+
+	wxString GetGenderString( void ) const;
+
+	const wxString& GetName( void ) const { return name; }
+	void SetName( const wxString& name ) { this->name = name; }
+
+	const wxString& GetLifeSpan( void ) const { return lifeSpan; }
+	void SetLifeSpan( const wxString& lifeSpan ) { this->lifeSpan = lifeSpan; }
+
+	const wxString& GetBirthPlace( void ) const { return birthPlace; }
+	void SetBirthPlace( const wxString& birthPlace ) { this->birthPlace = birthPlace; }
+
 	void GatherNearestRelations( FtaPersonList& personList );
 
 private:
 
 	InfoState infoState;
+	int flags;
 	wxString personId;
 	wxString motherId, fatherId;
 	FtaPersonIdSet childrenIdSet;
 	FtaPersonIdSet spousesIdSet;
+	wxString name;
+	Gender gender;
+	wxString lifeSpan;
+	wxString birthPlace;
 };
 
 // FtaPerson.h

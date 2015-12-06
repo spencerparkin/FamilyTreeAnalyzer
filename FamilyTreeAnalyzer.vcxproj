@@ -18,6 +18,7 @@
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaPedigreeRequest.h" />
     <ClInclude Include="Code\FtaPerson.h" />
+    <ClInclude Include="Code\FtaPersonDetailsRequest.h" />
     <ClInclude Include="Code\FtaPersonInfoRequest.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
@@ -29,6 +30,7 @@
     <ClCompile Include="Code\FtaFrame.cpp" />
     <ClCompile Include="Code\FtaPedigreeRequest.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
+    <ClCompile Include="Code\FtaPersonDetailsRequest.cpp" />
     <ClCompile Include="Code\FtaPersonInfoRequest.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>

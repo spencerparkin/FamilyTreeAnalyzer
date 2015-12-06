@@ -6,6 +6,7 @@
 #include "FtaClient.h"
 #include "FtaApp.h"
 #include "FtaPedigreeRequest.h"
+#include "FtaPersonDetailsRequest.h"
 
 FtaTreeCache::FtaTreeCache( void )
 {
@@ -104,7 +105,7 @@ bool FtaTreeCache::Dump( void )
 	wxString personId = personInfoRequest->GetPersonId();
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
 	if( person->IsInfoComplete() )
-		person->SetInfoState( FtaPerson::INFO_KNOWN );
+		person->SetInfoState( FtaPerson::INFO_COMPLETE );
 
 	if( ( signed )personMap.size() < personCountThreshold )
 	{
@@ -115,7 +116,7 @@ bool FtaTreeCache::Dump( void )
 		while( iter != adjacentPersonList.end() )
 		{
 			FtaPerson* adjacentPerson = *iter;
-			if( adjacentPerson->GetInfoState() == FtaPerson::INFO_UNKNOWN )
+			if( adjacentPerson->GetInfoState() == FtaPerson::INFO_INCOMPLETE )
 			{
 				( void )RequestPerson( adjacentPerson->GetPersonId() );
 			}
@@ -130,15 +131,21 @@ bool FtaTreeCache::Dump( void )
 bool FtaTreeCache::RequestPerson( const wxString& personId )
 {
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
-	if( person->GetInfoState() != FtaPerson::INFO_UNKNOWN )
+	if( person->GetInfoState() == FtaPerson::INFO_COMPLETE )
 		return false;
 
 	FtaClient* client = wxGetApp().GetClient();
 
 	// If all of the following requests complete, then the person's information on www.familysearch.com will become fully known.
-	client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ) );
-	client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ) );
-	//...
+
+	if( ( person->GetFlags() & FtaPerson::FLAG_ANCESTRY ) == 0 )
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ) );
+
+	if( ( person->GetFlags() & FtaPerson::FLAG_DESCENDANCY ) == 0 )
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ) );
+
+	if( ( person->GetFlags() & FtaPerson::FLAG_PERSONAL_DETAILS ) == 0 )
+		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ) );
 
 	person->SetInfoState( FtaPerson::INFO_REQUESTED );
 

@@ -134,56 +134,29 @@ FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, Res
 		if( i < size )
 			break;
 
+		FtaPerson* person = cache->Lookup( GetPersonId(), FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+		if( !person )
+			break;
+
+		switch( type )
+		{
+			case TYPE_ANCESTRY:
+			{
+				person->SetFlags( person->GetFlags() | FtaPerson::FLAG_ANCESTRY );
+				break;
+			}
+			case TYPE_DESCENDANCY:
+			{
+				person->SetFlags( person->GetFlags() | FtaPerson::FLAG_DESCENDANCY );
+				break;
+			}
+		}
+
 		success = true;
 	}
 	while( false );
 
 	return success;
-}
-
-wxJSONValue FtaPedigreeRequest::FindNumber( long givenNumber, const wxString& type, const wxJSONValue& personsArrayValue )
-{
-	int size = personsArrayValue.Size();
-	for( int i = 0; i < size; i++ )
-	{
-		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
-		long number;
-		if( personValue[ "display" ][ type ].AsString().ToLong( &number ) )
-			if( number == givenNumber )
-				return personValue;
-	}
-
-	return wxJSONValue();
-}
-
-wxJSONValue FtaPedigreeRequest::FindNumberString( const wxString& givenNumberString, const wxString& type, wxJSONValue& personsArrayValue )
-{
-	int size = personsArrayValue.Size();
-	for( int i = 0; i < size; i++ )
-	{
-		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
-		wxString numberString = personValue[ "display" ][ type ].AsString();
-		if( numberString == givenNumberString )
-			return personValue;
-	}
-
-	return wxJSONValue();
-}
-
-void FtaPedigreeRequest::GatherNumbersWithPrefix( const wxString& prefix, const wxString& type, const wxJSONValue& personsArrayValue, FtaOffsetArray& offsetArray, bool excludeSpouses )
-{
-	offsetArray.clear();
-
-	int size = personsArrayValue.Size();
-	for( int i = 0; i < size; i++ )
-	{
-		wxJSONValue personValue = ( *const_cast< wxJSONValue* >( &personsArrayValue ) )[i];
-		wxString numberString = personValue[ "display" ][ type ].AsString();
-		if( excludeSpouses && numberString.Find( "-S" ) >= 0 )
-			continue;
-		if( numberString.find( prefix ) == 0 )
-			offsetArray.push_back(i);
-	}
 }
 
 // FtaPedigreeRequest.cpp
