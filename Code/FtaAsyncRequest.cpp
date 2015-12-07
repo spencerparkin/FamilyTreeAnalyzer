@@ -54,6 +54,9 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEFUNCTION, &FtaClient::WriteFunction );
 	curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, &responseValueString );
 
+	curl_easy_setopt( curlHandleEasy, CURLOPT_HEADERFUNCTION, &FtaClient::HeaderFunction );
+	curl_easy_setopt( curlHandleEasy, CURLOPT_HEADERDATA, &headerArray );
+
 	return true;
 }
 

@@ -215,6 +215,16 @@ bool FtaClient::DeleteAccessToken( void )
 	return 0;
 }
 
+/*static*/ size_t FtaClient::HeaderFunction( void* buf, size_t size, size_t nitems, void* userPtr )
+{
+	wxArrayString* arrayString = ( wxArrayString* )userPtr;
+	wxString responseString;
+	size_t totalBytes = size * nitems;
+	responseString.Append( ( const char* )buf, totalBytes );
+	arrayString->push_back( responseString );
+	return totalBytes;
+}
+
 bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 {
 	bool success = true;
@@ -361,8 +371,6 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 		if( curlMsg->data.result == CURLE_OK )
 		{
-			// TODO: How do I get the "GET Status Codes" returned from a request?
-
 			bool processed = request->ProcessResponse();
 			wxASSERT( processed );
 		}
