@@ -369,6 +369,9 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 		FtaAsyncRequest* request = *iter;
 		request->SetCurlCode( curlMsg->data.result );
 
+		// TODO: If the request was throttled, we may need to remake it after a certain amount of time has passed.
+		//       See "https://familysearch.org/developers/docs/guides/throttling" for more info.
+
 		if( curlMsg->data.result == CURLE_OK )
 		{
 			bool processed = request->ProcessResponse();

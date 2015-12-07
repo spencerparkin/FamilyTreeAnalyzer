@@ -5,8 +5,6 @@
 #include "FtaFrame.h"
 #include "FtaTreeCache.h"
 
-// TODO: What is throttling, and how might it affect the data we're getting back from familysearch.org?
-
 wxIMPLEMENT_APP( FtaApp );
 
 FtaApp::FtaApp( void )
