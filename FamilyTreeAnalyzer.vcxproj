@@ -16,6 +16,8 @@
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaLogPanel.h" />
+    <ClInclude Include="Code\FtaPanel.h" />
     <ClInclude Include="Code\FtaPedigreeRequest.h" />
     <ClInclude Include="Code\FtaPerson.h" />
     <ClInclude Include="Code\FtaPersonDetailsRequest.h" />
@@ -30,6 +32,8 @@
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaLogPanel.cpp" />
+    <ClCompile Include="Code\FtaPanel.cpp" />
     <ClCompile Include="Code\FtaPedigreeRequest.cpp" />
     <ClCompile Include="Code\FtaPerson.cpp" />
     <ClCompile Include="Code\FtaPersonDetailsRequest.cpp" />

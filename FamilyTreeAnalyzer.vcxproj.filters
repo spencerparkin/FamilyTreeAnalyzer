@@ -8,6 +8,9 @@
     <Filter Include="Code\AsyncRequests">
       <UniqueIdentifier>{6ce83bbf-0769-4ae6-94b5-f963c2d9f70e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Code\Panels">
+      <UniqueIdentifier>{19e2bba3-dc7a-4fea-9379-1032de919ed1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -46,6 +49,12 @@
     <ClInclude Include="Code\FtaPersonOrdinancesRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaPanel.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaLogPanel.h">
+      <Filter>Code\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -83,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="Code\FtaPersonOrdinancesRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaPanel.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaLogPanel.cpp">
+      <Filter>Code\Panels</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,8 +2,10 @@
 
 #pragma once
 
+#include "FtaLogPanel.h"
 #include <wx/frame.h>
-#include <wx/stc/stc.h>
+#include <wx/aui/aui.h>
+#include <wx/timer.h>
 
 class FtaFrame : public wxFrame
 {
@@ -14,6 +16,12 @@ public:
 
 	void AddLogMessage( const wxString& message );
 	void ClearLog( void );
+
+	template< typename FtaPanelType >
+	FtaPanelType* GetPanel( void )
+	{
+		return( ( FtaPanelType* )FindPanel( &FtaPanelType::ms_classInfo ) );
+	}
 
 private:
 
@@ -27,6 +35,7 @@ private:
 		ID_ClearLog,
 		ID_Exit,
 		ID_About,
+		ID_Timer,
 	};
 
 	void OnAcquireAccessToken( wxCommandEvent& event );
@@ -38,8 +47,15 @@ private:
 	void OnExit( wxCommandEvent& event );
 	void OnAbout( wxCommandEvent& event );
 	void OnUpdateMenuItemUI( wxUpdateUIEvent& event );
+	void OnTimer( wxTimerEvent& event );
 
-	wxStyledTextCtrl* textCtrl;
+	bool MakePanels( void );
+
+	wxWindow* FindPanel( wxClassInfo* classInfo );
+
+	wxAuiManager* auiManager;
+
+	wxTimer timer;
 };
 
 // FtaFrame.h
