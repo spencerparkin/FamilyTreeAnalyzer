@@ -55,6 +55,9 @@
     <ClInclude Include="Code\FtaLogPanel.h">
       <Filter>Code\Panels</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaGraphPanel.h">
+      <Filter>Code\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -97,6 +100,9 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaLogPanel.cpp">
+      <Filter>Code\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaGraphPanel.cpp">
       <Filter>Code\Panels</Filter>
     </ClCompile>
   </ItemGroup>
