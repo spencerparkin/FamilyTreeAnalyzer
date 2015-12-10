@@ -1,6 +1,8 @@
 // FtaPersonPortraitRequest.cpp
 
 #include "FtaPersonPortraitRequest.h"
+#include "FtaTreeCache.h"
+#include "FtaApp.h"
 
 FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
 {
@@ -21,9 +23,24 @@ FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, Re
 
 /*virtual*/ bool FtaPersonPortraitRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
 {
-	// Hmmm...I don't thing we're going to get image data from JSON.  Figure it out.
-	// We have to somehow get the redirect location and then get the image from there.
-	return false;
+	FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
+	if( !person )
+		return false;
+
+	if( httpStatusCode.Find( "204" ) < 0 )
+	{
+		int i = FindHeaderLine( "Location:" );
+		if( i < 0 )
+			return false;
+
+		wxString portraitUrl = headerArray[i];
+		portraitUrl.Remove( 0, 10 );
+		person->SetPortraitUrl( portraitUrl );
+	}
+
+	person->SetFlags( person->GetFlags() | FtaPerson::FLAG_PORTRAIT );
+
+	return true;
 }
 
 // FtaPersonPortraitRequest.cpp

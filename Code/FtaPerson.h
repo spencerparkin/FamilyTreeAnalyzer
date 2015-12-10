@@ -71,6 +71,9 @@ public:
 	const wxString& GetBirthPlace( void ) const { return birthPlace; }
 	void SetBirthPlace( const wxString& birthPlace ) { this->birthPlace = birthPlace; }
 
+	const wxString& GetPortraitUrl( void ) const { return portraitUrl; }
+	void SetPortraitUrl( const wxString& portaritUrl ) { this->portraitUrl = portraitUrl; }
+
 	void GatherNearestRelations( FtaPersonList& personList );
 
 private:
@@ -85,6 +88,7 @@ private:
 	Gender gender;
 	wxString lifeSpan;
 	wxString birthPlace;
+	wxString portraitUrl;
 };
 
 // FtaPerson.h

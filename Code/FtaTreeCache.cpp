@@ -139,6 +139,7 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	FtaClient* client = wxGetApp().GetClient();
 
 	// If all of the following requests complete, then the person's information on www.familysearch.com will become fully known.
+	// Which, of course, is not to say that we know everything about the person.
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_ANCESTRY ) == 0 )
 		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ) );
@@ -149,13 +150,12 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	if( ( person->GetFlags() & FtaPerson::FLAG_PERSONAL_DETAILS ) == 0 )
 		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ) );
 
-	// It's okay to request this, because we don't actually get the image data; we just get a URL for it.
-	// Then, when we actually want to render the person, we know where to go get the image.
-	//if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
-	//	client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ) );
+	if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
+		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ) );
 
-	if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
-		client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ) );
+	// Only "approved applications" can request an individual's ordinance data.  Lame.
+	//if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
+	//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ) );
 
 	person->SetInfoState( FtaPerson::INFO_REQUESTED );
 

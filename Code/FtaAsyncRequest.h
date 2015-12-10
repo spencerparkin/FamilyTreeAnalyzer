@@ -16,7 +16,7 @@ public:
 	virtual ~FtaAsyncRequest( void );
 
 	virtual bool FormulateRequest( void );
-	virtual bool ProcessResponse( void );
+	virtual bool ProcessResponse( long& retryAfterSeconds );
 	virtual bool MakeUrl( wxString& url );
 
 	class ResponseProcessor
@@ -33,8 +33,15 @@ public:
 	void SetUserData( void* userData ) { this->userData = userData; }
 	void* GetUserData( void ) { return userData; }
 
+	void SetRetryTime( long retryTimeSeconds ) { this->retryTimeSeconds = retryTimeSeconds; }
+	int GetRetryTime( void ) const { return retryTimeSeconds; }
+
 protected:
 
+	int FindHeaderLine( const wxString& pattern );
+	
+	long retryTimeSeconds;
+	wxString httpStatusCode;
 	void* userData;
 	ResponseProcessor* processor;
 	wxString responseValueString;		// Typically JSON.

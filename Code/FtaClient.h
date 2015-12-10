@@ -25,7 +25,7 @@ public:
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
 	bool CompleteAllAsyncRequests( bool showWorkingDialog );
 	bool CancelAllAsyncRequests( void );
-	bool AsyncRequestsPending( void ) { return( asyncRequestList.size() > 0 ? true : false ); }
+	bool AsyncRequestsPending( void );
 
 	const wxString& GetAccessToken( void ) { return accessToken; }
 
@@ -43,6 +43,7 @@ private:
 	wxString accessToken;
 	char errorBuf[ CURL_ERROR_SIZE ];
 	FtaAsyncRequestList asyncRequestList;
+	FtaAsyncRequestList asyncRetryList;
 };
 
 // FtaClient.h

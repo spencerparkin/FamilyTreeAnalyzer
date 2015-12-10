@@ -8,6 +8,7 @@
 FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 {
 	this->processor = processor;
+	retryTimeSeconds = 0;
 	userData = nullptr;
 	headers = nullptr;
 	curlHandleEasy = curl_easy_init();	// TODO: Alloc from pool of existing handles instead?
@@ -70,20 +71,51 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	return true;
 }
 
-/*virtual*/ bool FtaAsyncRequest::ProcessResponse( void )
+int FtaAsyncRequest::FindHeaderLine( const wxString& pattern )
 {
+	for( int i = 0; i < ( signed )headerArray.GetCount(); i++ )
+		if( headerArray[i].Find( pattern ) >= 0 )
+			return i;
+
+	return -1;
+}
+
+/*virtual*/ bool FtaAsyncRequest::ProcessResponse( long& retryAfterSeconds )
+{
+	retryAfterSeconds = -1;
+
+	int i = FindHeaderLine( "HTTP/" );
+	if( i < 0 )
+		return false;
+
+	httpStatusCode = headerArray[i];
+	if( httpStatusCode.Find( "429" ) >= 0 )
+	{
+		i = FindHeaderLine( "Retry-After:" );
+		if( i < 0 )
+			return false;
+
+		wxString retryString = headerArray[i];
+		retryString.Remove( 0, 13 );
+		if( !retryString.ToLong( &retryAfterSeconds ) )
+			return false;
+
+		return true;
+	}
+
 	if( !processor )
 		return false;
 
-	if( responseValueString.IsEmpty() )
-		return false;
-
-	wxJSONReader jsonReader;
 	wxJSONValue responseValue;
-	int errorCount = jsonReader.Parse( responseValueString, &responseValue );
-	if( errorCount > 0 )
-		return false;
+	if( !responseValueString.IsEmpty() )
+	{
+		wxJSONReader jsonReader;
+		int errorCount = jsonReader.Parse( responseValueString, &responseValue );
+		if( errorCount > 0 )
+			return false;
+	}
 
+	// A null response value is valid in some cases.
 	if( !processor->ProcessResponse( this, responseValue ) )
 		return false;
 

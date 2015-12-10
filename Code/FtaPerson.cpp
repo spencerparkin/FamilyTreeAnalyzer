@@ -19,7 +19,7 @@ FtaPerson::FtaPerson( const wxString& personId )
 
 bool FtaPerson::IsInfoComplete( void )
 {
-	int infoCompleteMask = FLAG_ANCESTRY | FLAG_DESCENDANCY | FLAG_PERSONAL_DETAILS;
+	int infoCompleteMask = FLAG_ANCESTRY | FLAG_DESCENDANCY | FLAG_PERSONAL_DETAILS | FLAG_PORTRAIT;
 
 	if( ( flags & infoCompleteMask ) != infoCompleteMask )
 		return false;

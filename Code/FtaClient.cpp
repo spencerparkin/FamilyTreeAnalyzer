@@ -233,7 +233,7 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 	wxBusyCursor* busyCursor = nullptr;
 
 	if( showWorkingDialog )
-		progressDialog = new wxGenericProgressDialog( "Requests Pending...", "Working...", asyncRequestList.size(), nullptr, wxPD_APP_MODAL | wxPD_CAN_ABORT );
+		progressDialog = new wxGenericProgressDialog( "Requests Pending...", "Working...", 100, nullptr, wxPD_APP_MODAL | wxPD_CAN_ABORT );
 	else
 		busyCursor = new wxBusyCursor();
 
@@ -250,12 +250,12 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 			if( progressDialog->WasCancelled() )
 				break;
 
-			// We can't set the range as the true high water-mark, because the progress dialog
-			// goes into a blocking modal message pump loop thinger if we let it hit 100%.
-			if( ( signed )asyncRequestList.size() >= progressDialog->GetRange() )
-				progressDialog->SetRange( asyncRequestList.size() + 1 );
-
-			progressDialog->Update( asyncRequestList.size(), wxString::Format( "%d requests pending...", asyncRequestList.size() ) );
+			int newValue = progressDialog->GetValue() + 1;
+			if( newValue == progressDialog->GetRange() )
+				newValue = 1;
+			
+			int count = asyncRequestList.size() + asyncRetryList.size();
+			progressDialog->Update( newValue, wxString::Format( "%d requests pending...", count ) );
 		}
 	}
 
@@ -266,6 +266,17 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 	delete busyCursor;
 
 	return success;
+}
+
+bool FtaClient::AsyncRequestsPending( void )
+{
+	if( asyncRequestList.size() > 0 )
+		return true;
+
+	if( asyncRetryList.size() > 0 )
+		return true;
+
+	return false;
 }
 
 bool FtaClient::CancelAllAsyncRequests( void )
@@ -284,6 +295,16 @@ bool FtaClient::CancelAllAsyncRequests( void )
 		delete request;
 
 		asyncRequestList.erase( iter );
+	}
+
+	while( asyncRetryList.size() > 0 )
+	{
+		FtaAsyncRequestList::iterator iter = asyncRetryList.begin();
+		FtaAsyncRequest* request = *iter;
+
+		delete request;
+
+		asyncRetryList.erase( iter );
 	}
 
 	return true;
@@ -310,79 +331,107 @@ bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request )
 
 bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 {
-	CURLMcode curlmCode;
-
-	if( waitOnSockets )
+	if( asyncRequestList.size() > 0 )
 	{
-		long waitTimeMilliseconds;
-		curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
-		if( curlmCode != CURLM_OK )
-			return false;
+		CURLMcode curlmCode;
 
-		if( waitTimeMilliseconds > 0 )
+		if( waitOnSockets )
 		{
-			long waitTimeMicroseconds = waitTimeMilliseconds * 1000;
-			timeval waitTime;
-			waitTime.tv_sec = 0;
-			waitTime.tv_usec = waitTimeMicroseconds;
-
-			fd_set fdread, fdwrite, fdexcep;
-			FD_ZERO( &fdread );
-			FD_ZERO( &fdwrite );
-			FD_ZERO( &fdexcep );
-
-			int maxfd = -1;
-			curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+			long waitTimeMilliseconds;
+			curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
 			if( curlmCode != CURLM_OK )
 				return false;
 
-			if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
+			if( waitTimeMilliseconds > 0 )
 			{
-				if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, &waitTime ) )
-				{
-					int error = WSAGetLastError();
+				long waitTimeMicroseconds = waitTimeMilliseconds * 1000;
+				timeval waitTime;
+				waitTime.tv_sec = 0;
+				waitTime.tv_usec = waitTimeMicroseconds;
+
+				fd_set fdread, fdwrite, fdexcep;
+				FD_ZERO( &fdread );
+				FD_ZERO( &fdwrite );
+				FD_ZERO( &fdexcep );
+
+				int maxfd = -1;
+				curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+				if( curlmCode != CURLM_OK )
 					return false;
+
+				if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
+				{
+					if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, &waitTime ) )
+					{
+						int error = WSAGetLastError();
+						return false;
+					}
 				}
+			}
+		}
+
+		int runningHandles = 0;
+		curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
+		if( curlmCode != CURLM_OK )
+			return false;
+
+		struct CURLMsg* curlMsg = nullptr;
+		while( true )
+		{
+			int queuedMessageCount = 0;
+			curlMsg = curl_multi_info_read( curlHandleMulti, &queuedMessageCount );
+			if( !curlMsg )
+				break;
+
+			if( curlMsg->msg != CURLMSG_DONE )
+				continue;
+		
+			FtaAsyncRequestList::iterator iter = FindAsyncRequest( curlMsg->easy_handle );
+			wxASSERT( iter != asyncRequestList.end() );
+		
+			FtaAsyncRequest* request = *iter;
+			request->SetCurlCode( curlMsg->data.result );
+
+			long retryAfterSeconds = -1;
+			if( curlMsg->data.result == CURLE_OK )
+			{
+				bool processed = request->ProcessResponse( retryAfterSeconds );
+				wxASSERT( processed );
+			}
+
+			curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+			wxASSERT( curlmCode == CURLM_OK );
+
+			asyncRequestList.erase( iter );
+
+			if( retryAfterSeconds < 0 )
+				delete request;
+			else
+			{
+				long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
+				request->SetRetryTime( currentTimeSeconds + retryAfterSeconds );
+				asyncRetryList.push_back( request );
 			}
 		}
 	}
 
-	int runningHandles = 0;
-	curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
-	if( curlmCode != CURLM_OK )
-		return false;
-
-	struct CURLMsg* curlMsg = nullptr;
-	while( true )
+	FtaAsyncRequestList::iterator iter = asyncRetryList.begin();
+	while( iter != asyncRetryList.end() )
 	{
-		int queuedMessageCount = 0;
-		curlMsg = curl_multi_info_read( curlHandleMulti, &queuedMessageCount );
-		if( !curlMsg )
-			break;
+		FtaAsyncRequestList::iterator nextIter = iter;
+		nextIter++;
 
-		if( curlMsg->msg != CURLMSG_DONE )
-			continue;
-		
-		FtaAsyncRequestList::iterator iter = FindAsyncRequest( curlMsg->easy_handle );
-		wxASSERT( iter != asyncRequestList.end() );
-			
 		FtaAsyncRequest* request = *iter;
-		request->SetCurlCode( curlMsg->data.result );
-
-		// TODO: If the request was throttled, we may need to remake it after a certain amount of time has passed.
-		//       See "https://familysearch.org/developers/docs/guides/throttling" for more info.
-
-		if( curlMsg->data.result == CURLE_OK )
+		long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
+		if( currentTimeSeconds >= request->GetRetryTime() )
 		{
-			bool processed = request->ProcessResponse();
-			wxASSERT( processed );
+			asyncRetryList.erase( iter );
+
+			bool added = AddAsyncRequest( request );
+			wxASSERT( added );
 		}
 
-		curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
-		wxASSERT( curlmCode == CURLM_OK );
-
-		delete request;
-		asyncRequestList.erase( iter );
+		iter = nextIter;
 	}
 
 	return true;
