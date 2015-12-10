@@ -2,6 +2,7 @@
 
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
+#include "FtaFrame.h"
 #include "FtaAsyncRequest.h"
 #include "FtaApp.h"
 #include <wx/textdlg.h>
@@ -150,6 +151,8 @@ bool FtaClient::Authenticate( void )
 		if( !HasAccessToken() )
 			break;
 
+		wxGetApp().GetFrame()->AddLogMessage( "Authenticated!" );
+
 		success = true;
 	}
 	while( false );
@@ -186,6 +189,8 @@ bool FtaClient::DeleteAccessToken( void )
 			break;
 
 		accessToken = "";
+
+		wxGetApp().GetFrame()->AddLogMessage( "Logged out!" );
 
 		success = true;
 	}

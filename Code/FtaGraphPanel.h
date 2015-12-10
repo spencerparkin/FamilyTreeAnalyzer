@@ -5,6 +5,7 @@
 #include "FtaPanel.h"
 
 // TODO: Own a wxCanvas control.  Draw family tree using a spring-lattice method.
+// TODO: Support picking?
 class FtaGraphPanel : public FtaPanel
 {
 public:
