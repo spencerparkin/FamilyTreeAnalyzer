@@ -190,7 +190,8 @@ bool FtaClient::DeleteAccessToken( void )
 
 		accessToken = "";
 
-		wxGetApp().GetFrame()->AddLogMessage( "Logged out!" );
+		if( wxGetApp().GetFrame() )
+			wxGetApp().GetFrame()->AddLogMessage( "Logged out!" );
 
 		success = true;
 	}

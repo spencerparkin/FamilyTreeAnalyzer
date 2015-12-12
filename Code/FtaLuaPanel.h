@@ -3,6 +3,8 @@
 #pragma once
 
 #include "FtaPanel.h"
+#include <wx/stc/stc.h>
+#include <wx/button.h>
 
 class FtaLuaPanel : public FtaPanel
 {
@@ -16,6 +18,12 @@ public:
 	virtual bool GetPaneInfo( wxAuiPaneInfo& paneInfo );
 	virtual bool MakeControls( void );
 	virtual bool TimerUpdate( void );
+
+	void OnExecuteButtonPressed( wxCommandEvent& event );
+
+private:
+
+	wxStyledTextCtrl* textCtrl;
 };
 
 // FtaLuaPanel.h

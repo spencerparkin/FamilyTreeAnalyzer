@@ -71,8 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>Build/$(Configuration)\</OutDir>
-    <IntDir>Build/$(Configuration)\</IntDir>
+    <OutDir>Build/Lua/$(Configuration)\</OutDir>
+    <IntDir>Build/Lua/$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

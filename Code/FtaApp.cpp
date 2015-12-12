@@ -4,6 +4,7 @@
 #include "FtaClient.h"
 #include "FtaFrame.h"
 #include "FtaTreeCache.h"
+#include "FtaLuaFunction.h"
 
 wxIMPLEMENT_APP( FtaApp );
 
@@ -36,6 +37,8 @@ FtaApp::FtaApp( void )
 
 	luaL_openlibs(L);
 
+	FtaLuaFunction::RegisterAllFunctions();
+
 	client = new FtaClient();
 	if( !client->Initialize() )
 		return false;
@@ -48,6 +51,8 @@ FtaApp::FtaApp( void )
 
 /*virtual*/ int FtaApp::OnExit( void )
 {
+	frame = nullptr;
+
 	if( client )
 		( void )client->Shutdown();
 
