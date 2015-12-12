@@ -118,7 +118,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../wxWidgets-3.0.2/lib/vc_lib;../../curl-7.45.0/builds/libcurl-vc14-x86-release-static-ipv6-sspi-winssl/lib;%(AdditionalLibraryDirectories);../../wxJSON/lib/vc_lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxmsw30u_core.lib;wxbase30u.lib;wxmsw30u_gl.lib;libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw30u_core.lib;wxbase30u.lib;wxmsw30u_gl.lib;libcurl_a.lib;Lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
