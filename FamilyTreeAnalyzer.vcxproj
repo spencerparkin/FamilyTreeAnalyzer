@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
+    <ClInclude Include="Code\FtaClearFunction.h" />
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaFrame.h" />
@@ -36,6 +37,7 @@
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />
+    <ClCompile Include="Code\FtaClearFunction.cpp" />
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />

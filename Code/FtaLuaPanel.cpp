@@ -28,6 +28,8 @@ FtaLuaPanel::FtaLuaPanel( void )
 	textCtrl->StyleClearAll();
 	textCtrl->SetLexer( wxSTC_LEX_LUA );
 
+	// TODO: Get syntax coloring working.  Use mono-space font here and in log.
+
 	wxButton* executeButton = new wxButton( this, wxID_ANY, "Execute" );
 
 	wxBoxSizer* boxSizer = new wxBoxSizer( wxVERTICAL );

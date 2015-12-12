@@ -79,6 +79,9 @@
     <ClInclude Include="Code\FtaPrintFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaClearFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -142,6 +145,9 @@
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaPrintFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaClearFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
