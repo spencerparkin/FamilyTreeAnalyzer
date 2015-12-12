@@ -100,12 +100,16 @@ bool FtaTreeCache::Dump( void )
 	FtaPersonInfoRequest* personInfoRequest = ( FtaPersonInfoRequest* )request;
 	if( !personInfoRequest )
 		return false;
-	
-	if( !personInfoRequest->AccumulateInfoInCache( responseValue ) )
-		return false;
 
 	wxString personId = personInfoRequest->GetPersonId();
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
+
+	if( !personInfoRequest->AccumulateInfoInCache( responseValue ) )
+	{
+		person->SetFlags( person->GetFlags() | FtaPerson::FLAG_CACHE_ACCUM_FAILURE );
+		return false;
+	}
+
 	if( person->IsInfoComplete() )
 		person->SetInfoState( FtaPerson::INFO_COMPLETE );
 
