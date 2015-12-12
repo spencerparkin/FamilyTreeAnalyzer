@@ -4,7 +4,6 @@
 
 #include "FtaPanel.h"
 
-// TODO: Own a Lua state.  Write frame-work for registering Lua functions.
 class FtaLuaPanel : public FtaPanel
 {
 public:

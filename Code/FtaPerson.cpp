@@ -106,4 +106,72 @@ void FtaPerson::GatherNearestRelations( FtaPersonList& personList )
 	}
 }
 
+bool FtaPerson::SetFromLuaTable( lua_State* L, int idx )
+{
+	// TODO: Read fields from table at given index on the stack.
+	return false;
+}
+
+bool FtaPerson::GetToLuaTable( lua_State* L ) const
+{
+	if( infoState != INFO_COMPLETE )
+		return false;
+
+	lua_newtable(L);
+
+	lua_pushstring( L, personId );
+	lua_setfield( L, -2, "personId" );
+
+	lua_pushstring( L, motherId );
+	lua_setfield( L, -2, "motherId" );
+
+	lua_pushstring( L, fatherId );
+	lua_setfield( L, -2, "fatherId" );
+
+	lua_pushstring( L, name );
+	lua_setfield( L, -2, "name" );
+
+	lua_pushstring( L, lifeSpan );
+	lua_setfield( L, -2, "lifeSpan" );
+
+	lua_pushstring( L, birthPlace );
+	lua_setfield( L, -2, "birthPlace" );
+
+	lua_newtable(L);
+
+	int i = 0;
+	FtaPersonIdSet::const_iterator iter = childrenIdSet.begin();
+	while( iter != childrenIdSet.end() )
+	{
+		wxString childId = *iter;
+
+		lua_pushinteger( L, ++i );
+		lua_pushstring( L, childId );
+		lua_settable( L, -3 );
+
+		iter++;
+	}
+
+	lua_setfield( L, -2, "childIds" );
+
+	lua_newtable(L);
+
+	i = 0;
+	iter = spousesIdSet.begin();
+	while( iter != spousesIdSet.end() )
+	{
+		wxString spouseId = *iter;
+
+		lua_pushinteger( L, ++i );
+		lua_pushstring( L, spouseId );
+		lua_settable( L, -3 );
+
+		iter++;
+	}
+
+	lua_setfield( L, -2, "spouseIds" );
+
+	return true;
+}
+
 // FtaPerson.cpp

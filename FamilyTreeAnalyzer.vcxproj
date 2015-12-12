@@ -16,8 +16,10 @@
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraphPanel.h" />
     <ClInclude Include="Code\FtaLogPanel.h" />
+    <ClInclude Include="Code\FtaLuaFunction.h" />
     <ClInclude Include="Code\FtaLuaPanel.h" />
     <ClInclude Include="Code\FtaPanel.h" />
     <ClInclude Include="Code\FtaPedigreeRequest.h" />
@@ -26,6 +28,7 @@
     <ClInclude Include="Code\FtaPersonInfoRequest.h" />
     <ClInclude Include="Code\FtaPersonOrdinancesRequest.h" />
     <ClInclude Include="Code\FtaPersonPortraitRequest.h" />
+    <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
   <ItemGroup>
@@ -34,8 +37,10 @@
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraphPanel.cpp" />
     <ClCompile Include="Code\FtaLogPanel.cpp" />
+    <ClCompile Include="Code\FtaLuaFunction.cpp" />
     <ClCompile Include="Code\FtaLuaPanel.cpp" />
     <ClCompile Include="Code\FtaPanel.cpp" />
     <ClCompile Include="Code\FtaPedigreeRequest.cpp" />
@@ -44,6 +49,7 @@
     <ClCompile Include="Code\FtaPersonInfoRequest.cpp" />
     <ClCompile Include="Code\FtaPersonOrdinancesRequest.cpp" />
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp" />
+    <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -92,13 +98,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;SANDBOX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/;lua-5.3.2/Code/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../wxWidgets-3.0.2/lib/vc_lib;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/lib;%(AdditionalLibraryDirectories);../../wxJSON/lib/vc_lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxmsw30ud_core.lib;wxbase30ud.lib;wxmsw30ud_gl.lib;wxcode_msw30ud_wxjson.lib;libcurl_a_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../wxWidgets-3.0.2/lib/vc_lib;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/lib;%(AdditionalLibraryDirectories);../../wxJSON/lib/vc_lib;Build/Debug/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw30ud_core.lib;wxbase30ud.lib;wxmsw30ud_gl.lib;wxcode_msw30ud_wxjson.lib;libcurl_a_debug.lib;Lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

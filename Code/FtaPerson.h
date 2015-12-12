@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FtaContainers.h"
+#include <lua.hpp>
 
 class FtaPerson
 {
@@ -75,6 +76,9 @@ public:
 	void SetPortraitUrl( const wxString& portaritUrl ) { this->portraitUrl = portraitUrl; }
 
 	void GatherNearestRelations( FtaPersonList& personList );
+
+	bool SetFromLuaTable( lua_State* L, int idx );
+	bool GetToLuaTable( lua_State* L ) const;
 
 private:
 

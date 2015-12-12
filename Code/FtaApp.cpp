@@ -12,12 +12,15 @@ FtaApp::FtaApp( void )
 	client = nullptr;
 	frame = nullptr;
 	treeCache = nullptr;
+	L = nullptr;
 }
 
 /*virtual*/ FtaApp::~FtaApp( void )
 {
 	delete client;
 	delete treeCache;
+
+	lua_close(L);
 }
 
 /*virtual*/ bool FtaApp::OnInit( void )
@@ -26,6 +29,12 @@ FtaApp::FtaApp( void )
 		return false;
 
 	treeCache = new FtaTreeCache();
+
+	L = luaL_newstate();
+	if( !L )
+		return false;
+
+	luaL_openlibs(L);
 
 	client = new FtaClient();
 	if( !client->Initialize() )
