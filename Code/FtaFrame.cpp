@@ -12,6 +12,8 @@
 #include <wx/numdlg.h>
 #include <wx/textdlg.h>
 
+// TODO: Save/restore layout of panels.
+
 FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) : wxFrame( parent, wxID_ANY, "Family Tree Analyzer", pos, size ), timer( this, ID_Timer )
 {
 	auiManager = new wxAuiManager( this, wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT );

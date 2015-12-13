@@ -24,8 +24,12 @@ FtaLogPanel::FtaLogPanel( void )
 
 /*virtual*/ bool FtaLogPanel::MakeControls( void )
 {
-	// TODO: Make it read-only.
-	textCtrl = new wxStyledTextCtrl( this, wxID_ANY );
+	textCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE );
+
+	wxFont monoFont;
+	monoFont.SetFaceName( "Courier New" );
+	monoFont.SetFamily( wxFONTFAMILY_MODERN );
+	textCtrl->SetFont( monoFont );
 
 	wxBoxSizer* boxSizer = new wxBoxSizer( wxVERTICAL );
 	boxSizer->Add( textCtrl, 1, wxALL | wxGROW, 0 );
@@ -36,12 +40,12 @@ FtaLogPanel::FtaLogPanel( void )
 
 void FtaLogPanel::AddLogMessage( const wxString& message )
 {
-	textCtrl->AddText( message + "\n" );
+	textCtrl->AppendText( message + "\n" );
 }
 
 void FtaLogPanel::ClearLog( void )
 {
-	textCtrl->SetText( "" );
+	textCtrl->Clear();
 }
 
 bool FtaLogPanel::IsEmpty( void )

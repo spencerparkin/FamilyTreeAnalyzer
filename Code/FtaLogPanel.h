@@ -3,7 +3,7 @@
 #pragma once
 
 #include "FtaPanel.h"
-#include <wx/stc/stc.h>
+#include <wx/textctrl.h>
 
 class FtaLogPanel : public FtaPanel
 {
@@ -23,7 +23,7 @@ public:
 
 private:
 
-	wxStyledTextCtrl* textCtrl;
+	wxTextCtrl* textCtrl;
 };
 
 // FtaLogPanel.h
