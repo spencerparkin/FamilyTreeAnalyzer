@@ -8,6 +8,8 @@ class FtaPersonOrdinancesRequest : public FtaPersonInfoRequest
 {
 public:
 
+	wxDECLARE_CLASS( FtaPersonOrdinancesRequest );
+
 	FtaPersonOrdinancesRequest( const wxString& personId, ResponseProcessor* processor );
 	virtual ~FtaPersonOrdinancesRequest( void );
 

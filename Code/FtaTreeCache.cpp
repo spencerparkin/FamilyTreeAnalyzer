@@ -96,10 +96,10 @@ bool FtaTreeCache::Dump( void )
 
 /*virtual*/ bool FtaTreeCache::ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue )
 {
-	// TODO: Use RTTI here instead to be type-safe.
-	FtaPersonInfoRequest* personInfoRequest = ( FtaPersonInfoRequest* )request;
-	if( !personInfoRequest )
+	if( !request->IsKindOf( &FtaPersonInfoRequest::ms_classInfo ) )
 		return false;
+
+	FtaPersonInfoRequest* personInfoRequest = ( FtaPersonInfoRequest* )request;
 
 	wxString personId = personInfoRequest->GetPersonId();
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );

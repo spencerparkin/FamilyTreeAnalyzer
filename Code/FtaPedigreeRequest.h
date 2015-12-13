@@ -8,6 +8,8 @@ class FtaPedigreeRequest : public FtaPersonInfoRequest
 {
 public:
 
+	wxDECLARE_CLASS( FtaPedigreeRequest );
+
 	enum Type
 	{
 		TYPE_ANCESTRY,

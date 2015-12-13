@@ -2,6 +2,8 @@
 
 #include "FtaPersonOrdinancesRequest.h"
 
+wxIMPLEMENT_CLASS( FtaPersonOrdinancesRequest, FtaPersonInfoRequest );
+
 FtaPersonOrdinancesRequest::FtaPersonOrdinancesRequest( const wxString& personId, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
 {
 }

@@ -9,6 +9,8 @@ class FtaPersonInfoRequest : public FtaAsyncRequest
 {
 public:
 
+	wxDECLARE_ABSTRACT_CLASS( FtaPersonInfoRequest );
+
 	FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor );
 	virtual ~FtaPersonInfoRequest( void );
 

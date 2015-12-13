@@ -2,6 +2,8 @@
 
 #include "FtaPersonInfoRequest.h"
 
+wxIMPLEMENT_ABSTRACT_CLASS( FtaPersonInfoRequest, FtaAsyncRequest );
+
 FtaPersonInfoRequest::FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor ) : FtaAsyncRequest( processor )
 {
 	this->personId = personId;

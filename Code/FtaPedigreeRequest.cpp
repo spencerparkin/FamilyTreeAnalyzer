@@ -4,6 +4,8 @@
 #include "FtaTreeCache.h"
 #include "FtaApp.h"
 
+wxIMPLEMENT_CLASS( FtaPedigreeRequest, FtaPersonInfoRequest );
+
 FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
 {
 	this->type = type;

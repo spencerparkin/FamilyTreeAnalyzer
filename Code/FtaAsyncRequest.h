@@ -2,13 +2,16 @@
 
 #pragma once
 
+#include <wx/object.h>
 #include <wx/string.h>
 #include <wx/jsonval.h>
 #include <curl/curl.h>
 
-class FtaAsyncRequest
+class FtaAsyncRequest : public wxObject
 {
 public:
+
+	wxDECLARE_ABSTRACT_CLASS( FtaAsyncRequest );
 
 	class ResponseProcessor;
 

@@ -5,6 +5,8 @@
 #include "FtaApp.h"
 #include <wx/jsonreader.h>
 
+wxIMPLEMENT_ABSTRACT_CLASS( FtaAsyncRequest, wxObject );
+
 FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 {
 	this->processor = processor;

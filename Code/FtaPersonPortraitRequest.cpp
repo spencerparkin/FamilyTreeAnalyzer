@@ -4,6 +4,8 @@
 #include "FtaTreeCache.h"
 #include "FtaApp.h"
 
+wxIMPLEMENT_CLASS( FtaPersonPortraitRequest, FtaPersonInfoRequest );
+
 FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
 {
 }
