@@ -53,6 +53,9 @@ private:
 
 	wxWindow* FindPanel( wxClassInfo* classInfo );
 
+	bool SaveFrameConfig( void );
+	bool RestoreFrameConfig( void );
+
 	wxAuiManager* auiManager;
 
 	wxTimer timer;

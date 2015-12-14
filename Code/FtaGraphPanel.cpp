@@ -16,6 +16,7 @@ FtaGraphPanel::FtaGraphPanel( void )
 {
 	paneInfo.Caption( "Graph" );
 	paneInfo.CenterPane();
+	paneInfo.Name( "GraphPanel" );
 	return true;
 }
 

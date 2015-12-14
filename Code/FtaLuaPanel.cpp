@@ -21,6 +21,7 @@ FtaLuaPanel::FtaLuaPanel( void )
 {
 	paneInfo.Caption( "Lua" );
 	paneInfo.Dockable();
+	paneInfo.Name( "LuaPanel" );
 	return true;
 }
 

@@ -19,6 +19,7 @@ FtaLogPanel::FtaLogPanel( void )
 	paneInfo.Caption( "Log" );
 	paneInfo.Dockable();
 	paneInfo.BestSize( 300, 300 );
+	paneInfo.Name( "LogPanel" );
 	return true;
 }
 

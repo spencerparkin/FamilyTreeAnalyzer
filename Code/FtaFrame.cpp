@@ -11,8 +11,7 @@
 #include <wx/textdlg.h>
 #include <wx/numdlg.h>
 #include <wx/textdlg.h>
-
-// TODO: Save/restore layout of panels.
+#include <wx/config.h>
 
 FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) : wxFrame( parent, wxID_ANY, "Family Tree Analyzer", pos, size ), timer( this, ID_Timer )
 {
@@ -72,6 +71,8 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DumpCache );
 
 	MakePanels();
+
+	RestoreFrameConfig();
 
 	auiManager->Update();
 
@@ -168,6 +169,8 @@ void FtaFrame::OnFillCache( wxCommandEvent& event )
 
 void FtaFrame::OnExit( wxCommandEvent& event )
 {
+	SaveFrameConfig();
+
 	Close( true );
 }
 
@@ -243,6 +246,49 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 			break;
 		}
 	}
+}
+
+bool FtaFrame::SaveFrameConfig( void )
+{
+	wxConfig* config = new wxConfig( "FtaFrameConfig" );
+
+	wxSize size = GetSize();
+	config->Write( "FtaFrameWidth", size.x );
+	config->Write( "FtaFrameHeight", size.y );
+
+	wxPoint pos = GetPosition();
+	config->Write( "FtaFramePosX", pos.x );
+	config->Write( "FtaFramePosY", pos.y );
+
+	wxString perspective = auiManager->SavePerspective();
+	config->Write( "FtaFramePerspective", perspective );
+
+	delete config;
+
+	return true;
+}
+
+bool FtaFrame::RestoreFrameConfig( void )
+{
+	wxConfig* config = new wxConfig( "FtaFrameConfig" );
+
+	wxSize size;
+	config->Read( "FtaFrameWidth", &size.x, 700 );
+	config->Read( "FtaFrameHeight", &size.y, 500 );
+	SetSize( size );
+
+	wxPoint pos;
+	config->Read( "FtaFramePosX", &pos.x, 100 );
+	config->Read( "FtaFramePosY", &pos.y, 100 );
+	SetPosition( pos );
+
+	wxString perspective;
+	if( config->Read( "FtaFramePerspective", &perspective ) )
+		auiManager->LoadPerspective( perspective );
+
+	delete config;
+
+	return true;
 }
 
 // FtaFrame.cpp
