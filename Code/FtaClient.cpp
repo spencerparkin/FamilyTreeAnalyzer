@@ -121,7 +121,7 @@ bool FtaClient::Authenticate( void )
 		curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, &responseString );
 
 		CURLcode curlCode = curl_easy_perform( curlHandleEasy );
-		if( curlCode != CURLE_OK )
+		if( ReportCurlError( curlCode ) )
 			break;
 
 		if( responseString.IsEmpty() )
@@ -185,7 +185,7 @@ bool FtaClient::DeleteAccessToken( void )
 		curl_easy_setopt( curlHandleEasy, CURLOPT_URL, "https://sandbox.familysearch.org" );
 
 		CURLcode curlCode = curl_easy_perform( curlHandleEasy );
-		if( curlCode != CURLE_OK )
+		if( ReportCurlError( curlCode ) )
 			break;
 
 		accessToken = "";
@@ -201,6 +201,45 @@ bool FtaClient::DeleteAccessToken( void )
 		curl_slist_free_all( headers );
 
 	return success;
+}
+
+/*static*/ bool FtaClient::ReportCurlError( CURLcode curlCode )
+{
+	if( curlCode == CURLE_OK )
+		return false;
+
+	wxString error = "Curl error unknown.";
+	switch( curlCode )
+	{
+		case CURLE_COULDNT_RESOLVE_HOST:
+		{
+			error = "Failed to resolve host.";
+			break;
+		}
+	}
+
+	wxMessageDialog messageDialog( nullptr, error, "Curl Error", wxOK | wxCENTRE | wxICON_ERROR );
+	messageDialog.ShowModal();
+	return true;
+}
+
+/*static*/ bool FtaClient::ReportCurlMultiError( CURLMcode curlmCode )
+{
+	if( curlmCode == CURLM_OK )
+		return false;
+
+	wxString error = "Curl-multi error unknown.";
+	switch( curlmCode )
+	{
+		default:
+		{
+			break;
+		}
+	}
+
+	wxMessageDialog messageDialog( nullptr, error, "Curl Error", wxOK | wxCENTRE | wxICON_ERROR );
+	messageDialog.ShowModal();
+	return true;
 }
 
 /*static*/ size_t FtaClient::WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr )
@@ -296,6 +335,7 @@ bool FtaClient::CancelAllAsyncRequests( void )
 		FtaAsyncRequest* request = *iter;
 
 		CURLMcode curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+		ReportCurlMultiError( curlmCode );
 		wxASSERT( curlmCode == CURLM_OK );
 
 		delete request;
@@ -325,7 +365,7 @@ bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request )
 	}
 
 	CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
-	if( curlmCode != CURLM_OK )
+	if( ReportCurlMultiError( curlmCode ) )
 	{
 		delete request;
 		return false;
@@ -345,7 +385,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 		{
 			long waitTimeMilliseconds;
 			curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
-			if( curlmCode != CURLM_OK )
+			if( ReportCurlMultiError( curlmCode ) )
 				return false;
 
 			if( waitTimeMilliseconds > 0 )
@@ -362,7 +402,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 				int maxfd = -1;
 				curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
-				if( curlmCode != CURLM_OK )
+				if( ReportCurlMultiError( curlmCode ) )
 					return false;
 
 				if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
@@ -378,7 +418,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 
 		int runningHandles = 0;
 		curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
-		if( curlmCode != CURLM_OK )
+		if( ReportCurlMultiError( curlmCode ) )
 			return false;
 
 		struct CURLMsg* curlMsg = nullptr;
@@ -406,6 +446,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 			}
 
 			curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+			ReportCurlMultiError( curlmCode );
 			wxASSERT( curlmCode == CURLM_OK );
 
 			asyncRequestList.erase( iter );
