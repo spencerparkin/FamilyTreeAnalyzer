@@ -11,6 +11,7 @@ wxIMPLEMENT_DYNAMIC_CLASS( FtaLuaPanel, FtaPanel );
 FtaLuaPanel::FtaLuaPanel( void )
 {
 	textCtrl = nullptr;
+	historyLocation = -1;
 }
 
 /*virtual*/ FtaLuaPanel::~FtaLuaPanel( void )
@@ -80,6 +81,7 @@ FtaLuaPanel::FtaLuaPanel( void )
 	SetSizer( boxSizer );
 
 	Bind( wxEVT_BUTTON, &FtaLuaPanel::OnExecuteButtonPressed, this );
+	Bind( wxEVT_CHAR_HOOK, &FtaLuaPanel::OnCharHook, this );
 
 	return true;
 }
@@ -100,12 +102,44 @@ void FtaLuaPanel::OnExecuteButtonPressed( wxCommandEvent& event )
 	if( FtaLuaReportError( L, result ) )
 		return;
 
+	codeHistory.Add( code );
+	historyLocation = codeHistory.GetCount() - 1;
+
+	textCtrl->SetText( "" );
 	textCtrl->SetFocus();
 }
 
 /*virtual*/ bool FtaLuaPanel::TimerUpdate( void )
 {
 	return true;
+}
+
+void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
+{
+	if( !event.ControlDown() )
+	{
+		event.Skip();
+		return;
+	}
+	
+	switch( event.GetKeyCode() )
+	{
+		case WXK_UP:
+		{
+			if( historyLocation > 0 )
+				historyLocation--;
+			break;
+		}
+		case WXK_DOWN:
+		{
+			if( historyLocation < ( signed )codeHistory.GetCount() - 1 )
+				historyLocation++;
+			break;
+		}
+	}
+
+	wxString code = codeHistory[ historyLocation ];
+	textCtrl->SetText( code );
 }
 
 // FtaLuaPanel.cpp

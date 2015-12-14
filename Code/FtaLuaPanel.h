@@ -5,6 +5,7 @@
 #include "FtaPanel.h"
 #include <wx/stc/stc.h>
 #include <wx/button.h>
+#include <wx/arrstr.h>
 
 class FtaLuaPanel : public FtaPanel
 {
@@ -20,10 +21,14 @@ public:
 	virtual bool TimerUpdate( void );
 
 	void OnExecuteButtonPressed( wxCommandEvent& event );
+	void OnCharHook( wxKeyEvent& event );
 
 private:
 
 	wxStyledTextCtrl* textCtrl;
+
+	wxArrayString codeHistory;
+	int historyLocation;
 };
 
 // FtaLuaPanel.h
