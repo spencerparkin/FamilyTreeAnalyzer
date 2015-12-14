@@ -216,6 +216,11 @@ bool FtaClient::DeleteAccessToken( void )
 			error = "Failed to resolve host.";
 			break;
 		}
+		case CURLE_URL_MALFORMAT:
+		{
+			error = "Malformed URL.";
+			break;
+		}
 	}
 
 	wxMessageDialog messageDialog( nullptr, error, "Curl Error", wxOK | wxCENTRE | wxICON_ERROR );
@@ -299,8 +304,7 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 			if( newValue == progressDialog->GetRange() )
 				newValue = 1;
 			
-			int count = asyncRequestList.size() + asyncRetryList.size();
-			progressDialog->Update( newValue, wxString::Format( "%d requests pending...", count ) );
+			progressDialog->Update( newValue, wxString::Format( "%d requests pending... (%d requests throttled...)", asyncRequestList.size(), asyncRetryList.size() ) );
 		}
 	}
 
@@ -437,6 +441,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 		
 			FtaAsyncRequest* request = *iter;
 			request->SetCurlCode( curlMsg->data.result );
+			ReportCurlError( request->GetCurlCode() );
 
 			long retryAfterSeconds = -1;
 			if( curlMsg->data.result == CURLE_OK )

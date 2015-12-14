@@ -31,12 +31,25 @@ FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, Re
 
 	if( httpStatusCode.Find( "204" ) < 0 )
 	{
-		int i = FindHeaderLine( "Location:" );
+		int i = FindHeaderLine( "Location:", 0 );
 		if( i < 0 )
 			return false;
 
 		wxString portraitUrl = headerArray[i];
-		portraitUrl.Remove( 0, 10 );
+		i = portraitUrl.Find( "http" );
+		if( i < 0 )
+			return false;
+
+		portraitUrl.Remove( 0, i );
+
+		i = portraitUrl.Find( "\n" );
+		if( i >= 0 )
+			portraitUrl.Remove( i, 1 );
+
+		i = portraitUrl.Find( "\r" );
+		if( i >= 0 )
+			portraitUrl.Remove( i, 1 );
+
 		person->SetPortraitUrl( portraitUrl );
 	}
 

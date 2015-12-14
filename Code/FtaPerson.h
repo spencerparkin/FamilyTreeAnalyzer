@@ -74,7 +74,7 @@ public:
 	void SetBirthPlace( const wxString& birthPlace ) { this->birthPlace = birthPlace; }
 
 	const wxString& GetPortraitUrl( void ) const { return portraitUrl; }
-	void SetPortraitUrl( const wxString& portaritUrl ) { this->portraitUrl = portraitUrl; }
+	void SetPortraitUrl( const wxString& portraitUrl ) { this->portraitUrl = portraitUrl; }
 
 	void GatherNearestRelations( FtaPersonList& personList );
 

@@ -41,7 +41,8 @@ public:
 
 protected:
 
-	int FindHeaderLine( const wxString& pattern );
+	// We might want to provide a version of this routine that uses regular expressions.
+	int FindHeaderLine( const wxString& pattern, int requiredStartLocation = -1 );
 	
 	long retryTimeSeconds;
 	wxString httpStatusCode;

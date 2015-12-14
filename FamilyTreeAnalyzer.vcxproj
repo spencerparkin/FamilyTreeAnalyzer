@@ -29,6 +29,7 @@
     <ClInclude Include="Code\FtaPersonDetailsRequest.h" />
     <ClInclude Include="Code\FtaPersonInfoRequest.h" />
     <ClInclude Include="Code\FtaPersonOrdinancesRequest.h" />
+    <ClInclude Include="Code\FtaPersonPortraitDataRequest.h" />
     <ClInclude Include="Code\FtaPersonPortraitRequest.h" />
     <ClInclude Include="Code\FtaPrintFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
@@ -53,6 +54,7 @@
     <ClCompile Include="Code\FtaPersonDetailsRequest.cpp" />
     <ClCompile Include="Code\FtaPersonInfoRequest.cpp" />
     <ClCompile Include="Code\FtaPersonOrdinancesRequest.cpp" />
+    <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp" />
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp" />
     <ClCompile Include="Code\FtaPrintFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />

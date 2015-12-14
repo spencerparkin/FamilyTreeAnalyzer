@@ -73,11 +73,15 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	return true;
 }
 
-int FtaAsyncRequest::FindHeaderLine( const wxString& pattern )
+int FtaAsyncRequest::FindHeaderLine( const wxString& pattern, int requiredStartLocation /*= -1*/ )
 {
 	for( int i = 0; i < ( signed )headerArray.GetCount(); i++ )
-		if( headerArray[i].Find( pattern ) >= 0 )
-			return i;
+	{
+		int startLocation = headerArray[i].Find( pattern );
+		if( startLocation >= 0 )
+			if( requiredStartLocation == -1 || startLocation == requiredStartLocation )
+				return i;
+	}
 
 	return -1;
 }
@@ -105,21 +109,21 @@ int FtaAsyncRequest::FindHeaderLine( const wxString& pattern )
 		return true;
 	}
 
-	if( !processor )
-		return false;
-
-	wxJSONValue responseValue;
-	if( !responseValueString.IsEmpty() )
+	if( processor )
 	{
-		wxJSONReader jsonReader;
-		int errorCount = jsonReader.Parse( responseValueString, &responseValue );
-		if( errorCount > 0 )
+		wxJSONValue responseValue;
+		if( !responseValueString.IsEmpty() )
+		{
+			wxJSONReader jsonReader;
+			int errorCount = jsonReader.Parse( responseValueString, &responseValue );
+			if( errorCount > 0 )
+				return false;
+		}
+
+		// A null response value is valid in some cases.
+		if( !processor->ProcessResponse( this, responseValue ) )
 			return false;
 	}
-
-	// A null response value is valid in some cases.
-	if( !processor->ProcessResponse( this, responseValue ) )
-		return false;
 
 	return true;
 }
