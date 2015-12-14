@@ -13,6 +13,8 @@
 #include <wx/textdlg.h>
 #include <wx/config.h>
 
+#include "FtaPersonPortraitDataRequest.h"
+
 FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) : wxFrame( parent, wxID_ANY, "Family Tree Analyzer", pos, size ), timer( this, ID_Timer )
 {
 	auiManager = new wxAuiManager( this, wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT );
@@ -117,7 +119,12 @@ bool FtaFrame::MakePanels( void )
 
 void FtaFrame::OnClearLog( wxCommandEvent& event )
 {
-	ClearLog();
+	// test!...
+	FtaClient* client = wxGetApp().GetClient();
+	client->AddAsyncRequest( new FtaPersonPortraitDataRequest( "KWZC-XN7", nullptr ) );
+	client->CompleteAllAsyncRequests( false );
+
+	//ClearLog();
 }
 
 void FtaFrame::AddLogMessage( const wxString& message )
