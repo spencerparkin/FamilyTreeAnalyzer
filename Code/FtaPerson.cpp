@@ -3,6 +3,7 @@
 #include "FtaPerson.h"
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
+#include "FtaGraphPanel.h"
 #include "FtaApp.h"
 
 FtaPerson::FtaPerson( const wxString& personId )
@@ -11,10 +12,12 @@ FtaPerson::FtaPerson( const wxString& personId )
 	infoState = INFO_INCOMPLETE;
 	flags = 0;
 	gender = GENDER_UNKNOWN;
+	portraitTexture = GL_INVALID_VALUE;
 }
 
 /*virtual*/ FtaPerson::~FtaPerson( void )
 {
+	SetPortraitTexture( GL_INVALID_VALUE );
 }
 
 bool FtaPerson::IsInfoComplete( void )
@@ -171,6 +174,19 @@ bool FtaPerson::GetToLuaTable( lua_State* L ) const
 
 	lua_setfield( L, -2, "spouseIds" );
 
+	return true;
+}
+
+bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
+{
+	if( this->portraitTexture != GL_INVALID_VALUE )
+	{
+		FtaFrame* frame = wxGetApp().GetFrame();
+		if( frame )
+			frame->GetPanel< FtaGraphPanel >()->GetCanvas()->FreeTexture( this->portraitTexture );
+	}
+
+	this->portraitTexture = portraitTexture;
 	return true;
 }
 

@@ -4,6 +4,7 @@
 
 #include "FtaContainers.h"
 #include <lua.hpp>
+#include <wx/glcanvas.h>
 
 class FtaPerson
 {
@@ -81,6 +82,9 @@ public:
 	bool SetFromLuaTable( lua_State* L, int idx );
 	bool GetToLuaTable( lua_State* L ) const;
 
+	bool SetPortraitTexture( GLuint portraitTexture );
+	GLuint GetPortraitTexture( void ) { return portraitTexture; }
+
 private:
 
 	InfoState infoState;
@@ -94,6 +98,7 @@ private:
 	wxString lifeSpan;
 	wxString birthPlace;
 	wxString portraitUrl;
+	GLuint portraitTexture;
 };
 
 // FtaPerson.h
