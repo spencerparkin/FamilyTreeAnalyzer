@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FtaPersonInfoRequest.h"
+#include <wx/mstream.h>
 
 class FtaPersonPortraitDataRequest : public FtaPersonInfoRequest
 {
@@ -19,6 +20,10 @@ public:
 	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) override;
 
 	static size_t WriteImageDataFunction( void* buf, size_t size, size_t nitems, void* userPtr );
+
+private:
+
+	wxMemoryOutputStream memoryOutputStream;
 };
 
 // FtaPersonPortraitDataRequest.h

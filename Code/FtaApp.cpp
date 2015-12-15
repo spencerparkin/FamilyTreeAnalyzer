@@ -29,6 +29,10 @@ FtaApp::FtaApp( void )
 	if( !wxApp::OnInit() )
 		return false;
 
+	//wxInitAllImageHandlers();
+
+	wxImage::AddHandler( new wxJPEGHandler() );
+
 	treeCache = new FtaTreeCache();
 
 	L = luaL_newstate();

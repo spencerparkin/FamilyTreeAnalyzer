@@ -20,14 +20,26 @@ FtaPersonPortraitDataRequest::FtaPersonPortraitDataRequest( const wxString& pers
 		return false;
 
 	curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEFUNCTION, &FtaPersonPortraitDataRequest::WriteImageDataFunction );
-	curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, nullptr );		// TODO: Pass in buffer stream here.
+	curl_easy_setopt( curlHandleEasy, CURLOPT_WRITEDATA, &memoryOutputStream );
 
 	return true;
 }
 
 /*static*/ size_t FtaPersonPortraitDataRequest::WriteImageDataFunction( void* buf, size_t size, size_t nitems, void* userPtr )
 {
+	wxMemoryOutputStream* memoryOutputStream = ( wxMemoryOutputStream* )userPtr;
+
+	// We can't return from the callback until we've written everything.
 	size_t totalBytes = size * nitems;
+	size_t bytesLeft = totalBytes;
+	char* byteBuffer = ( char* )buf;
+	while( !memoryOutputStream->WriteAll( byteBuffer, bytesLeft ) )
+	{
+		size_t bytesWritten = memoryOutputStream->LastWrite();
+		bytesLeft -= bytesWritten;
+		byteBuffer += bytesWritten;
+	}
+
 	return totalBytes;
 }
 
@@ -39,8 +51,20 @@ FtaPersonPortraitDataRequest::FtaPersonPortraitDataRequest( const wxString& pers
 	if( retryAfterSeconds >= 0 )
 		return true;
 
-	// TODO: Read our image data into a wxImage object and then save it on the FtaPerson class instance.
+	wxMemoryInputStream memoryInputStream( memoryOutputStream );
+	wxImage image( memoryInputStream, wxBITMAP_TYPE_ANY );
+	if( !image.IsOk() )
+		return false;
 
+	/*GLuint portraitTexture = ...;
+	if( portraitTexture == GL_INVALID_VALUE )
+		return false;*/
+
+	FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::FAIL_ON_CACHE_MISS );
+	if( !person )
+		return false;
+
+	//person->SetPortraitTexture( portraitTexture );
 	return true;
 }
 
@@ -55,8 +79,6 @@ FtaPersonPortraitDataRequest::FtaPersonPortraitDataRequest( const wxString& pers
 	url = person->GetPortraitUrl();
 	if( url.IsEmpty() )
 		return false;
-
-	// TODO: Glean from URL the image type so that we know how to read it.
 
 	return true;
 }

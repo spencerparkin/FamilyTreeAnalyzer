@@ -119,12 +119,7 @@ bool FtaFrame::MakePanels( void )
 
 void FtaFrame::OnClearLog( wxCommandEvent& event )
 {
-	// test!...
-	FtaClient* client = wxGetApp().GetClient();
-	client->AddAsyncRequest( new FtaPersonPortraitDataRequest( "KWZC-XN7", nullptr ) );
-	client->CompleteAllAsyncRequests( false );
-
-	//ClearLog();
+	ClearLog();
 }
 
 void FtaFrame::AddLogMessage( const wxString& message )
