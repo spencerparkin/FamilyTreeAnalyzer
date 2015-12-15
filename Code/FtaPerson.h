@@ -83,7 +83,7 @@ public:
 	bool GetToLuaTable( lua_State* L ) const;
 
 	bool SetPortraitTexture( GLuint portraitTexture );
-	GLuint GetPortraitTexture( void ) { return portraitTexture; }
+	GLuint GetPortraitTexture( void );
 
 private:
 

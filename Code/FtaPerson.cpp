@@ -3,6 +3,8 @@
 #include "FtaPerson.h"
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
+#include "FtaClient.h"
+#include "FtaPersonPortraitDataRequest.h"
 #include "FtaGraphPanel.h"
 #include "FtaApp.h"
 
@@ -188,6 +190,18 @@ bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
 
 	this->portraitTexture = portraitTexture;
 	return true;
+}
+
+GLuint FtaPerson::GetPortraitTexture( void )
+{
+	if( portraitTexture == GL_INVALID_VALUE && ( flags & FLAG_PORTRAIT ) != 0 )
+	{
+		FtaClient* client = wxGetApp().GetClient();
+		client->AddAsyncRequest( new FtaPersonPortraitDataRequest( personId, nullptr ) );
+		client->CompleteAllAsyncRequests( false );
+	}
+
+	return portraitTexture;
 }
 
 // FtaPerson.cpp
