@@ -15,8 +15,54 @@ FtaGraph::FtaGraph( void )
 
 /*virtual*/ bool FtaGraph::Layout( void )
 {
-	//...
-	// TODO: Write default layout algorithm.
+	bool success = false;
+	FtaPersonIdSetList personIdSetList;
+
+	do
+	{
+		if( !CreateConnectedComponents( personIdSetList ) )
+			break;
+
+		FtaPersonIdSetList::iterator iter = personIdSetList.begin();
+		while( iter != personIdSetList.end() )
+		{
+			FtaPersonIdSet* connectedComponent = *iter;
+			if( !LayoutConnectedComponent( *connectedComponent ) )
+				break;
+
+			iter++;
+		}
+
+		if( iter != personIdSetList.end() )
+			break;
+
+		if( PackConnectedComponents( personIdSetList ) )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	DestroyConnectedComponents( personIdSetList );
+
+	return success;
+}
+
+/*virtual*/ bool FtaGraph::LayoutConnectedComponent( FtaPersonIdSet& connectedComponent )
+{
+	// TODO: I'm thinking that the first thing I'll try is to simply place
+	//       individuals at the same generation level on the same row and
+	//       draw two arrows from every person to their parents.  How I sort
+	//       each row will be based on the idea of minimizing how far the arrows
+	//       have to go to reach the parents.
+
+	return false;
+}
+
+/*virtual*/ bool FtaGraph::PackConnectedComponents( FtaPersonIdSetList& personIdSetList )
+{
+	// TODO: The simplest thing I can think of is simply to compute a bounding box
+	//       for each component, and then array the boxes.
 
 	return false;
 }
@@ -62,11 +108,10 @@ bool FtaGraph::CreateConnectedComponents( FtaPersonIdSetList& personIdSetList )
 		iter = remainingPersons.begin();
 		wxString personId = *iter;
 		FtaPersonIdSet* connectedComponent = new FtaPersonIdSet;
-		if( GenerateConnectedComponent( personId, remainingPersons, *connectedComponent ) )
-			personIdSetList.push_back( connectedComponent );
-		else
+		personIdSetList.push_back( connectedComponent );
+		if( !GenerateConnectedComponent( personId, remainingPersons, *connectedComponent ) )
 		{
-			delete connectedComponent;
+			DestroyConnectedComponents( personIdSetList );
 			return false;
 		}
 	}

@@ -23,6 +23,9 @@ public:
 
 protected:
 
+	virtual bool LayoutConnectedComponent( FtaPersonIdSet& connectedComponent );
+	virtual bool PackConnectedComponents( FtaPersonIdSetList& personIdSetList );
+
 	bool GenerateConnectedComponent( const wxString& personId, FtaPersonIdSet& remainingPersons, FtaPersonIdSet& connectedComponent );
 
 	FtaPersonIdSet personIdSet;
