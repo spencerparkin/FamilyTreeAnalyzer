@@ -49,10 +49,10 @@ bool FtaPerson::DumpInfo( void )
 	FtaFrame* frame = wxGetApp().GetFrame();
 
 	frame->AddLogMessage( "-------------------------------------" );
-	frame->AddLogMessage( "Name: " + name );
+	frame->AddLogMessage( "Name: " + ( name.IsEmpty() ? wxString( "Unknown" ) : name ) );
 	frame->AddLogMessage( "Gender: " + GetGenderString() );
-	frame->AddLogMessage( "Life-span: " + lifeSpan );
-	frame->AddLogMessage( "Birth-place: " + birthPlace );
+	frame->AddLogMessage( "Life-span: " + ( lifeSpan.IsEmpty() ? wxString( "Unknown" ) : lifeSpan ) );
+	frame->AddLogMessage( "Birth-place: " + ( lifeSpan.IsEmpty() ? wxString( "Unknown" ) : birthPlace ) );
 	frame->AddLogMessage( "Person-ID: " + personId );
 	frame->AddLogMessage( "Mother-ID: " + ( motherId.IsEmpty() ? wxString( "Unknown" ) : motherId ) );
 	frame->AddLogMessage( "Father-ID: " + ( fatherId.IsEmpty() ? wxString( "Unknown" ) : fatherId ) );

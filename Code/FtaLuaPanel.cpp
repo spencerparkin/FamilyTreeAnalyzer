@@ -88,6 +88,11 @@ FtaLuaPanel::FtaLuaPanel( void )
 
 void FtaLuaPanel::OnExecuteButtonPressed( wxCommandEvent& event )
 {
+	Execute();
+}
+
+bool FtaLuaPanel::Execute( void )
+{
 	lua_State* L = wxGetApp().GetLuaState();
 
 	FtaLuaStackPopper stackPopper(L);
@@ -96,17 +101,19 @@ void FtaLuaPanel::OnExecuteButtonPressed( wxCommandEvent& event )
 
 	int result = luaL_loadbuffer( L, code, code.Length(), "FtaChunk" );
 	if( FtaLuaReportError( L, result ) )
-		return;
+		return false;
 
 	result = lua_pcall( L, 0, 0, 0 );
 	if( FtaLuaReportError( L, result ) )
-		return;
+		return false;
 
 	codeHistory.Add( code );
 	historyLocation = codeHistory.GetCount() - 1;
 
 	textCtrl->SetText( "" );
 	textCtrl->SetFocus();
+
+	return true;
 }
 
 /*virtual*/ bool FtaLuaPanel::TimerUpdate( void )
@@ -121,7 +128,7 @@ void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
 		event.Skip();
 		return;
 	}
-	
+
 	switch( event.GetKeyCode() )
 	{
 		case WXK_UP:
@@ -138,8 +145,21 @@ void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
 		}
 	}
 
-	wxString code = codeHistory[ historyLocation ];
-	textCtrl->SetText( code );
+	switch( event.GetKeyCode() )
+	{
+		case WXK_UP:
+		case WXK_DOWN:
+		{
+			wxString code = codeHistory[ historyLocation ];
+			textCtrl->SetText( code );
+			break;
+		}
+		case WXK_RETURN:
+		{
+			Execute();
+			break;
+		}
+	}
 }
 
 // FtaLuaPanel.cpp

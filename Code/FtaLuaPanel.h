@@ -25,6 +25,8 @@ public:
 
 private:
 
+	bool Execute( void );
+
 	wxStyledTextCtrl* textCtrl;
 
 	wxArrayString codeHistory;
