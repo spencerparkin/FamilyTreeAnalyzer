@@ -7,6 +7,7 @@
 
 WX_DEFINE_LIST( FtaPersonList );
 WX_DEFINE_LIST( FtaAsyncRequestList );
+WX_DEFINE_LIST( FtaPersonIdSetList );
 
 void FtaDeletePersonMap( FtaPersonMap& personMap )
 {

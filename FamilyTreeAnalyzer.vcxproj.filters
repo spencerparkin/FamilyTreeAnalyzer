@@ -85,6 +85,12 @@
     <ClInclude Include="Code\FtaPersonPortraitDataRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaGraph.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaSetGraphFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -155,6 +161,12 @@
     </ClCompile>
     <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaGraph.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaSetGraphFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

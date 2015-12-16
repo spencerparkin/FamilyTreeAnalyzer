@@ -18,6 +18,7 @@
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
+    <ClInclude Include="Code\FtaGraph.h" />
     <ClInclude Include="Code\FtaGraphPanel.h" />
     <ClInclude Include="Code\FtaLogPanel.h" />
     <ClInclude Include="Code\FtaLuaFunction.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="Code\FtaPersonPortraitDataRequest.h" />
     <ClInclude Include="Code\FtaPersonPortraitRequest.h" />
     <ClInclude Include="Code\FtaPrintFunction.h" />
+    <ClInclude Include="Code\FtaSetGraphFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
   </ItemGroup>
@@ -43,6 +45,7 @@
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
+    <ClCompile Include="Code\FtaGraph.cpp" />
     <ClCompile Include="Code\FtaGraphPanel.cpp" />
     <ClCompile Include="Code\FtaLogPanel.cpp" />
     <ClCompile Include="Code\FtaLuaFunction.cpp" />
@@ -57,6 +60,7 @@
     <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp" />
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp" />
     <ClCompile Include="Code\FtaPrintFunction.cpp" />
+    <ClCompile Include="Code\FtaSetGraphFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
   </ItemGroup>

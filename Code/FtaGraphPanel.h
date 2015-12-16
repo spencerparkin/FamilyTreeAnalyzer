@@ -3,10 +3,9 @@
 #pragma once
 
 #include "FtaPanel.h"
+#include "FtaGraph.h"
 #include <wx/glcanvas.h>
 
-// TODO: Own a wxCanvas control.  Draw family tree using a spring-lattice method.
-// TODO: Support picking?
 class FtaGraphPanel : public FtaPanel
 {
 public:
@@ -33,12 +32,16 @@ public:
 		GLuint GenerateTexture( const wxImage& image );
 		void FreeTexture( GLuint texture );
 
+		FtaGraph* GetGraph( void ) { return graph; }
+		void SetGraph( FtaGraph* graph );
+
 	private:
 
 		void BindContext( void );
 
 		wxGLContext* context;
 		static int attributeList[];
+		FtaGraph* graph;
 	};
 
 	Canvas* GetCanvas( void ) { return canvas; }

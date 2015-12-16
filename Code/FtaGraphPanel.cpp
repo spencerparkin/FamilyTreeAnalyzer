@@ -43,13 +43,27 @@ int FtaGraphPanel::Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 FtaGraphPanel::Canvas::Canvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList )
 {
 	context = nullptr;
+	graph = nullptr;
 
 	Bind( wxEVT_PAINT, &Canvas::OnPaint, this );
+	Bind( wxEVT_SIZE, &Canvas::OnSize, this );
 }
 
 /*virtual*/ FtaGraphPanel::Canvas::~Canvas( void )
 {
 	delete context;
+
+	SetGraph( nullptr );
+}
+
+void FtaGraphPanel::Canvas::SetGraph( FtaGraph* graph )
+{
+	if( this->graph )
+		delete this->graph;
+
+	this->graph = graph;
+
+	Refresh();
 }
 
 void FtaGraphPanel::Canvas::OnPaint( wxPaintEvent& event )
@@ -58,6 +72,9 @@ void FtaGraphPanel::Canvas::OnPaint( wxPaintEvent& event )
 
 	glClearColor( 1.f, 1.f, 1.f, 1.f );
 	glClear( GL_COLOR_BUFFER_BIT );
+
+	if( graph )
+		graph->Draw( GL_RENDER );
 
 	glFlush();
 
