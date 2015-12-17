@@ -50,6 +50,8 @@ private:
 
 	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
 
+	// TODO: Cache the personId of the person authenticated here.  May need to request it from service.
+	//       See "read current user" request.
 	CURL* curlHandleEasy;
 	CURLM* curlHandleMulti;
 	wxString accessToken;

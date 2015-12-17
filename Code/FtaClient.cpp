@@ -196,6 +196,10 @@ bool FtaClient::DeleteAccessToken( void )
 
 		accessToken = "";
 
+		// In compliance with read certification, a log-out requires we purge the cache.
+		if( !wxGetApp().GetTreeCache()->Wipe() )
+			break;
+
 		if( wxGetApp().GetFrame() )
 			wxGetApp().GetFrame()->AddLogMessage( "Logged out!" );
 
