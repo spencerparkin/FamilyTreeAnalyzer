@@ -11,7 +11,6 @@
 FtaPerson::FtaPerson( const wxString& personId )
 {
 	this->personId = personId;
-	infoState = INFO_INCOMPLETE;
 	flags = 0;
 	gender = GENDER_UNKNOWN;
 	portraitTexture = GL_INVALID_VALUE;
@@ -22,7 +21,7 @@ FtaPerson::FtaPerson( const wxString& personId )
 	SetPortraitTexture( GL_INVALID_VALUE );
 }
 
-bool FtaPerson::IsInfoComplete( void )
+bool FtaPerson::IsInfoComplete( void ) const
 {
 	int infoCompleteMask = FLAG_ANCESTRY | FLAG_DESCENDANCY | FLAG_PERSONAL_DETAILS | FLAG_PORTRAIT;
 
@@ -44,7 +43,7 @@ wxString FtaPerson::GetGenderString( void ) const
 	return "???";
 }
 
-bool FtaPerson::DumpInfo( void )
+bool FtaPerson::DumpInfo( void ) const
 {
 	FtaFrame* frame = wxGetApp().GetFrame();
 
@@ -59,10 +58,10 @@ bool FtaPerson::DumpInfo( void )
 
 	frame->AddLogMessage( wxString::Format( "%d child(ren)...", childrenIdSet.size() ) );
 	int i = 0;
-	FtaPersonIdSet::iterator iter = childrenIdSet.begin();
+	FtaPersonIdSet::const_iterator iter = childrenIdSet.begin();
 	while( iter != childrenIdSet.end() )
 	{
-			wxString childId = *iter;
+		wxString childId = *iter;
 		frame->AddLogMessage( wxString::Format( "%d: ", ++i ) + childId );
 		iter++;
 	}
@@ -119,7 +118,7 @@ bool FtaPerson::SetFromLuaTable( lua_State* L, int idx )
 
 bool FtaPerson::GetToLuaTable( lua_State* L ) const
 {
-	if( infoState != INFO_COMPLETE )
+	if( !IsInfoComplete() )
 		return false;
 
 	lua_newtable(L);

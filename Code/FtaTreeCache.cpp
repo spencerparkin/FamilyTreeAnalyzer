@@ -110,9 +110,6 @@ bool FtaTreeCache::Dump( void )
 		return false;
 	}
 
-	if( person->IsInfoComplete() )
-		person->SetInfoState( FtaPerson::INFO_COMPLETE );
-
 	if( ( signed )personMap.size() < personCountThreshold )
 	{
 		FtaPersonList adjacentPersonList;
@@ -122,7 +119,7 @@ bool FtaTreeCache::Dump( void )
 		while( iter != adjacentPersonList.end() )
 		{
 			FtaPerson* adjacentPerson = *iter;
-			if( adjacentPerson->GetInfoState() == FtaPerson::INFO_INCOMPLETE )
+			if( !adjacentPerson->IsInfoComplete() )
 			{
 				( void )RequestPerson( adjacentPerson->GetPersonId() );
 			}
@@ -137,7 +134,7 @@ bool FtaTreeCache::Dump( void )
 bool FtaTreeCache::RequestPerson( const wxString& personId )
 {
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
-	if( person->GetInfoState() == FtaPerson::INFO_COMPLETE || person->GetInfoState() == FtaPerson::INFO_REQUESTED )
+	if( !person || person->IsInfoComplete() )
 		return false;
 
 	FtaClient* client = wxGetApp().GetClient();
@@ -145,23 +142,24 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	// If all of the following requests complete, then the person's information on www.familysearch.com will become fully known.
 	// Which, of course, is not to say that we know everything about the person.
 
+	// TODO: It may be better to flag that a bit of info is already requested so that
+	//       we never remake the request.  This prevents the need reject a request that
+	//       we detect is already queued.
+
 	if( ( person->GetFlags() & FtaPerson::FLAG_ANCESTRY ) == 0 )
-		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ) );
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_DESCENDANCY ) == 0 )
-		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ) );
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_PERSONAL_DETAILS ) == 0 )
-		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ) );
+		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
-		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ) );
+		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ), true );
 
-	// Only "approved applications" can request an individual's ordinance data.  Lame.
 	//if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
-	//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ) );
-
-	person->SetInfoState( FtaPerson::INFO_REQUESTED );
+	//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ), true );
 
 	return true;
 }

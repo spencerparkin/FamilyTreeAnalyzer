@@ -21,6 +21,7 @@ public:
 
 	virtual bool FormulateRequest( void ) override;
 	virtual bool MakeUrl( wxString& url ) override;
+	virtual bool Matches( FtaAsyncRequest* request ) override;
 
 	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) override;
 

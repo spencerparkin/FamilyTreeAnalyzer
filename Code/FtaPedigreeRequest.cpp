@@ -15,6 +15,18 @@ FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, Res
 {
 }
 
+/*virtual*/ bool FtaPedigreeRequest::Matches( FtaAsyncRequest* request )
+{
+	if( !FtaPersonInfoRequest::Matches( request ) )
+		return false;
+
+	FtaPedigreeRequest* pedigreeRequest = ( FtaPedigreeRequest* )request;
+	if( type != pedigreeRequest->type )
+		return false;
+
+	return true;
+}
+
 /*virtual*/ bool FtaPedigreeRequest::FormulateRequest( void )
 {
 	if( !FtaAsyncRequest::FormulateRequest() )

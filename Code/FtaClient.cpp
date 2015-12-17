@@ -375,23 +375,37 @@ bool FtaClient::CancelAllAsyncRequests( void )
 	return true;
 }
 
-bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request )
+bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued /*= false*/ )
 {
-	if( !request->FormulateRequest() )
-	{
-		delete request;
-		return false;
-	}
+	bool success = false;
 
-	CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
-	if( ReportCurlMultiError( curlmCode ) )
+	do
 	{
-		delete request;
-		return false;
-	}
+		if( rejectIfAlreadyQueued )
+		{
+			FtaAsyncRequestList* requestList = nullptr;
+			FtaAsyncRequestList::iterator iter = FindAsyncRequest( request, requestList );
+			if( iter != requestList->end() )
+				break;
+		}
 
-	asyncRequestList.push_back( request );
-	return true;
+		if( !request->FormulateRequest() )
+			break;
+
+		CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
+		if( ReportCurlMultiError( curlmCode ) )
+			break;
+
+		asyncRequestList.push_back( request );
+
+		success = true;
+	}
+	while( false );
+
+	if( !success )
+		delete request;
+
+	return success;
 }
 
 bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
@@ -514,6 +528,38 @@ FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( CURL* curlHandleEasy 
 			break;
 
 		iter++;
+	}
+
+	return iter;
+}
+
+FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( FtaAsyncRequest* request, FtaAsyncRequestList*& requestList )
+{
+	requestList = &asyncRequestList;
+
+	FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
+	while( iter != asyncRequestList.end() )
+	{
+		FtaAsyncRequest* pendingRequest = *iter;
+		if( pendingRequest == request || pendingRequest->Matches( request ) )
+			break;
+
+		iter++;
+	}
+
+	if( iter == asyncRequestList.end() )
+	{
+		requestList = &asyncRetryList;
+
+		iter = asyncRetryList.begin();
+		while( iter != asyncRetryList.end() )
+		{
+			FtaAsyncRequest* pendingRequest = *iter;
+			if( pendingRequest == request || pendingRequest->Matches( request ) )
+				break;
+
+			iter++;
+		}
 	}
 
 	return iter;

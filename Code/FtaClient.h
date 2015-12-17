@@ -20,7 +20,7 @@ public:
 	bool Authenticate( void );
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
-	bool AddAsyncRequest( FtaAsyncRequest* request );
+	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false );
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
 	bool CompleteAllAsyncRequests( bool showWorkingDialog );
 	bool CancelAllAsyncRequests( void );
@@ -49,6 +49,7 @@ public:
 private:
 
 	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
+	FtaAsyncRequestList::iterator FindAsyncRequest( FtaAsyncRequest* request, FtaAsyncRequestList*& requestList );
 
 	// TODO: Cache the personId of the person authenticated here.  May need to request it from service.
 	//       See "read current user" request.

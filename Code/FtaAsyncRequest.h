@@ -22,6 +22,7 @@ public:
 	virtual bool ProcessResponse( long& retryAfterSeconds );
 	virtual bool ProcessJSONResponse( wxJSONValue& responseValue ) { return true; }
 	virtual bool MakeUrl( wxString& url );
+	virtual bool Matches( FtaAsyncRequest* request ) { return false; }
 
 	class ResponseProcessor
 	{

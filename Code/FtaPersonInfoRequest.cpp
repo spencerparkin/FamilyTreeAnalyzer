@@ -13,6 +13,21 @@ FtaPersonInfoRequest::FtaPersonInfoRequest( const wxString& personId, ResponsePr
 {
 }
 
+/*virtual*/ bool FtaPersonInfoRequest::Matches( FtaAsyncRequest* request )
+{
+	if( !request->IsKindOf( &FtaPersonInfoRequest::ms_classInfo ) )
+		return false;
+
+	FtaPersonInfoRequest* personInfoRequest = ( FtaPersonInfoRequest* )request;
+	if( personId != personInfoRequest->GetPersonId() )
+		return false;
+
+	if( GetClassInfo() != request->GetClassInfo() )
+		return false;
+
+	return true;
+}
+
 wxJSONValue FtaPersonInfoRequest::FindPersonId( const wxString& personId, const wxJSONValue& personsArrayValue )
 {
 	int size = personsArrayValue.Size();

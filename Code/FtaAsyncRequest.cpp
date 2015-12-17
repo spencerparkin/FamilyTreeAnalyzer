@@ -13,7 +13,7 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	retryTimeSeconds = 0;
 	userData = nullptr;
 	headers = nullptr;
-	curlHandleEasy = curl_easy_init();	// TODO: Alloc from pool of existing handles instead?
+	curlHandleEasy = nullptr;
 }
 
 /*virtual*/ FtaAsyncRequest::~FtaAsyncRequest( void )
@@ -35,6 +35,9 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	wxString accessToken = wxGetApp().GetClient()->GetAccessToken();
 	if( accessToken.IsEmpty() )
 		return false;
+
+	if( !curlHandleEasy )
+		curlHandleEasy = curl_easy_init();	// TODO: Alloc from pool of existing handles instead?
 
 	curl_easy_reset( curlHandleEasy );
 

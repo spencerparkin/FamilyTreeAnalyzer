@@ -15,6 +15,7 @@ public:
 	virtual ~FtaPersonInfoRequest( void );
 
 	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) = 0;
+	virtual bool Matches( FtaAsyncRequest* request ) override;
 
 	const wxString& GetPersonId( void ) const { return personId; }
 

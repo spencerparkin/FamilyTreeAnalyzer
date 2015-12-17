@@ -37,14 +37,11 @@ public:
 		GENDER_FEMALE,
 	};
 
-	bool IsInfoComplete( void );
-	bool DumpInfo( void );
+	bool IsInfoComplete( void ) const;
+	bool DumpInfo( void ) const;
 
 	int GetFlags( void ) const { return flags; }
 	void SetFlags( int flags ) { this->flags = flags; }
-
-	InfoState GetInfoState( void ) const { return infoState; }
-	void SetInfoState( InfoState infoState ) { this->infoState = infoState; }
 
 	const wxString& GetPersonId( void ) const { return personId; }
 
@@ -87,7 +84,6 @@ public:
 
 private:
 
-	InfoState infoState;
 	int flags;
 	wxString personId;
 	wxString motherId, fatherId;
