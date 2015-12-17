@@ -1,1 +1,31 @@
-Test
+{
+  "sourceDescriptions" : [ {
+    "id" : "SD-LDSO",
+    "about" : "#LDSO",
+    "componentOf" : {
+      "description" : "https://sandbox.familysearch.org/platform/collection"
+    },
+    "titles" : [ {
+      "value" : "LDS Ordinances"
+    } ]
+  } ],
+  "collections" : [ {
+    "id" : "LDSO",
+    "links" : {
+      "http://oauth.net/core/2.0/endpoint/token" : {
+        "href" : "https://integration.familysearch.org/cis-web/oauth2/v3/token"
+      },
+      "http://oauth.net/core/2.0/endpoint/authorize" : {
+        "href" : "https://integration.familysearch.org/cis-web/oauth2/v3/authorization"
+      },
+      "ordinances-policy" : {
+        "href" : "https://sandbox.familysearch.org/platform/ordinances/policy"
+      },
+      "current-user" : {
+        "href" : "https://sandbox.familysearch.org/platform/users/current"
+      }
+    },
+    "title" : "LDS Ordinances"
+  } ],
+  "description" : "#SD-LDSO"
+}

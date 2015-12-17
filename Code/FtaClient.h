@@ -6,10 +6,9 @@
 #include <wx/jsonval.h>
 #include <curl/curl.h>
 #include "FtaContainers.h"
+#include "FtaAsyncRequest.h"
 
-class FtaAsyncRequest;
-
-class FtaClient
+class FtaClient : public FtaAsyncRequest::ResponseProcessor
 {
 public:
 
@@ -27,6 +26,8 @@ public:
 	bool CancelAllAsyncRequests( void );
 	bool AsyncRequestsPending( void );
 
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
+
 	const wxString& GetAccessToken( void ) { return accessToken; }
 
 	static size_t WriteFunction( void* buf, size_t size, size_t nitems, void* userPtr );
@@ -37,6 +38,14 @@ public:
 	static bool ReportCurlError( CURLcode curlCode );
 	static bool ReportCurlMultiError( CURLMcode curlmCode );
 
+	enum PrivilegeFlag
+	{
+		PF_LDS_ORDINANCES			= 0x00000001,
+	};
+
+	void SetPrivilegeFlags( int privilegeFlags ) { this->privilegeFlags = privilegeFlags; }
+	int GetPrivilegeFlags( void ) { return privilegeFlags; }
+
 private:
 
 	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
@@ -44,6 +53,7 @@ private:
 	CURL* curlHandleEasy;
 	CURLM* curlHandleMulti;
 	wxString accessToken;
+	int privilegeFlags;
 	char errorBuf[ CURL_ERROR_SIZE ];
 	FtaAsyncRequestList asyncRequestList;
 	FtaAsyncRequestList asyncRetryList;

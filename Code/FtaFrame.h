@@ -29,6 +29,8 @@ private:
 	{
 		ID_AcquireAccessToken = wxID_HIGHEST,
 		ID_DeleteAccessToken,
+		ID_AcquirePrivileges,
+		ID_DeletePrivileges,
 		ID_FillCache,
 		ID_WipeCache,
 		ID_DumpCache,
@@ -40,6 +42,8 @@ private:
 
 	void OnAcquireAccessToken( wxCommandEvent& event );
 	void OnDeleteAccessToken( wxCommandEvent& event );
+	void OnAcquirePrivileges( wxCommandEvent& event );
+	void OnDeletePrivileges( wxCommandEvent& event );
 	void OnFillCache( wxCommandEvent& event );
 	void OnWipeCache( wxCommandEvent& event );
 	void OnDumpCache( wxCommandEvent& event );

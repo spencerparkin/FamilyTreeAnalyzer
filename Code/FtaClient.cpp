@@ -16,6 +16,8 @@ FtaClient::FtaClient( void )
 {
 	curlHandleEasy = nullptr;
 	curlHandleMulti = nullptr;
+
+	privilegeFlags = 0;
 }
 
 /*virtual*/ FtaClient::~FtaClient( void )
@@ -78,6 +80,8 @@ bool FtaClient::Authenticate( void )
 
 		wxBusyCursor busyCursor;
 
+		privilegeFlags = 0;
+
 		curl_easy_reset( curlHandleEasy );
 
 		// See https://familysearch.org/developers/docs/certification/authentication for more info.
@@ -86,7 +90,7 @@ bool FtaClient::Authenticate( void )
 			"FamilyTreeAnalyzer would like to know your basic FamilySearch profile information "
 			"and access data about your ancestors from the FamilySearch family tree.  "
 			"FamilyTreeAnalyzer will use this information in accordance with their respective terms "
-			"of service and privacy policies.  May FamilyTreeAnalyzer proceed?";
+			"of service and privacy policies.\n\nMay FamilyTreeAnalyzer proceed?";
 		if( wxYES != wxMessageBox( notice, "Notice", wxYES_NO | wxICON_QUESTION ) )
 			break;
 
@@ -173,6 +177,8 @@ bool FtaClient::DeleteAccessToken( void )
 		if( !HasAccessToken() || !curlHandleEasy )
 			break;
 
+		privilegeFlags = 0;
+
 		curl_easy_reset( curlHandleEasy );
 
 		wxString authorization = "Authorization: Bearer " + accessToken;
@@ -201,6 +207,11 @@ bool FtaClient::DeleteAccessToken( void )
 		curl_slist_free_all( headers );
 
 	return success;
+}
+
+/*virtual*/ bool FtaClient::ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue )
+{
+	return true;
 }
 
 /*static*/ bool FtaClient::ReportCurlError( CURLcode curlCode )

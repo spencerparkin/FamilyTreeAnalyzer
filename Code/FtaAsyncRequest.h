@@ -20,6 +20,7 @@ public:
 
 	virtual bool FormulateRequest( void );
 	virtual bool ProcessResponse( long& retryAfterSeconds );
+	virtual bool ProcessJSONResponse( wxJSONValue& responseValue ) { return true; }
 	virtual bool MakeUrl( wxString& url );
 
 	class ResponseProcessor
@@ -48,7 +49,7 @@ protected:
 	wxString httpStatusCode;
 	void* userData;
 	ResponseProcessor* processor;
-	wxString responseValueString;		// Typically JSON.
+	wxString responseValueString;		// Must be JSON if used.
 	wxArrayString headerArray;
 	CURL* curlHandleEasy;
 	CURLcode curlCode;

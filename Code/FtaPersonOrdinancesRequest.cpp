@@ -1,6 +1,8 @@
 // FtaPersonOrdinancesRequest.cpp
 
 #include "FtaPersonOrdinancesRequest.h"
+#include "FtaClient.h"
+#include "FtaApp.h"
 
 wxIMPLEMENT_CLASS( FtaPersonOrdinancesRequest, FtaPersonInfoRequest );
 
@@ -14,16 +16,17 @@ FtaPersonOrdinancesRequest::FtaPersonOrdinancesRequest( const wxString& personId
 
 /*virtual*/ bool FtaPersonOrdinancesRequest::MakeUrl( wxString& url )
 {
-	if( !FtaPersonInfoRequest::MakeUrl( url ) )
+	FtaClient* client = wxGetApp().GetClient();
+	if( ( client->GetPrivilegeFlags() & FtaClient::PF_LDS_ORDINANCES ) == 0 )
 		return false;
 
-	// Uh...what about ordinances for a specific individual?
-	url += "/platform/ordinances/ordinances";
-	return true;
+	// Until this program gets certified, I don't have access to the ordinances end-points.
+	return false;
 }
 
 /*virtual*/ bool FtaPersonOrdinancesRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
 {
+	// TODO: Read ordinances info into the person's record in the cache.
 	return true;
 }
 

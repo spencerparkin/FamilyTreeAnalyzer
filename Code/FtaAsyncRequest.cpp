@@ -109,19 +109,20 @@ int FtaAsyncRequest::FindHeaderLine( const wxString& pattern, int requiredStartL
 		return true;
 	}
 
-	if( processor )
+	if( !responseValueString.IsEmpty() )
 	{
+		wxJSONReader jsonReader;
 		wxJSONValue responseValue;
-		if( !responseValueString.IsEmpty() )
+		int errorCount = jsonReader.Parse( responseValueString, &responseValue );
+		if( errorCount > 0 )
+			return false;
+
+		if( processor )
 		{
-			wxJSONReader jsonReader;
-			int errorCount = jsonReader.Parse( responseValueString, &responseValue );
-			if( errorCount > 0 )
+			if( !processor->ProcessResponse( this, responseValue ) )
 				return false;
 		}
-
-		// A null response value is valid in some cases.
-		if( !processor->ProcessResponse( this, responseValue ) )
+		else if( !ProcessJSONResponse( responseValue ) )
 			return false;
 	}
 

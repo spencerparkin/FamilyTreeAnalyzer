@@ -4,6 +4,7 @@
 #include "FtaApp.h"
 #include "FtaClient.h"
 #include "FtaTreeCache.h"
+#include "FtaOrdinancesPrivilegeRequest.h"
 #include <wx/aboutdlg.h>
 #include <wx/menu.h>
 #include <wx/statusbr.h>
@@ -13,19 +14,22 @@
 #include <wx/textdlg.h>
 #include <wx/config.h>
 
-#include "FtaPersonPortraitDataRequest.h"
-
 FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) : wxFrame( parent, wxID_ANY, "Family Tree Analyzer", pos, size ), timer( this, ID_Timer )
 {
 	auiManager = new wxAuiManager( this, wxAUI_MGR_LIVE_RESIZE | wxAUI_MGR_DEFAULT );
 
 	wxMenu* programMenu = new wxMenu();
-	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with FamilySearch.org." );
+	wxMenuItem* acquireAccessTokenMenuItem = new wxMenuItem( programMenu, ID_AcquireAccessToken, "Acquire Access Token", "Authenticate with (login to) FamilySearch.org." );
 	wxMenuItem* deleteAccessTokenMenuItem = new wxMenuItem( programMenu, ID_DeleteAccessToken, "Delete Access Token", "Logout of FamilySearch.org." );
+	wxMenuItem* acquirePrivilegesMenuItem = new wxMenuItem( programMenu, ID_AcquirePrivileges, "Acquire Privileges", "Determine and acquire privileges with FamilySearch.org." );
+	wxMenuItem* deletePrivilegesMenuItem = new wxMenuItem( programMenu, ID_DeletePrivileges, "Delete Privileges", "Relinquish all currently had privileges with FamilySearch.org." );
 	wxMenuItem* clearLogMenuItem = new wxMenuItem( programMenu, ID_ClearLog, "Clear Log", "Clear the log." );
 	wxMenuItem* exitMenuItem = new wxMenuItem( programMenu, ID_Exit, "Exit", "Exit this program." );
 	programMenu->Append( acquireAccessTokenMenuItem );
 	programMenu->Append( deleteAccessTokenMenuItem );
+	programMenu->AppendSeparator();
+	programMenu->Append( acquirePrivilegesMenuItem );
+	programMenu->Append( deletePrivilegesMenuItem );
 	programMenu->AppendSeparator();
 	programMenu->Append( clearLogMenuItem );
 	programMenu->AppendSeparator();
@@ -59,6 +63,8 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 
 	Bind( wxEVT_MENU, &FtaFrame::OnAcquireAccessToken, this, ID_AcquireAccessToken );
 	Bind( wxEVT_MENU, &FtaFrame::OnDeleteAccessToken, this, ID_DeleteAccessToken );
+	Bind( wxEVT_MENU, &FtaFrame::OnAcquirePrivileges, this, ID_AcquirePrivileges );
+	Bind( wxEVT_MENU, &FtaFrame::OnDeletePrivileges, this, ID_DeletePrivileges );
 	Bind( wxEVT_MENU, &FtaFrame::OnClearLog, this, ID_ClearLog );
 	Bind( wxEVT_MENU, &FtaFrame::OnFillCache, this, ID_FillCache );
 	Bind( wxEVT_MENU, &FtaFrame::OnWipeCache, this, ID_WipeCache );
@@ -67,6 +73,8 @@ FtaFrame::FtaFrame( wxWindow* parent, const wxPoint& pos, const wxSize& size ) :
 	Bind( wxEVT_MENU, &FtaFrame::OnAbout, this, ID_About );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquireAccessToken );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DeleteAccessToken );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_AcquirePrivileges );
+	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_DeletePrivileges );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_ClearLog );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_FillCache );
 	Bind( wxEVT_UPDATE_UI, &FtaFrame::OnUpdateMenuItemUI, this, ID_WipeCache );
@@ -142,6 +150,19 @@ void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
 {
 	if( wxGetApp().GetClient()->DeleteAccessToken() )
 		wxMessageBox( "Logged out!" );
+}
+
+void FtaFrame::OnAcquirePrivileges( wxCommandEvent& event )
+{
+	FtaClient* client = wxGetApp().GetClient();
+	client->AddAsyncRequest( new FtaOrdinancesPrivilegeRequest( nullptr ) );
+	// TODO: Any other privileges we might have with the service?  Add more requests for each.
+	client->CompleteAllAsyncRequests( false );
+}
+
+void FtaFrame::OnDeletePrivileges( wxCommandEvent& event )
+{
+	wxGetApp().GetClient()->SetPrivilegeFlags(0);
 }
 
 void FtaFrame::OnWipeCache( wxCommandEvent& event )
@@ -234,6 +255,16 @@ void FtaFrame::OnUpdateMenuItemUI( wxUpdateUIEvent& event )
 		case ID_FillCache:
 		{
 			event.Enable( wxGetApp().GetClient()->HasAccessToken() );
+			break;
+		}
+		case ID_AcquirePrivileges:
+		{
+			event.Enable( ( wxGetApp().GetClient()->HasAccessToken() && wxGetApp().GetClient()->GetPrivilegeFlags() == 0 ) ? true : false );
+			break;
+		}
+		case ID_DeletePrivileges:
+		{
+			event.Enable( wxGetApp().GetClient()->GetPrivilegeFlags() != 0 ? true : false );
 			break;
 		}
 		case ID_DumpCache:
