@@ -38,6 +38,7 @@
     <ClInclude Include="Code\FtaSetGraphFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
+    <ClInclude Include="Code\FtaWhoAmIFunction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp" />
@@ -67,6 +68,7 @@
     <ClCompile Include="Code\FtaSetGraphFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
+    <ClCompile Include="Code\FtaWhoAmIFunction.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F4255D73-F7A5-49E7-94CC-97B5DA4C39B1}</ProjectGuid>

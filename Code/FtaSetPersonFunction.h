@@ -14,7 +14,7 @@ public:
 	virtual ~FtaSetPersonFunction( void );
 
 	virtual int Call( lua_State* L ) override;
-	virtual wxString LuaFunctionName( void ) override { return "SetPerson"; }
+	virtual wxString LuaFunctionName( void ) override { return "setPerson"; }
 };
 
 // FtaSetPersonFunction.h

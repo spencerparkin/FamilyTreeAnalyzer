@@ -200,6 +200,8 @@ bool FtaClient::DeleteAccessToken( void )
 
 		accessToken = "";
 
+		SetCurrentUserPersonId( "" );
+
 		// In compliance with read certification, a log-out requires we purge the cache.
 		if( !wxGetApp().GetTreeCache()->Wipe() )
 			break;
@@ -509,7 +511,7 @@ bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 		if( curlMsg->data.result == CURLE_OK )
 		{
 			bool processed = request->ProcessResponse( retryAfterSeconds );
-			wxASSERT( processed );
+			//wxASSERT( processed );
 		}
 
 		bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_NONE );

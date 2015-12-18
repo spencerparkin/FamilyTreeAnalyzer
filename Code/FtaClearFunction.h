@@ -14,7 +14,7 @@ public:
 	virtual ~FtaClearFunction( void );
 
 	virtual int Call( lua_State* L ) override;
-	virtual wxString LuaFunctionName( void ) override { return "Clear"; }
+	virtual wxString LuaFunctionName( void ) override { return "clear"; }
 };
 
 // FtaClearFunction.h

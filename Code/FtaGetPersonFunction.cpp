@@ -2,6 +2,7 @@
 
 #include "FtaGetPersonFunction.h"
 #include "FtaTreeCache.h"
+#include "FtaClient.h"
 #include "FtaApp.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaGetPersonFunction, FtaLuaFunction );
@@ -18,9 +19,7 @@ FtaGetPersonFunction::FtaGetPersonFunction( void )
 {
 	wxString personId = luaL_checkstring( L, 1 );
 	if( personId.IsEmpty() )
-	{
-		// TODO: Here we should query for the ID of the person logged in and then use that.
-	}
+		personId = wxGetApp().GetClient()->GetCurrentUserPersonId();
 
 	FtaTreeCache* cache = wxGetApp().GetTreeCache();
 	if( !cache )

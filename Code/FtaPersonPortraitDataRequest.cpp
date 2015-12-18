@@ -84,6 +84,9 @@ FtaPersonPortraitDataRequest::FtaPersonPortraitDataRequest( const wxString& pers
 	if( !person || ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
 		return false;
 
+	if( person->GetPortraitUrl() == "No Content" )
+		return false;
+
 	url = person->GetPortraitUrl();
 	if( url.IsEmpty() )
 		return false;

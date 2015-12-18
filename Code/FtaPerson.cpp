@@ -118,10 +118,13 @@ bool FtaPerson::SetFromLuaTable( lua_State* L, int idx )
 
 bool FtaPerson::GetToLuaTable( lua_State* L ) const
 {
-	if( !IsInfoComplete() )
-		return false;
-
 	lua_newtable(L);
+
+	if( !IsInfoComplete() )
+	{
+		lua_pushboolean( L, true );
+		lua_setfield( L, -2, "partialInfo" );
+	}
 
 	lua_pushstring( L, personId );
 	lua_setfield( L, -2, "personId" );

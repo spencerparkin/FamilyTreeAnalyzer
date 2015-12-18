@@ -33,7 +33,8 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 			{
 				case ALLOCATE_ON_CACHE_MISS:
 				{
-					wxGetApp().GetFrame()->AddLogMessage( "Created person " + personId );
+					// A weakness here is that we may be allocating a non-existent, non-sensical person.
+					wxGetApp().GetFrame()->AddLogMessage( "Allocated person " + personId );
 					personMap[ personId ] = new FtaPerson( personId );
 					break;
 				}
@@ -51,6 +52,12 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 
 		if( iter != personMap.end() )
 			person = iter->second;
+	}
+
+	if( person && !person->IsInfoComplete() && disposition == POPULATE_ON_CACHE_MISS )
+	{
+		if( RequestPerson( personId ) )
+			wxGetApp().GetClient()->CompleteAllAsyncRequests( false );
 	}
 
 	return person;
@@ -105,10 +112,7 @@ bool FtaTreeCache::Dump( void )
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
 
 	if( !personInfoRequest->AccumulateInfoInCache( responseValue ) )
-	{
-		person->SetFlags( person->GetFlags() | FtaPerson::FLAG_CACHE_ACCUM_FAILURE );
 		return false;
-	}
 
 	if( ( signed )personMap.size() < personCountThreshold )
 	{

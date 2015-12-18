@@ -14,7 +14,7 @@ public:
 	virtual ~FtaSetGraphFunction( void );
 
 	virtual int Call( lua_State* L ) override;
-	virtual wxString LuaFunctionName( void ) override { return "SetGraph"; }
+	virtual wxString LuaFunctionName( void ) override { return "setGraph"; }
 };
 
 // FtaSetGraphFunction.h

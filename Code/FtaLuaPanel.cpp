@@ -129,18 +129,19 @@ void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
 		return;
 	}
 
+	// TODO: I need to fix this, but my mind is mush right now.
 	switch( event.GetKeyCode() )
 	{
 		case WXK_UP:
 		{
-			if( historyLocation > 0 )
-				historyLocation--;
+			if( historyLocation < ( signed )codeHistory.GetCount() - 1 )
+				historyLocation++;
 			break;
 		}
 		case WXK_DOWN:
 		{
-			if( historyLocation < ( signed )codeHistory.GetCount() - 1 )
-				historyLocation++;
+			if( historyLocation > 0 )
+				historyLocation--;
 			break;
 		}
 	}

@@ -97,6 +97,9 @@
     <ClInclude Include="Code\FtaCurrentUserRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaWhoAmIFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -179,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaCurrentUserRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaWhoAmIFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

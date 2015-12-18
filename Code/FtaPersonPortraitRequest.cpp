@@ -23,13 +23,18 @@ FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, Re
 	return true;
 }
 
-/*virtual*/ bool FtaPersonPortraitRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
+/*virtual*/ bool FtaPersonPortraitRequest::ProcessResponse( long& retryAfterSeconds )
 {
+	if( !FtaPersonInfoRequest::ProcessResponse( retryAfterSeconds ) )
+		return false;
+
 	FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::ALLOCATE_ON_CACHE_MISS );
 	if( !person )
 		return false;
 
-	if( httpStatusCode.Find( "204" ) < 0 )
+	if( httpStatusCode.Find( "204" ) >= 0 )
+		person->SetPortraitUrl( "No Content" );
+	else
 	{
 		int i = FindHeaderLine( "Location:", 0 );
 		if( i < 0 )
@@ -55,6 +60,11 @@ FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, Re
 
 	person->SetFlags( person->GetFlags() | FtaPerson::FLAG_PORTRAIT );
 
+	return true;
+}
+
+/*virtual*/ bool FtaPersonPortraitRequest::AccumulateInfoInCache( wxJSONValue& responseValue )
+{
 	return true;
 }
 

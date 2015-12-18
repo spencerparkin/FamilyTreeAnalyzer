@@ -14,7 +14,7 @@ public:
 	virtual ~FtaPrintFunction( void );
 
 	virtual int Call( lua_State* L ) override;
-	virtual wxString LuaFunctionName( void ) override { return "Print"; }
+	virtual wxString LuaFunctionName( void ) override { return "print"; }
 };
 
 // FtaPrintFunction.h
