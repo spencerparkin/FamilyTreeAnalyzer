@@ -14,6 +14,7 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
 	userData = nullptr;
 	headers = nullptr;
 	curlHandleEasy = nullptr;
+	state = STATE_NONE;
 }
 
 /*virtual*/ FtaAsyncRequest::~FtaAsyncRequest( void )

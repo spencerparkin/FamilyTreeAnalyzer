@@ -319,7 +319,7 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 			if( newValue == progressDialog->GetRange() )
 				newValue = 1;
 			
-			progressDialog->Update( newValue, wxString::Format( "%d requests pending... (%d requests throttled...)", asyncRequestList.size(), asyncRetryList.size() ) );
+			progressDialog->Update( newValue, wxString::Format( "%d requests pending...", asyncRequestList.size() ) );
 		}
 	}
 
@@ -337,9 +337,6 @@ bool FtaClient::AsyncRequestsPending( void )
 	if( asyncRequestList.size() > 0 )
 		return true;
 
-	if( asyncRetryList.size() > 0 )
-		return true;
-
 	return false;
 }
 
@@ -353,166 +350,198 @@ bool FtaClient::CancelAllAsyncRequests( void )
 		FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
 		FtaAsyncRequest* request = *iter;
 
-		CURLMcode curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
-		ReportCurlMultiError( curlmCode );
-		wxASSERT( curlmCode == CURLM_OK );
+		bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_NONE );
+		wxASSERT( changed );
 
 		delete request;
 
 		asyncRequestList.erase( iter );
 	}
 
-	while( asyncRetryList.size() > 0 )
+	return true;
+}
+
+bool FtaClient::ChangeRequestState( FtaAsyncRequest* request, FtaAsyncRequest::State newState )
+{
+	if( request->GetState() == newState )
+		return false;
+	
+	FtaAsyncRequest::State oldState = request->GetState();
+
+	switch( oldState )
 	{
-		FtaAsyncRequestList::iterator iter = asyncRetryList.begin();
-		FtaAsyncRequest* request = *iter;
+		case FtaAsyncRequest::STATE_PENDING:
+		{
+			CURLMcode curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
+			if( ReportCurlMultiError( curlmCode ) )
+				return false;
 
-		delete request;
-
-		asyncRetryList.erase( iter );
+			break;
+		}
 	}
+
+	switch( newState )
+	{
+		case FtaAsyncRequest::STATE_PENDING:
+		{
+			if( !request->FormulateRequest() )
+				return false;
+
+			CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
+			if( ReportCurlMultiError( curlmCode ) )
+				return false;
+
+			break;
+		}
+	}
+
+	request->SetState( newState );
 
 	return true;
 }
 
-bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued /*= false*/ )
+bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued /*= false*/, bool deleteIfRejected /*= true*/ )
 {
 	bool success = false;
 
 	do
 	{
-		if( rejectIfAlreadyQueued )
+		bool alreadyQueued = false;
+		bool pointerMatch = false;
+		FtaAsyncRequestList::iterator iter = FindAsyncRequest( request, pointerMatch );
+		if( iter != asyncRequestList.end() )
+			alreadyQueued = true;
+
+		if( rejectIfAlreadyQueued && alreadyQueued )
 		{
-			FtaAsyncRequestList* requestList = nullptr;
-			FtaAsyncRequestList::iterator iter = FindAsyncRequest( request, requestList );
-			if( iter != requestList->end() )
-				break;
+			if( deleteIfRejected )
+			{
+				// We wouldn't want to delete a request that's in our list; thereby leaving us with a stale pointer.
+				wxASSERT( pointerMatch == false );
+				wxASSERT( request->GetState() == FtaAsyncRequest::STATE_NONE );
+				delete request;
+			}
+
+			break;
 		}
 
-		if( !request->FormulateRequest() )
+		if( !ChangeRequestState( request, FtaAsyncRequest::STATE_PENDING ) )
 			break;
 
-		CURLMcode curlmCode = curl_multi_add_handle( curlHandleMulti, request->GetCurlHandle() );
-		if( ReportCurlMultiError( curlmCode ) )
-			break;
-
-		asyncRequestList.push_back( request );
+		if( !pointerMatch )
+			asyncRequestList.push_back( request );
 
 		success = true;
 	}
 	while( false );
-
-	if( !success )
-		delete request;
 
 	return success;
 }
 
 bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
 {
-	if( asyncRequestList.size() > 0 )
+	CURLMcode curlmCode;
+
+	if( waitOnSockets )
 	{
-		CURLMcode curlmCode;
-
-		if( waitOnSockets )
-		{
-			long waitTimeMilliseconds;
-			curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
-			if( ReportCurlMultiError( curlmCode ) )
-				return false;
-
-			if( waitTimeMilliseconds > 0 )
-			{
-				long waitTimeMicroseconds = waitTimeMilliseconds * 1000;
-				timeval waitTime;
-				waitTime.tv_sec = 0;
-				waitTime.tv_usec = waitTimeMicroseconds;
-
-				fd_set fdread, fdwrite, fdexcep;
-				FD_ZERO( &fdread );
-				FD_ZERO( &fdwrite );
-				FD_ZERO( &fdexcep );
-
-				int maxfd = -1;
-				curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
-				if( ReportCurlMultiError( curlmCode ) )
-					return false;
-
-				if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
-				{
-					if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, &waitTime ) )
-					{
-						int error = WSAGetLastError();
-						return false;
-					}
-				}
-			}
-		}
-
-		int runningHandles = 0;
-		curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
+		long waitTimeMilliseconds;
+		curlmCode = curl_multi_timeout( curlHandleMulti, &waitTimeMilliseconds );
 		if( ReportCurlMultiError( curlmCode ) )
 			return false;
 
-		struct CURLMsg* curlMsg = nullptr;
-		while( true )
+		if( waitTimeMilliseconds > 0 )
 		{
-			int queuedMessageCount = 0;
-			curlMsg = curl_multi_info_read( curlHandleMulti, &queuedMessageCount );
-			if( !curlMsg )
-				break;
+			long waitTimeMicroseconds = waitTimeMilliseconds * 1000;
+			timeval waitTime;
+			waitTime.tv_sec = 0;
+			waitTime.tv_usec = waitTimeMicroseconds;
 
-			if( curlMsg->msg != CURLMSG_DONE )
-				continue;
-		
-			FtaAsyncRequestList::iterator iter = FindAsyncRequest( curlMsg->easy_handle );
-			wxASSERT( iter != asyncRequestList.end() );
-		
-			FtaAsyncRequest* request = *iter;
-			request->SetCurlCode( curlMsg->data.result );
-			ReportCurlError( request->GetCurlCode() );
+			fd_set fdread, fdwrite, fdexcep;
+			FD_ZERO( &fdread );
+			FD_ZERO( &fdwrite );
+			FD_ZERO( &fdexcep );
 
-			long retryAfterSeconds = -1;
-			if( curlMsg->data.result == CURLE_OK )
+			int maxfd = -1;
+			curlmCode = curl_multi_fdset( curlHandleMulti, &fdread, &fdwrite, &fdexcep, &maxfd );
+			if( ReportCurlMultiError( curlmCode ) )
+				return false;
+
+			if( fdread.fd_count > 0 || fdwrite.fd_count > 0 )
 			{
-				bool processed = request->ProcessResponse( retryAfterSeconds );
-				wxASSERT( processed );
-			}
-
-			curlmCode = curl_multi_remove_handle( curlHandleMulti, request->GetCurlHandle() );
-			ReportCurlMultiError( curlmCode );
-			wxASSERT( curlmCode == CURLM_OK );
-
-			asyncRequestList.erase( iter );
-
-			if( retryAfterSeconds < 0 )
-				delete request;
-			else
-			{
-				long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
-				request->SetRetryTime( currentTimeSeconds + retryAfterSeconds );
-				asyncRetryList.push_back( request );
+				if( SOCKET_ERROR == select( maxfd + 1, &fdread, &fdwrite, &fdexcep, &waitTime ) )
+				{
+					int error = WSAGetLastError();
+					return false;
+				}
 			}
 		}
 	}
 
-	FtaAsyncRequestList::iterator iter = asyncRetryList.begin();
-	while( iter != asyncRetryList.end() )
+	// STPTODO: Does this handle the vacuous case?  We may have pending requests, but they're all being throttled.
+	int runningHandles = 0;
+	curlmCode = curl_multi_perform( curlHandleMulti, &runningHandles );
+	if( ReportCurlMultiError( curlmCode ) )
+		return false;
+
+	struct CURLMsg* curlMsg = nullptr;
+	while( true )
 	{
-		FtaAsyncRequestList::iterator nextIter = iter;
-		nextIter++;
+		int queuedMessageCount = 0;
+		curlMsg = curl_multi_info_read( curlHandleMulti, &queuedMessageCount );
+		if( !curlMsg )
+			break;
 
+		if( curlMsg->msg != CURLMSG_DONE )
+			continue;
+		
+		FtaAsyncRequestList::iterator iter = FindAsyncRequest( curlMsg->easy_handle );
+		wxASSERT( iter != asyncRequestList.end() );
+		
 		FtaAsyncRequest* request = *iter;
-		long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
-		if( currentTimeSeconds >= request->GetRetryTime() )
-		{
-			asyncRetryList.erase( iter );
+		wxASSERT( request->GetState() == FtaAsyncRequest::STATE_PENDING );
 
-			bool added = AddAsyncRequest( request );
-			wxASSERT( added );
+		request->SetCurlCode( curlMsg->data.result );
+		ReportCurlError( request->GetCurlCode() );
+
+		long retryAfterSeconds = -1;
+		if( curlMsg->data.result == CURLE_OK )
+		{
+			bool processed = request->ProcessResponse( retryAfterSeconds );
+			wxASSERT( processed );
 		}
 
-		iter = nextIter;
+		bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_NONE );
+		wxASSERT( changed );
+
+		if( retryAfterSeconds < 0 )
+		{
+			asyncRequestList.erase( iter );
+			delete request;
+		}
+		else
+		{
+			long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
+			request->SetRetryTime( currentTimeSeconds + retryAfterSeconds );
+			ChangeRequestState( request, FtaAsyncRequest::STATE_THROTTLED );
+		}
+	}
+
+	FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
+	while( iter != asyncRequestList.end() )
+	{
+		FtaAsyncRequest* request = *iter;
+
+		if( request->GetState() == FtaAsyncRequest::STATE_THROTTLED )
+		{
+			long currentTimeSeconds = clock() / CLOCKS_PER_SEC;
+			if( currentTimeSeconds >= request->GetRetryTime() )
+			{
+				bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_PENDING );
+				wxASSERT( changed );
+			}
+		}
+
+		iter++;
 	}
 
 	return true;
@@ -533,33 +562,24 @@ FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( CURL* curlHandleEasy 
 	return iter;
 }
 
-FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( FtaAsyncRequest* request, FtaAsyncRequestList*& requestList )
+FtaAsyncRequestList::iterator FtaClient::FindAsyncRequest( FtaAsyncRequest* request, bool& pointerMatch, bool performLogicalMatch /*= true*/ )
 {
-	requestList = &asyncRequestList;
+	pointerMatch = false;
 
 	FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
 	while( iter != asyncRequestList.end() )
 	{
 		FtaAsyncRequest* pendingRequest = *iter;
-		if( pendingRequest == request || pendingRequest->Matches( request ) )
+		if( pendingRequest == request )
+		{
+			pointerMatch = true;
+			break;
+		}
+
+		if( performLogicalMatch && pendingRequest->Matches( request ) )
 			break;
 
 		iter++;
-	}
-
-	if( iter == asyncRequestList.end() )
-	{
-		requestList = &asyncRetryList;
-
-		iter = asyncRetryList.begin();
-		while( iter != asyncRetryList.end() )
-		{
-			FtaAsyncRequest* pendingRequest = *iter;
-			if( pendingRequest == request || pendingRequest->Matches( request ) )
-				break;
-
-			iter++;
-		}
 	}
 
 	return iter;

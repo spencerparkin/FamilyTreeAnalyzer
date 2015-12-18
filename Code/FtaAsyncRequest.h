@@ -41,11 +41,22 @@ public:
 	void SetRetryTime( long retryTimeSeconds ) { this->retryTimeSeconds = retryTimeSeconds; }
 	int GetRetryTime( void ) const { return retryTimeSeconds; }
 
+	enum State
+	{
+		STATE_NONE,
+		STATE_PENDING,
+		STATE_THROTTLED,
+	};
+
+	void SetState( State state ) { this->state = state; }
+	State GetState( void ) const { return state; }
+
 protected:
 
 	// We might want to provide a version of this routine that uses regular expressions.
 	int FindHeaderLine( const wxString& pattern, int requiredStartLocation = -1 );
 	
+	State state;
 	long retryTimeSeconds;
 	wxString httpStatusCode;
 	void* userData;

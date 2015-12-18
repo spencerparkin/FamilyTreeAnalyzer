@@ -20,7 +20,7 @@ public:
 	bool Authenticate( void );
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
-	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false );
+	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false, bool deleteIfRejected = true );
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
 	bool CompleteAllAsyncRequests( bool showWorkingDialog );
 	bool CancelAllAsyncRequests( void );
@@ -48,8 +48,10 @@ public:
 
 private:
 
+	bool ChangeRequestState( FtaAsyncRequest* request, FtaAsyncRequest::State newState );
+
 	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
-	FtaAsyncRequestList::iterator FindAsyncRequest( FtaAsyncRequest* request, FtaAsyncRequestList*& requestList );
+	FtaAsyncRequestList::iterator FindAsyncRequest( FtaAsyncRequest* request, bool& pointerMatch, bool performLogicalMatch = true );
 
 	// TODO: Cache the personId of the person authenticated here.  May need to request it from service.
 	//       See "read current user" request.
@@ -59,7 +61,6 @@ private:
 	int privilegeFlags;
 	char errorBuf[ CURL_ERROR_SIZE ];
 	FtaAsyncRequestList asyncRequestList;
-	FtaAsyncRequestList asyncRetryList;
 };
 
 // FtaClient.h
