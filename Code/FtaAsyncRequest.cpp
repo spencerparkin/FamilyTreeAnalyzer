@@ -7,7 +7,7 @@
 
 wxIMPLEMENT_ABSTRACT_CLASS( FtaAsyncRequest, wxObject );
 
-FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor )
+FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor /*= nullptr*/ )
 {
 	this->processor = processor;
 	retryTimeSeconds = 0;

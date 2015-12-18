@@ -15,7 +15,7 @@ public:
 
 	class ResponseProcessor;
 
-	FtaAsyncRequest( ResponseProcessor* processor );
+	FtaAsyncRequest( ResponseProcessor* processor = nullptr );
 	virtual ~FtaAsyncRequest( void );
 
 	virtual bool FormulateRequest( void );

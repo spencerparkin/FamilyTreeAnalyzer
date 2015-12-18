@@ -20,7 +20,7 @@ public:
 	bool Authenticate( void );
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
-	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false, bool deleteIfRejected = true );
+	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false, bool deleteIfNotAdded = true );
 	bool ServiceAllAsyncRequests( bool waitOnSockets );
 	bool CompleteAllAsyncRequests( bool showWorkingDialog );
 	bool CancelAllAsyncRequests( void );
@@ -46,6 +46,9 @@ public:
 	void SetPrivilegeFlags( int privilegeFlags ) { this->privilegeFlags = privilegeFlags; }
 	int GetPrivilegeFlags( void ) { return privilegeFlags; }
 
+	void SetCurrentUserPersonId( const wxString& personId ) { currentUserPersonId = personId; }
+	const wxString& GetCurrentUserPersonId( void ) const { return currentUserPersonId; }
+
 private:
 
 	bool ChangeRequestState( FtaAsyncRequest* request, FtaAsyncRequest::State newState );
@@ -53,8 +56,7 @@ private:
 	FtaAsyncRequestList::iterator FindAsyncRequest( CURL* curlHandleEasy );
 	FtaAsyncRequestList::iterator FindAsyncRequest( FtaAsyncRequest* request, bool& pointerMatch, bool performLogicalMatch = true );
 
-	// TODO: Cache the personId of the person authenticated here.  May need to request it from service.
-	//       See "read current user" request.
+	wxString currentUserPersonId;
 	CURL* curlHandleEasy;
 	CURLM* curlHandleMulti;
 	wxString accessToken;

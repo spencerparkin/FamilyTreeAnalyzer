@@ -4,6 +4,7 @@
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
 #include "FtaAsyncRequest.h"
+#include "FtaCurrentUserRequest.h"
 #include "FtaApp.h"
 #include <wx/textdlg.h>
 #include <wx/jsonval.h>
@@ -156,6 +157,9 @@ bool FtaClient::Authenticate( void )
 			break;
 
 		wxGetApp().GetFrame()->AddLogMessage( "Authenticated!" );
+
+		AddAsyncRequest( new FtaCurrentUserRequest() );
+		CompleteAllAsyncRequests( false );
 
 		success = true;
 	}
@@ -400,30 +404,20 @@ bool FtaClient::ChangeRequestState( FtaAsyncRequest* request, FtaAsyncRequest::S
 	return true;
 }
 
-bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued /*= false*/, bool deleteIfRejected /*= true*/ )
+bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued /*= false*/, bool deleteIfNotAdded /*= true*/ )
 {
 	bool success = false;
+	bool alreadyQueued = false;
+	bool pointerMatch = false;
 
 	do
 	{
-		bool alreadyQueued = false;
-		bool pointerMatch = false;
 		FtaAsyncRequestList::iterator iter = FindAsyncRequest( request, pointerMatch );
 		if( iter != asyncRequestList.end() )
 			alreadyQueued = true;
 
 		if( rejectIfAlreadyQueued && alreadyQueued )
-		{
-			if( deleteIfRejected )
-			{
-				// We wouldn't want to delete a request that's in our list; thereby leaving us with a stale pointer.
-				wxASSERT( pointerMatch == false );
-				wxASSERT( request->GetState() == FtaAsyncRequest::STATE_NONE );
-				delete request;
-			}
-
 			break;
-		}
 
 		if( !ChangeRequestState( request, FtaAsyncRequest::STATE_PENDING ) )
 			break;
@@ -434,6 +428,14 @@ bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQ
 		success = true;
 	}
 	while( false );
+
+	if( !success && deleteIfNotAdded )
+	{
+		// We wouldn't want to delete a request that's in our list; thereby leaving us with a stale pointer.
+		wxASSERT( pointerMatch == false );
+		wxASSERT( request->GetState() == FtaAsyncRequest::STATE_NONE );
+		delete request;
+	}
 
 	return success;
 }

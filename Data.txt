@@ -29,3 +29,32 @@
   } ],
   "description" : "#SD-LDSO"
 }
+
+
+{
+  "users" : [ {
+    "id" : "cis.user.MMMM-6M93",
+    "links" : {
+      "person" : {
+        "href" : "https://sandbox.familysearch.org/platform/tree/persons/KWZH-7PH"
+      },
+      "self" : {
+        "href" : "https://sandbox.familysearch.org/platform/users/current"
+      },
+      "artifacts" : {
+        "href" : "https://sandbox.familysearch.org/platform/memories/users/cis.user.MMMM-6M93/memories"
+      }
+    },
+    "contactName" : "tuf000140222",
+    "givenName" : "Dalia",
+    "familyName" : "Lessels",
+    "email" : "noreply@ldschurch.org",
+    "country" : "USA",
+    "gender" : "FEMALE",
+    "birthDate" : "02 Feb 1985",
+    "preferredLanguage" : "en",
+    "displayName" : "Dalia Lessels",
+    "personId" : "KWZH-7PH",
+    "treeUserId" : "MMXY-D47"
+  } ]
+}

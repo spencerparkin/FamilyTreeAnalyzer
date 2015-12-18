@@ -16,6 +16,7 @@
     <ClInclude Include="Code\FtaClearFunction.h" />
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
+    <ClInclude Include="Code\FtaCurrentUserRequest.h" />
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
@@ -44,6 +45,7 @@
     <ClCompile Include="Code\FtaClearFunction.cpp" />
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
+    <ClCompile Include="Code\FtaCurrentUserRequest.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />

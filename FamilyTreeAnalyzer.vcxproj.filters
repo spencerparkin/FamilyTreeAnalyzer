@@ -94,6 +94,9 @@
     <ClInclude Include="Code\FtaOrdinancesPrivilegeRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaCurrentUserRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -172,6 +175,9 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaOrdinancesPrivilegeRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaCurrentUserRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
   </ItemGroup>
