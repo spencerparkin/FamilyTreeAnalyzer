@@ -146,10 +146,6 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	// If all of the following requests complete, then the person's information on www.familysearch.com will become fully known.
 	// Which, of course, is not to say that we know everything about the person.
 
-	// TODO: It may be better to flag that a bit of info is already requested so that
-	//       we never remake the request.  This prevents the need reject a request that
-	//       we detect is already queued.
-
 	if( ( person->GetFlags() & FtaPerson::FLAG_ANCESTRY ) == 0 )
 		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ), true );
 
@@ -162,8 +158,12 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
 		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ), true );
 
-	//if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
-	//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ), true );
+	if( ( client->GetPrivilegeFlags() & FtaClient::PF_LDS_ORDINANCES ) != 0 )
+	{
+		// This program is far away from ever becoming LDS ordinance access certified.
+		//if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
+		//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ), true );
+	}
 
 	return true;
 }
