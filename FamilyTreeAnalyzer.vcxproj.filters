@@ -109,6 +109,9 @@
     <ClInclude Include="Code\FtaHelpFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaDumpFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">

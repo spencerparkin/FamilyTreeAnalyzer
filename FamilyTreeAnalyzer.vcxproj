@@ -17,6 +17,7 @@
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaCurrentUserRequest.h" />
+    <ClInclude Include="Code\FtaDumpFunction.h" />
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonIdsFunction.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
