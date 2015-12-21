@@ -41,6 +41,7 @@
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
     <ClInclude Include="Code\FtaWhoAmIFunction.h" />
+    <ClInclude Include="Code\FtaHelpFunction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp" />
@@ -55,6 +56,7 @@
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
     <ClCompile Include="Code\FtaGraphPanel.cpp" />
+    <ClCompile Include="Code\FtaHelpFunction.cpp" />
     <ClCompile Include="Code\FtaLogPanel.cpp" />
     <ClCompile Include="Code\FtaLuaFunction.cpp" />
     <ClCompile Include="Code\FtaLuaPanel.cpp" />

@@ -1,11 +1,14 @@
 // FtaLuaFunction.cpp
 
 #include "FtaLuaFunction.h"
+#include "FtaFrame.h"
 #include "FtaApp.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaLuaFunction, wxObject );
 
 #define FTA_LUA_FUNCTION		"FtaLuaFunction"
+
+bool FtaLuaFunction::functionHelp = false;
 
 /*static*/ void FtaLuaFunction::RegisterAllFunctions( void )
 {
@@ -84,6 +87,21 @@ FtaLuaFunction::FtaLuaFunction( void )
 {
 }
 
+/*virtual*/ int FtaLuaFunction::Help( lua_State* L )
+{
+	FtaFrame* frame = wxGetApp().GetFrame();
+	frame->AddLogMessage( "No help provided for this function." );
+	return 0;
+}
+
+/*static*/ bool FtaLuaFunction::IsEntryPoint( lua_CFunction function )
+{
+	if( function == &FtaLuaFunction::EntryPoint )
+		return true;
+
+	return false;
+}
+
 /*static*/ int FtaLuaFunction::EntryPoint( lua_State* L )
 {
 	FtaLuaFunction** userData = ( FtaLuaFunction** )luaL_testudata( L, lua_upvalueindex(1), FTA_LUA_FUNCTION );
@@ -91,6 +109,9 @@ FtaLuaFunction::FtaLuaFunction( void )
 		return 0;
 
 	FtaLuaFunction* function = *userData;
+	if( functionHelp )
+		return function->Help( L );
+
 	return function->Call( L );
 }
 

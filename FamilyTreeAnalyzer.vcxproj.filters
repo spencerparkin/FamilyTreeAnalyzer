@@ -106,6 +106,9 @@
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaHelpFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -196,6 +199,9 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaHelpFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
