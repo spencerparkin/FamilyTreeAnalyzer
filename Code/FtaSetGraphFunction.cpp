@@ -16,6 +16,17 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 {
 }
 
+/*virtual*/ int FtaSetGraphFunction::Help( lua_State* L )
+{
+	wxGetApp().GetFrame()->AddLogMessage(
+		"Use the setGraph() function to tell FamilyTreeAnalyzer what set of people "
+		"you would like to visualize and in what way.  The first argument is the graph type.  "
+		"As of this writing, \"default\" is the only acceptable value for this argument.  "
+		"The second argument is an array consisting of person-IDs in the form of string.  "
+		"These are the people you would like to see graphed." );
+	return 0;
+}
+
 /*virtual*/ int FtaSetGraphFunction::Call( lua_State* L )
 {
 	bool success = false;

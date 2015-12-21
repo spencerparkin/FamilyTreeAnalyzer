@@ -44,6 +44,17 @@ bool FtaLuaFunction::functionHelp = false;
 {
 	lua_State* L = wxGetApp().GetLuaState();
 
+	while( true )
+	{
+		lua_getglobal( L, "fta" );
+		if( !lua_isnil( L, -1 ) )
+			break;
+	
+		lua_pop( L, 1 );
+		lua_newtable( L );
+		lua_setglobal( L, "fta" );
+	}
+
 	FtaLuaFunction** userData = ( FtaLuaFunction** )lua_newuserdata( L, sizeof( FtaLuaFunction* ) );
 	*userData = function;
 
@@ -58,7 +69,10 @@ bool FtaLuaFunction::functionHelp = false;
 	lua_pushcclosure( L, &FtaLuaFunction::EntryPoint, 1 );
 
 	wxString functionName = function->LuaFunctionName();
-	lua_setglobal( L, functionName );
+	lua_setfield( L, -2, functionName );
+	
+	lua_pop( L, 1 );
+
 	return true;
 }
 

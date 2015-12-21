@@ -26,6 +26,7 @@ FtaLuaPanel::FtaLuaPanel( void )
 	return true;
 }
 
+// TODO: Support drag-drop of scripts.
 /*virtual*/ bool FtaLuaPanel::MakeControls( void )
 {
 	textCtrl = new wxStyledTextCtrl( this, wxID_ANY );

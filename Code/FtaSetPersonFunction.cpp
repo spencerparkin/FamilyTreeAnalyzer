@@ -1,6 +1,8 @@
 // FtaSetPersonFunction.cpp
 
 #include "FtaSetPersonFunction.h"
+#include "FtaFrame.h"
+#include "FtaApp.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaSetPersonFunction, FtaLuaFunction );
 
@@ -10,6 +12,16 @@ FtaSetPersonFunction::FtaSetPersonFunction( void )
 
 /*virtual*/ FtaSetPersonFunction::~FtaSetPersonFunction( void )
 {
+}
+
+/*virtual*/ int FtaSetPersonFunction::Help( lua_State* L )
+{
+	wxGetApp().GetFrame()->AddLogMessage(
+			"The setPerson() function is stubbed in for completeness, but not yet implemented.  "
+			"When it is implemented, it will always require user intervention and verification before "
+			"possibly doing any up-load request to FamilySearch.org.  Lua scripts, like any program, have "
+			"the potential to make many mistakes in a very short period of time." );
+	return 0;
 }
 
 /*virtual*/ int FtaSetPersonFunction::Call( lua_State* L )

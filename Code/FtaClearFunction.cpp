@@ -14,6 +14,12 @@ FtaClearFunction::FtaClearFunction( void )
 {
 }
 
+/*virtual*/ int FtaClearFunction::Help( lua_State* L )
+{
+	wxGetApp().GetFrame()->AddLogMessage( "Use the clear() function to clear all log messages.  It takes no arguments and returns nothing." );
+	return 0;
+}
+
 /*virtual*/ int FtaClearFunction::Call( lua_State* L )
 {
 	wxGetApp().GetFrame()->ClearLog();

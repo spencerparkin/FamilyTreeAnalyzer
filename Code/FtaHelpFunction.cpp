@@ -14,6 +14,12 @@ FtaHelpFunction::FtaHelpFunction( void )
 {
 }
 
+/*virtual*/ int FtaHelpFunction::Help( lua_State* L )
+{
+	wxGetApp().GetFrame()->AddLogMessage( "Use the help() function to get help with functions provided as part of the FamilyTreeAnalyzer API." );
+	return 0;
+}
+
 /*virtual*/ int FtaHelpFunction::Call( lua_State* L )
 {
 	if( !lua_iscfunction( L, -1 ) )
