@@ -29,7 +29,8 @@ public:
 
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
 
-	int GetPersonCount( void ) { return personMap.size(); }
+	int GetPersonCount( void ) const { return personMap.size(); }
+	const FtaPersonMap& GetPersonMap( void ) const { return personMap; }
 
 private:
 

@@ -18,6 +18,8 @@
     <ClInclude Include="Code\FtaContainers.h" />
     <ClInclude Include="Code\FtaCurrentUserRequest.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaGetAllCachedPersonIdsFunction.h" />
+    <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
     <ClInclude Include="Code\FtaGraphPanel.h" />
@@ -48,6 +50,8 @@
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaCurrentUserRequest.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaGetAllCachedPersonIdsFunction.cpp" />
+    <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
     <ClCompile Include="Code\FtaGraphPanel.cpp" />
