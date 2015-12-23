@@ -194,13 +194,14 @@ bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
 	return true;
 }
 
-GLuint FtaPerson::GetPortraitTexture( void )
+GLuint FtaPerson::GetPortraitTexture( bool wait /*= true*/, int signature /*= -1*/ )
 {
 	if( portraitTexture == GL_INVALID_VALUE && ( flags & FLAG_PORTRAIT ) != 0 )
 	{
 		FtaClient* client = wxGetApp().GetClient();
-		client->AddAsyncRequest( new FtaPersonPortraitDataRequest( personId, nullptr ) );
-		client->CompleteAllAsyncRequests( false );
+		client->AddAsyncRequest( new FtaPersonPortraitDataRequest( personId, nullptr, signature ) );
+		if( wait )
+			client->CompleteAllAsyncRequests( false, signature );
 	}
 
 	return portraitTexture;

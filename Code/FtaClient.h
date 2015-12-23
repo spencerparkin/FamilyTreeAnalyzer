@@ -21,10 +21,10 @@ public:
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
 	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false, bool deleteIfNotAdded = true );
-	bool ServiceAllAsyncRequests( bool waitOnSockets );
-	bool CompleteAllAsyncRequests( bool showWorkingDialog );
-	bool CancelAllAsyncRequests( void );
-	bool AsyncRequestsPending( void );
+	bool ServiceAllAsyncRequests( bool waitOnSockets, int signature = -1 );
+	bool CompleteAllAsyncRequests( bool showWorkingDialog, int signature = -1 );
+	bool CancelAllAsyncRequests( int signature = -1 );
+	bool AsyncRequestsPending( int signature = -1 );
 
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
 
@@ -49,6 +49,8 @@ public:
 	void SetCurrentUserPersonId( const wxString& personId ) { currentUserPersonId = personId; }
 	const wxString& GetCurrentUserPersonId( void ) const { return currentUserPersonId; }
 
+	static int NewSignature( void ) { return newSignature++; }
+
 private:
 
 	bool ChangeRequestState( FtaAsyncRequest* request, FtaAsyncRequest::State newState );
@@ -63,6 +65,7 @@ private:
 	int privilegeFlags;
 	char errorBuf[ CURL_ERROR_SIZE ];
 	FtaAsyncRequestList asyncRequestList;
+	static int newSignature;
 };
 
 // FtaClient.h

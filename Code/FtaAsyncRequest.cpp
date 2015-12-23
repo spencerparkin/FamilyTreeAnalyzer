@@ -7,7 +7,7 @@
 
 wxIMPLEMENT_ABSTRACT_CLASS( FtaAsyncRequest, wxObject );
 
-FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor /*= nullptr*/ )
+FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor /*= nullptr*/, int signature /*= -1*/ )
 {
 	this->processor = processor;
 	retryTimeSeconds = 0;
@@ -15,6 +15,7 @@ FtaAsyncRequest::FtaAsyncRequest( ResponseProcessor* processor /*= nullptr*/ )
 	headers = nullptr;
 	curlHandleEasy = nullptr;
 	state = STATE_NONE;
+	this->signature = signature;
 }
 
 /*virtual*/ FtaAsyncRequest::~FtaAsyncRequest( void )

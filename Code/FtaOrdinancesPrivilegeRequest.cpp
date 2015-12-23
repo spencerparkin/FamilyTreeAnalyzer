@@ -7,7 +7,7 @@
 
 wxIMPLEMENT_CLASS( FtaOrdinancesPrivilegeRequest, FtaAsyncRequest );
 
-FtaOrdinancesPrivilegeRequest::FtaOrdinancesPrivilegeRequest( ResponseProcessor* processor ) : FtaAsyncRequest( processor )
+FtaOrdinancesPrivilegeRequest::FtaOrdinancesPrivilegeRequest( ResponseProcessor* processor, int signature /*= -1*/ ) : FtaAsyncRequest( processor, signature )
 {
 }
 

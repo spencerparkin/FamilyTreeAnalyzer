@@ -15,7 +15,7 @@ public:
 
 	class ResponseProcessor;
 
-	FtaAsyncRequest( ResponseProcessor* processor = nullptr );
+	FtaAsyncRequest( ResponseProcessor* processor = nullptr, int signature = -1 );
 	virtual ~FtaAsyncRequest( void );
 
 	virtual bool FormulateRequest( void );
@@ -41,6 +41,9 @@ public:
 	void SetRetryTime( long retryTimeSeconds ) { this->retryTimeSeconds = retryTimeSeconds; }
 	int GetRetryTime( void ) const { return retryTimeSeconds; }
 
+	void SetSignature( int signature ) { this->signature = signature; }
+	int GetSignature( void ) const { return signature; }
+
 	enum State
 	{
 		STATE_NONE,
@@ -57,6 +60,7 @@ protected:
 	int FindHeaderLine( const wxString& pattern, int requiredStartLocation = -1 );
 	
 	State state;
+	int signature;
 	long retryTimeSeconds;
 	wxString httpStatusCode;
 	void* userData;

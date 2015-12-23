@@ -10,7 +10,7 @@ public:
 
 	wxDECLARE_CLASS( FtaCurrentUserRequest );
 
-	FtaCurrentUserRequest( void );
+	FtaCurrentUserRequest( int signature = -1 );
 	virtual ~FtaCurrentUserRequest( void );
 
 	virtual bool ProcessJSONResponse( wxJSONValue& responseValue ) override;

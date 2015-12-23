@@ -11,7 +11,7 @@ public:
 
 	wxDECLARE_CLASS( FtaPersonPortraitDataRequest );
 
-	FtaPersonPortraitDataRequest( const wxString& personId, ResponseProcessor* processor );
+	FtaPersonPortraitDataRequest( const wxString& personId, ResponseProcessor* processor, int signature );
 	virtual ~FtaPersonPortraitDataRequest( void );
 
 	virtual bool FormulateRequest( void ) override;

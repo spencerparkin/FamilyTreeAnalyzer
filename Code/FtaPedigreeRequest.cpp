@@ -6,7 +6,7 @@
 
 wxIMPLEMENT_CLASS( FtaPedigreeRequest, FtaPersonInfoRequest );
 
-FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
+FtaPedigreeRequest::FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor, int signature /*= -1*/ ) : FtaPersonInfoRequest( personId, processor, signature )
 {
 	this->type = type;
 }

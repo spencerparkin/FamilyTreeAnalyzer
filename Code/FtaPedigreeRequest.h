@@ -16,7 +16,7 @@ public:
 		TYPE_DESCENDANCY,
 	};
 
-	FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor );
+	FtaPedigreeRequest( const wxString& personId, Type type, ResponseProcessor* processor, int signature = -1 );
 	virtual ~FtaPedigreeRequest( void );
 
 	virtual bool FormulateRequest( void ) override;

@@ -34,7 +34,7 @@ public:
 
 private:
 
-	bool RequestPerson( const wxString& personId );
+	bool RequestPerson( const wxString& personId, int signature = -1 );
 
 	int personCountThreshold;
 	FtaPersonMap personMap;

@@ -10,7 +10,7 @@ public:
 
 	wxDECLARE_CLASS( FtaPersonPortraitRequest );
 
-	FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor );
+	FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor, int signature = -1 );
 	virtual ~FtaPersonPortraitRequest( void );
 
 	virtual bool ProcessResponse( long& retryAfterSeconds ) override;

@@ -11,7 +11,7 @@ public:
 
 	wxDECLARE_ABSTRACT_CLASS( FtaPersonInfoRequest );
 
-	FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor );
+	FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor, int signature = -1 );
 	virtual ~FtaPersonInfoRequest( void );
 
 	virtual bool AccumulateInfoInCache( wxJSONValue& responseValue ) = 0;

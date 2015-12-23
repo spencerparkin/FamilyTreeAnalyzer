@@ -40,8 +40,9 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 				case POPULATE_ON_CACHE_MISS:
 				{
 					personCountThreshold = 0;
-					if( RequestPerson( personId ) )
-						wxGetApp().GetClient()->CompleteAllAsyncRequests( false );
+					int signature = FtaClient::NewSignature();
+					if( RequestPerson( personId, signature ) )
+						wxGetApp().GetClient()->CompleteAllAsyncRequests( false, signature );
 					break;
 				}
 			}
@@ -55,8 +56,9 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 
 	if( person && !person->IsInfoComplete() && disposition == POPULATE_ON_CACHE_MISS )
 	{
-		if( RequestPerson( personId ) )
-			wxGetApp().GetClient()->CompleteAllAsyncRequests( false );
+		int signature = FtaClient::NewSignature();
+		if( RequestPerson( personId, signature ) )
+			wxGetApp().GetClient()->CompleteAllAsyncRequests( false, signature );
 	}
 
 	return person;
@@ -134,7 +136,7 @@ bool FtaTreeCache::Dump( void )
 	return true;
 }
 
-bool FtaTreeCache::RequestPerson( const wxString& personId )
+bool FtaTreeCache::RequestPerson( const wxString& personId, int signature /*= -1*/ )
 {
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
 	if( !person || person->IsInfoComplete() )
@@ -146,22 +148,22 @@ bool FtaTreeCache::RequestPerson( const wxString& personId )
 	// Which, of course, is not to say that we know everything about the person.
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_ANCESTRY ) == 0 )
-		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this ), true );
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_ANCESTRY, this, signature ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_DESCENDANCY ) == 0 )
-		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this ), true );
+		client->AddAsyncRequest( new FtaPedigreeRequest( personId, FtaPedigreeRequest::TYPE_DESCENDANCY, this, signature ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_PERSONAL_DETAILS ) == 0 )
-		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this ), true );
+		client->AddAsyncRequest( new FtaPersonDetailsRequest( personId, this, signature ), true );
 
 	if( ( person->GetFlags() & FtaPerson::FLAG_PORTRAIT ) == 0 )
-		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this ), true );
+		client->AddAsyncRequest( new FtaPersonPortraitRequest( personId, this, signature ), true );
 
 	if( ( client->GetPrivilegeFlags() & FtaClient::PF_LDS_ORDINANCES ) != 0 )
 	{
 		// This program is far away from ever becoming LDS ordinance access certified.
 		//if( ( person->GetFlags() & FtaPerson::FLAG_ORDINANCES ) == 0 )
-		//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this ), true );
+		//	client->AddAsyncRequest( new FtaPersonOrdinancesRequest( personId, this, signature ), true );
 	}
 
 	return true;

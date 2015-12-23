@@ -6,7 +6,7 @@
 
 wxIMPLEMENT_CLASS( FtaPersonDetailsRequest, FtaPersonInfoRequest );
 
-FtaPersonDetailsRequest::FtaPersonDetailsRequest( const wxString& personId, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
+FtaPersonDetailsRequest::FtaPersonDetailsRequest( const wxString& personId, ResponseProcessor* processor, int signature /*= -1*/ ) : FtaPersonInfoRequest( personId, processor, signature )
 {
 }
 

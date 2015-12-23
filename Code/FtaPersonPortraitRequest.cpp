@@ -6,7 +6,7 @@
 
 wxIMPLEMENT_CLASS( FtaPersonPortraitRequest, FtaPersonInfoRequest );
 
-FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor ) : FtaPersonInfoRequest( personId, processor )
+FtaPersonPortraitRequest::FtaPersonPortraitRequest( const wxString& personId, ResponseProcessor* processor, int signature /*= -1*/ ) : FtaPersonInfoRequest( personId, processor, signature )
 {
 }
 

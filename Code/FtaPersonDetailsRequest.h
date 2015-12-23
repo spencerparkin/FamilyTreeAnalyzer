@@ -10,7 +10,7 @@ public:
 
 	wxDECLARE_CLASS( FtaPersonDetailsRequest );
 
-	FtaPersonDetailsRequest( const wxString& personId, ResponseProcessor* processor );
+	FtaPersonDetailsRequest( const wxString& personId, ResponseProcessor* processor, int signature = -1 );
 	virtual ~FtaPersonDetailsRequest( void );
 
 	virtual bool MakeUrl( wxString& url ) override;

@@ -4,7 +4,7 @@
 
 wxIMPLEMENT_ABSTRACT_CLASS( FtaPersonInfoRequest, FtaAsyncRequest );
 
-FtaPersonInfoRequest::FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor ) : FtaAsyncRequest( processor )
+FtaPersonInfoRequest::FtaPersonInfoRequest( const wxString& personId, ResponseProcessor* processor, int signature /*= -1*/ ) : FtaAsyncRequest( processor, signature )
 {
 	this->personId = personId;
 }

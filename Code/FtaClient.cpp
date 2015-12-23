@@ -13,6 +13,8 @@
 #include <wx/utils.h>
 #include <wx/progdlg.h>
 
+int FtaClient::newSignature = 0;
+
 FtaClient::FtaClient( void )
 {
 	curlHandleEasy = nullptr;
@@ -299,7 +301,7 @@ bool FtaClient::DeleteAccessToken( void )
 	return totalBytes;
 }
 
-bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
+bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog, int signature /*= -1*/ )
 {
 	bool success = true;
 
@@ -311,9 +313,9 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 	else
 		busyCursor = new wxBusyCursor();
 
-	while( AsyncRequestsPending() )
+	while( AsyncRequestsPending( signature ) )
 	{
-		if( !ServiceAllAsyncRequests( true ) )
+		if( !ServiceAllAsyncRequests( true, signature ) )
 		{
 			success = false;
 			break;
@@ -332,8 +334,7 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 		}
 	}
 
-	if( AsyncRequestsPending() )
-		CancelAllAsyncRequests();
+	CancelAllAsyncRequests( signature );
 
 	delete progressDialog;
 	delete busyCursor;
@@ -341,30 +342,49 @@ bool FtaClient::CompleteAllAsyncRequests( bool showWorkingDialog )
 	return success;
 }
 
-bool FtaClient::AsyncRequestsPending( void )
+bool FtaClient::AsyncRequestsPending( int signature /*= -1*/ )
 {
-	if( asyncRequestList.size() > 0 )
-		return true;
+	int count = 0;
 
-	return false;
+	if( signature == -1 )
+		count = asyncRequestList.size();
+	else
+	{
+		for( FtaAsyncRequestList::iterator iter = asyncRequestList.begin(); iter != asyncRequestList.end(); iter++ )
+			if( ( *iter )->GetSignature() == signature )
+				 count++;
+	}
+
+	return( count > 0 ? true : false );
 }
 
-bool FtaClient::CancelAllAsyncRequests( void )
+bool FtaClient::CancelAllAsyncRequests( int signature /*= -1*/ )
 {
 	if( !curlHandleMulti )
 		return false;
 
-	while( asyncRequestList.size() > 0 )
+	while( AsyncRequestsPending( signature ) )
 	{
 		FtaAsyncRequestList::iterator iter = asyncRequestList.begin();
-		FtaAsyncRequest* request = *iter;
+		while( iter != asyncRequestList.end() )
+		{
+			FtaAsyncRequestList::iterator nextIter = iter;
+			nextIter++;
 
-		bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_NONE );
-		wxASSERT( changed );
+			FtaAsyncRequest* request = *iter;
 
-		delete request;
+			if( signature == -1 || request->GetSignature() == signature )
+			{
+				bool changed = ChangeRequestState( request, FtaAsyncRequest::STATE_NONE );
+				wxASSERT( changed );
 
-		asyncRequestList.erase( iter );
+				delete request;
+
+				asyncRequestList.erase( iter );
+			}
+
+			iter = nextIter;
+		}
 	}
 
 	return true;
@@ -445,7 +465,7 @@ bool FtaClient::AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQ
 	return success;
 }
 
-bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets )
+bool FtaClient::ServiceAllAsyncRequests( bool waitOnSockets, int signature /*= -1*/ )
 {
 	CURLMcode curlmCode;
 

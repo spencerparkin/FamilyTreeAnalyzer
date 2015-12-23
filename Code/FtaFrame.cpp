@@ -156,9 +156,10 @@ void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
 void FtaFrame::OnAcquirePrivileges( wxCommandEvent& event )
 {
 	FtaClient* client = wxGetApp().GetClient();
-	client->AddAsyncRequest( new FtaOrdinancesPrivilegeRequest( nullptr ) );
-	// TODO: Any other privileges we might have with the service?  Add more requests for each.
-	client->CompleteAllAsyncRequests( false );
+	int signature = FtaClient::NewSignature();
+	client->AddAsyncRequest( new FtaOrdinancesPrivilegeRequest( nullptr, signature ) );
+	// TODO: Any other privileges we might have with the service?  Add a request for each.
+	client->CompleteAllAsyncRequests( false, signature );
 }
 
 void FtaFrame::OnDeletePrivileges( wxCommandEvent& event )

@@ -10,7 +10,7 @@ public:
 
 	wxDECLARE_CLASS( FtaOrdinancesPrivilegeRequest );
 
-	FtaOrdinancesPrivilegeRequest( ResponseProcessor* processor );
+	FtaOrdinancesPrivilegeRequest( ResponseProcessor* processor, int signature = -1 );
 	virtual ~FtaOrdinancesPrivilegeRequest( void );
 
 	virtual bool ProcessResponse( long& retryAfterSeconds ) override;

@@ -7,7 +7,7 @@
 
 wxIMPLEMENT_CLASS( FtaCurrentUserRequest, FtaAsyncRequest );
 
-FtaCurrentUserRequest::FtaCurrentUserRequest( void )
+FtaCurrentUserRequest::FtaCurrentUserRequest( int signature /*= -1*/ ) : FtaAsyncRequest( nullptr, signature )
 {
 }
 
