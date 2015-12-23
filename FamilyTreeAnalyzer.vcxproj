@@ -42,6 +42,7 @@
     <ClInclude Include="Code\FtaPersonPortraitRequest.h" />
     <ClInclude Include="Code\FtaPrintFunction.h" />
     <ClInclude Include="Code\FtaQueryUserForInteger.h" />
+    <ClInclude Include="Code\FtaQueryUserForString.h" />
     <ClInclude Include="Code\FtaSetGraphFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp" />
     <ClCompile Include="Code\FtaPrintFunction.cpp" />
     <ClCompile Include="Code\FtaQueryUserForInteger.cpp" />
+    <ClCompile Include="Code\FtaQueryUserForString.cpp" />
     <ClCompile Include="Code\FtaSetGraphFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
