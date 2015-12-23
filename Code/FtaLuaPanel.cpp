@@ -5,6 +5,7 @@
 #include "FtaApp.h"
 #include <wx/font.h>
 #include <wx/fontdlg.h>
+#include <wx/file.h>
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaLuaPanel, FtaPanel );
 
@@ -84,6 +85,10 @@ FtaLuaPanel::FtaLuaPanel( void )
 	Bind( wxEVT_BUTTON, &FtaLuaPanel::OnExecuteButtonPressed, this );
 	Bind( wxEVT_CHAR_HOOK, &FtaLuaPanel::OnCharHook, this );
 
+	FileDropTarget* fileDropTarget = new FileDropTarget();
+	fileDropTarget->textCtrl = textCtrl;
+	textCtrl->SetDropTarget( fileDropTarget );
+
 	return true;
 }
 
@@ -162,6 +167,36 @@ void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
 			break;
 		}
 	}
+}
+
+FtaLuaPanel::FileDropTarget::FileDropTarget( void )
+{
+	textCtrl = nullptr;
+}
+
+/*virtual*/ FtaLuaPanel::FileDropTarget::~FileDropTarget( void )
+{
+}
+
+/*virtual*/ bool FtaLuaPanel::FileDropTarget::OnDropFiles( wxCoord x, wxCoord y, const wxArrayString& fileNames )
+{
+	if( !textCtrl )
+		return false;
+
+	for( unsigned int i = 0; i < fileNames.GetCount(); i++ )
+	{
+		wxString filePath = fileNames[i];
+		wxFile file( filePath, wxFile::read );
+		wxString code;
+		if( !file.ReadAll( &code ) )
+			continue;
+
+		textCtrl->AppendText( "-- " + filePath + "\n\n" );
+		textCtrl->AppendText( code );
+		textCtrl->AppendText( "\n\n" );
+	}
+
+	return true;
 }
 
 // FtaLuaPanel.cpp

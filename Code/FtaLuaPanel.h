@@ -6,6 +6,7 @@
 #include <wx/stc/stc.h>
 #include <wx/button.h>
 #include <wx/arrstr.h>
+#include <wx/dnd.h>
 
 class FtaLuaPanel : public FtaPanel
 {
@@ -26,6 +27,18 @@ public:
 private:
 
 	bool Execute( void );
+
+	class FileDropTarget : public wxFileDropTarget
+	{
+	public:
+
+		FileDropTarget( void );
+		virtual ~FileDropTarget( void );
+
+		virtual bool OnDropFiles( wxCoord x, wxCoord y, const wxArrayString& fileNames ) override;
+
+		wxStyledTextCtrl* textCtrl;
+	};
 
 	wxStyledTextCtrl* textCtrl;
 
