@@ -18,7 +18,7 @@ FtaQueryUserForString::FtaQueryUserForString( void )
 /*virtual*/ int FtaQueryUserForString::Help( lua_State* L )
 {
 	wxGetApp().GetFrame()->AddLogMessage(
-		"Use the queryUserForString() to ask the user for string input.  "
+		"Use the queryUserForString() function to ask the user for string input.  "
 		"A single table argument is expected with the fields \"question\" and \"default\".  "
 		"The first of these is used to prompt the user.  The second is a default string choice.  "
 		"False is returned in the user canceled.  If the user did not cancel, then the field "
