@@ -25,6 +25,7 @@
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
     <ClInclude Include="Code\FtaGraphPanel.h" />
+    <ClInclude Include="Code\FtaGraphViz.h" />
     <ClInclude Include="Code\FtaLoginFunction.h" />
     <ClInclude Include="Code\FtaLogoutFunction.h" />
     <ClInclude Include="Code\FtaLogPanel.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
     <ClCompile Include="Code\FtaGraphPanel.cpp" />
+    <ClCompile Include="Code\FtaGraphViz.cpp" />
     <ClCompile Include="Code\FtaHelpFunction.cpp" />
     <ClCompile Include="Code\FtaLoginFunction.cpp" />
     <ClCompile Include="Code\FtaLogoutFunction.cpp" />

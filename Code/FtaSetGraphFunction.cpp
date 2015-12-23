@@ -2,6 +2,7 @@
 
 #include "FtaSetGraphFunction.h"
 #include "FtaGraph.h"
+#include "FtaGraphViz.h"
 #include "FtaFrame.h"
 #include "FtaApp.h"
 #include "FtaGraphPanel.h"
@@ -33,6 +34,9 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 	wxString errorMsg;
 	FtaGraph* graph = nullptr;
 
+	// TODO: We might provide another arg that is a table interpreted by the chosen graph type.
+	//       We can call a virtual method on the graph to configure itself based on that table.
+
 	do
 	{
 		if( lua_gettop( L ) < 2 )
@@ -50,7 +54,8 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 		wxString graphType = lua_tostring( L, -2 );
 		if( graphType == "default" )
 			graph = new FtaGraph();
-		//else if( graphType == ...
+		else if( graphType == "graphviz" )
+			graph = new FtaGraphViz();
 		else
 		{
 			errorMsg.Format( "Unknown graph type \"" + graphType + "\"." );

@@ -14,6 +14,9 @@
     <Filter Include="Code\LuaFunctions">
       <UniqueIdentifier>{e65f29a3-7e5a-4c5f-9733-a82809991df6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Code\Graphs">
+      <UniqueIdentifier>{3badbd0c-d0ae-4c5b-95c0-5eb454b35fa1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -127,6 +130,9 @@
     <ClInclude Include="Code\FtaQueryUserForString.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaGraphViz.h">
+      <Filter>Code\Graphs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -236,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaQueryUserForString.cpp">
       <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaGraphViz.cpp">
+      <Filter>Code\Graphs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
