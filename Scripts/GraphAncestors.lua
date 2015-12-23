@@ -1,6 +1,6 @@
 -- GraphAncestors.lua
 
-if not fta.login( 'username' ) then
+if not fta.amLoggedIn() and not fta.login() then
 	error( 'Failed to login!' )
 end
 
@@ -16,18 +16,21 @@ function CollectAncestors( personId, ancestors, curGen, maxGen )
 	if curGen > maxGen then return end
 	if personId == '' then return end
 	
+	fta.print( "Found person " .. personId .. " at generation " .. tostring( curGen ) )
 	ancestors[ #ancestors + 1 ] = personId
 	
 	local person = fta.getPerson( personId )
 	if person then
-		CollectAncestors( person.fatherId, curGen + 1, maxGen )
-		CollectAncestors( person.motherId, curGen + 1, maxGen )
+		CollectAncestors( person.fatherId, ancestors, curGen + 1, maxGen )
+		CollectAncestors( person.motherId, ancestors, curGen + 1, maxGen )
 	end
 	
 end
 
 local ancestors = {}
-CollectAncestors( fta.whoAmI(), ancestors, 0, maxGen )
+local personId = fta.whoAmI()
+personId = 'KWZC-XN7'
+CollectAncestors( personId, ancestors, 0, maxGen )
 
 fta.setGraph( "default", ancestors )
 

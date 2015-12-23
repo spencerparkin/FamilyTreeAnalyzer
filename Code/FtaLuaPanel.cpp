@@ -27,7 +27,7 @@ FtaLuaPanel::FtaLuaPanel( void )
 	return true;
 }
 
-// TODO: Support drag-drop of scripts.
+// TODO: Support line numbers and perhaps ctrl-G and ctrl-F.
 /*virtual*/ bool FtaLuaPanel::MakeControls( void )
 {
 	textCtrl = new wxStyledTextCtrl( this, wxID_ANY );

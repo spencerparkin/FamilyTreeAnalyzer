@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\FtaAmLoggedInFunction.h" />
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
     <ClInclude Include="Code\FtaClearFunction.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="Code\FtaPersonPortraitDataRequest.h" />
     <ClInclude Include="Code\FtaPersonPortraitRequest.h" />
     <ClInclude Include="Code\FtaPrintFunction.h" />
+    <ClInclude Include="Code\FtaQueryUserForInteger.h" />
     <ClInclude Include="Code\FtaSetGraphFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
@@ -47,6 +49,7 @@
     <ClInclude Include="Code\FtaHelpFunction.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code\FtaAmLoggedInFunction.cpp" />
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />
     <ClCompile Include="Code\FtaClearFunction.cpp" />
@@ -76,6 +79,7 @@
     <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp" />
     <ClCompile Include="Code\FtaPersonPortraitRequest.cpp" />
     <ClCompile Include="Code\FtaPrintFunction.cpp" />
+    <ClCompile Include="Code\FtaQueryUserForInteger.cpp" />
     <ClCompile Include="Code\FtaSetGraphFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />

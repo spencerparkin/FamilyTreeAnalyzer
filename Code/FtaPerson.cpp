@@ -129,19 +129,19 @@ bool FtaPerson::GetToLuaTable( lua_State* L ) const
 	lua_pushstring( L, personId );
 	lua_setfield( L, -2, "personId" );
 
-	lua_pushstring( L, ( motherId.IsEmpty() ? "Unknown" : motherId ) );
+	lua_pushstring( L, motherId );
 	lua_setfield( L, -2, "motherId" );
 
-	lua_pushstring( L, ( fatherId.IsEmpty() ? "Unknown" : fatherId ) );
+	lua_pushstring( L, fatherId );
 	lua_setfield( L, -2, "fatherId" );
 
-	lua_pushstring( L, ( name.IsEmpty() ? "Unknown" : name ) );
+	lua_pushstring( L, name );
 	lua_setfield( L, -2, "name" );
 
-	lua_pushstring( L, ( lifeSpan.IsEmpty() ? "Unknown" : lifeSpan ) );
+	lua_pushstring( L, lifeSpan );
 	lua_setfield( L, -2, "lifeSpan" );
 
-	lua_pushstring( L, ( birthPlace.IsEmpty() ? "Unknown" : birthPlace ) );
+	lua_pushstring( L, birthPlace );
 	lua_setfield( L, -2, "birthPlace" );
 
 	lua_newtable(L);

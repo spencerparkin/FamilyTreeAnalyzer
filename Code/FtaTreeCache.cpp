@@ -34,7 +34,6 @@ FtaPerson* FtaTreeCache::Lookup( const wxString& personId, LookupDisposition dis
 				case ALLOCATE_ON_CACHE_MISS:
 				{
 					// A weakness here is that we may be allocating a non-existent, non-sensical person.
-					wxGetApp().GetFrame()->AddLogMessage( "Allocated person " + personId );
 					personMap[ personId ] = new FtaPerson( personId );
 					break;
 				}

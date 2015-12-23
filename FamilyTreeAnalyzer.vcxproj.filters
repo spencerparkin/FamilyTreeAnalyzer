@@ -118,6 +118,12 @@
     <ClInclude Include="Code\FtaLogoutFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaQueryUserForInteger.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaAmLoggedInFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -217,6 +223,12 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaLogoutFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaQueryUserForInteger.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaAmLoggedInFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>

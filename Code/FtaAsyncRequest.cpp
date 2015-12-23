@@ -112,6 +112,8 @@ int FtaAsyncRequest::FindHeaderLine( const wxString& pattern, int requiredStartL
 
 		return true;
 	}
+	else if( httpStatusCode.Find( "400" ) >= 0 )
+		return false;
 
 	if( !responseValueString.IsEmpty() )
 	{
