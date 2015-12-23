@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\c3ga\c3ga.h" />
     <ClInclude Include="Code\FtaAmLoggedInFunction.h" />
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
@@ -51,6 +52,8 @@
     <ClInclude Include="Code\FtaHelpFunction.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Code\c3ga\c3ga.cpp" />
+    <ClCompile Include="Code\c3ga\c3ga_parse_mv.cpp" />
     <ClCompile Include="Code\FtaAmLoggedInFunction.cpp" />
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />

@@ -17,6 +17,9 @@
     <Filter Include="Code\Graphs">
       <UniqueIdentifier>{3badbd0c-d0ae-4c5b-95c0-5eb454b35fa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Code\C3GA">
+      <UniqueIdentifier>{df0b70b1-a833-483c-bf30-1c556e255ce9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -133,6 +136,9 @@
     <ClInclude Include="Code\FtaGraphViz.h">
       <Filter>Code\Graphs</Filter>
     </ClInclude>
+    <ClInclude Include="Code\c3ga\c3ga.h">
+      <Filter>Code\C3GA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -245,6 +251,12 @@
     </ClCompile>
     <ClCompile Include="Code\FtaGraphViz.cpp">
       <Filter>Code\Graphs</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\c3ga\c3ga.cpp">
+      <Filter>Code\C3GA</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\c3ga\c3ga_parse_mv.cpp">
+      <Filter>Code\C3GA</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
