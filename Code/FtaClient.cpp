@@ -69,7 +69,7 @@ bool FtaClient::Shutdown( void )
 	return true;
 }
 
-bool FtaClient::Authenticate( void )
+bool FtaClient::Authenticate( wxString& userName /*= ""*/ )
 {
 	bool success = false;
 	curl_slist* headers = nullptr;
@@ -95,15 +95,18 @@ bool FtaClient::Authenticate( void )
 		if( wxYES != wxMessageBox( notice, "Notice", wxYES_NO | wxICON_QUESTION ) )
 			break;
 
-		wxString userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
 		if( userName.IsEmpty() )
-			break;
+		{
+			userName = wxGetTextFromUser( "Enter username.", "Username", wxEmptyString, nullptr );
+			if( userName.IsEmpty() )
+				break;
+		}
 
 		wxString passWord = wxGetPasswordFromUser( "Enter password.", "Password", wxEmptyString, nullptr );
 		if( passWord.IsEmpty() )
 			break;
 #else
-		wxString userName = "tuf000140222";
+		userName = "tuf000140222";
 		wxString passWord = "1234pass";
 #endif
 

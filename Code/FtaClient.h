@@ -17,7 +17,7 @@ public:
 
 	bool Initialize( void );
 	bool Shutdown( void );
-	bool Authenticate( void );
+	bool Authenticate( wxString& userName );
 	bool DeleteAccessToken( void );
 	bool HasAccessToken( void ) { return !accessToken.IsEmpty(); }
 	bool AddAsyncRequest( FtaAsyncRequest* request, bool rejectIfAlreadyQueued = false, bool deleteIfNotAdded = true );

@@ -112,6 +112,12 @@
     <ClInclude Include="Code\FtaDumpFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaLoginFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaLogoutFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -205,6 +211,12 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaHelpFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaLoginFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaLogoutFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>

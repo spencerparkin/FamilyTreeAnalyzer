@@ -142,8 +142,9 @@ void FtaFrame::ClearLog( void )
 
 void FtaFrame::OnAcquireAccessToken( wxCommandEvent& event )
 {
-	if( wxGetApp().GetClient()->Authenticate() )
-		wxMessageBox( "Authentication succeeded!" );
+	wxString userName;
+	if( wxGetApp().GetClient()->Authenticate( userName ) )
+		wxMessageBox( "Authentication succeeded for " + userName + "!" );
 }
 
 void FtaFrame::OnDeleteAccessToken( wxCommandEvent& event )
