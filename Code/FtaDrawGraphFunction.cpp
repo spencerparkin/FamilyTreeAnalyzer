@@ -6,6 +6,7 @@
 #include "FtaFrame.h"
 #include "FtaApp.h"
 #include "FtaVizPanel.h"
+#include "FtaCanvas.h"
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaDrawGraphFunction, FtaLuaFunction );
 

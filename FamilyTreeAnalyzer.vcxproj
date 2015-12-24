@@ -16,6 +16,8 @@
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
     <ClInclude Include="Code\FtaCamera.h" />
+    <ClInclude Include="Code\FtaCanvas.h" />
+    <ClInclude Include="Code\FtaCanvasPlugin.h" />
     <ClInclude Include="Code\FtaClearFunction.h" />
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
@@ -26,6 +28,7 @@
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
+    <ClInclude Include="Code\FtaKinematicCamera.h" />
     <ClInclude Include="Code\FtaVisualization.h" />
     <ClInclude Include="Code\FtaVizPanel.h" />
     <ClInclude Include="Code\FtaGraphViz.h" />
@@ -60,6 +63,8 @@
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />
     <ClCompile Include="Code\FtaCamera.cpp" />
+    <ClCompile Include="Code\FtaCanvas.cpp" />
+    <ClCompile Include="Code\FtaCanvasPlugin.cpp" />
     <ClCompile Include="Code\FtaClearFunction.cpp" />
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
@@ -69,6 +74,7 @@
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
+    <ClCompile Include="Code\FtaKinematicCamera.cpp" />
     <ClCompile Include="Code\FtaVisualization.cpp" />
     <ClCompile Include="Code\FtaVizPanel.cpp" />
     <ClCompile Include="Code\FtaGraphViz.cpp" />

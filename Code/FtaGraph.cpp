@@ -189,4 +189,14 @@ bool FtaGraph::GraphPerson( const wxString& personId )
 	return false;
 }
 
+/*virtual*/ bool FtaGraph::Bind( void )
+{
+	return true;
+}
+
+/*virtual*/ bool FtaGraph::Unbind( void )
+{
+	return true;
+}
+
 // FtaGraph.cpp

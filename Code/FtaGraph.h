@@ -15,6 +15,8 @@ public:
 
 	virtual bool Layout( void );
 	virtual bool Draw( GLenum renderMode ) override;
+	virtual bool Bind( void ) override;
+	virtual bool Unbind( void ) override;
 
 	void AddPerson( const wxString& personId );
 	void RemovePerson( const wxString& personId );

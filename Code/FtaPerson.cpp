@@ -6,6 +6,7 @@
 #include "FtaClient.h"
 #include "FtaPersonPortraitDataRequest.h"
 #include "FtaVizPanel.h"
+#include "FtaCanvas.h"
 #include "FtaApp.h"
 
 FtaPerson::FtaPerson( const wxString& personId )

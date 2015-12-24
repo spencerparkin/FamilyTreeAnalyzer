@@ -7,6 +7,8 @@
 #include "FtaCamera.h"
 #include <wx/glcanvas.h>
 
+class FtaCanvas;
+
 class FtaVizPanel : public FtaPanel
 {
 public:
@@ -20,40 +22,11 @@ public:
 	virtual bool MakeControls( void );
 	virtual bool TimerUpdate( void );
 
-	class Canvas : public wxGLCanvas
-	{
-	public:
-
-		Canvas( wxWindow* parent );
-		virtual ~Canvas( void );
-
-		void OnPaint( wxPaintEvent& event );
-		void OnSize( wxSizeEvent& event );
-
-		GLuint GenerateTexture( const wxImage& image );
-		void FreeTexture( GLuint texture );
-
-		FtaVisualization* GetVisualization( void ) { return viz; }
-		void SetVisualization( FtaVisualization* viz );
-
-		FtaCamera* GetCamera( void ) { return camera; }
-		void SetCamera( FtaCamera* camera );
-
-	private:
-
-		void BindContext( void );
-
-		wxGLContext* context;
-		static int attributeList[];
-		FtaVisualization* viz;
-		FtaCamera* camera;
-	};
-
-	Canvas* GetCanvas( void ) { return canvas; }
+	FtaCanvas* GetCanvas( void ) { return canvas; }
 
 private:
 
-	Canvas* canvas;
+	FtaCanvas* canvas;
 };
 
 // FtaVizPanel.h

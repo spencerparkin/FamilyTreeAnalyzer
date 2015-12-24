@@ -23,6 +23,9 @@
     <Filter Include="Code\Visualizations">
       <UniqueIdentifier>{3badbd0c-d0ae-4c5b-95c0-5eb454b35fa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Code\Cameras">
+      <UniqueIdentifier>{a6d959b8-46b6-4152-9de5-7e4d4dd44df9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -146,6 +149,15 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
     <ClInclude Include="Code\FtaCamera.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaCanvasPlugin.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaKinematicCamera.h">
+      <Filter>Code\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaCanvas.h">
       <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
@@ -272,6 +284,15 @@
     </ClCompile>
     <ClCompile Include="Code\FtaCamera.cpp">
       <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaCanvasPlugin.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaCanvas.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaKinematicCamera.cpp">
+      <Filter>Code\Cameras</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

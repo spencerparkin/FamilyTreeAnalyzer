@@ -4,6 +4,7 @@
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
 #include "FtaVizPanel.h"
+#include "FtaCanvas.h"
 #include "FtaApp.h"
 
 wxIMPLEMENT_CLASS( FtaPersonPortraitDataRequest, FtaPersonInfoRequest );

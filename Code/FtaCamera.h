@@ -2,18 +2,37 @@
 
 #pragma once
 
-class FtaCamera
+#include "FtaCanvasPlugin.h"
+#include "c3ga/c3ga.h"
+#include <wx/glcanvas.h>
+
+class FtaCanvas;
+
+class FtaCamera : public FtaCanvasPlugin
 {
 public:
 
 	FtaCamera( void );
 	virtual ~FtaCamera( void );
 
-	// TODO: Provide virtual methods here that setup the projection/model-view matrices for us and do other preparation for drawing.
-	// TODO: Provide virtual methods here that responde to user input taken from the canvas controls.
+	virtual void PreRender( GLenum renderMode, FtaCanvas* canvas ) = 0;
+	virtual void PostRender( GLenum renderMode, FtaCanvas* canvas ) = 0;
 
-	// TODO: Derivatives should own positional/orientational/kinematic information.
-	// TODO: We might own here the hit-record data, but expect the visualization class to process it.
+	GLuint* GetHitBuffer( void ) { return hitBuffer; }
+	GLuint GetHitBufferSize( void ) const { return hitBufferSize; }
+
+protected:
+
+	void SetupViewMatrices( GLenum renderMode, FtaCanvas* canvas );
+
+	void PrepareHitBuffer( void );
+	void ProcessHitBuffer( FtaCanvas* canvas, bool freeHitBuffer = true );
+
+	c3ga::vectorE3GA eye;
+	c3ga::vectorE3GA xAxis, yAxis, zAxis;
+
+	GLuint* hitBuffer;
+	GLuint hitBufferSize;
 };
 
 // FtaCamera.h
