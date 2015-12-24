@@ -5,6 +5,7 @@
 #include "FtaContainers.h"
 #include <lua.hpp>
 #include <wx/glcanvas.h>
+#include "c3ga/c3ga.h"
 
 class FtaPerson
 {
@@ -93,7 +94,16 @@ private:
 	wxString lifeSpan;
 	wxString birthPlace;
 	wxString portraitUrl;
-	GLuint portraitTexture;
+
+	struct Portrait
+	{
+		GLuint texture;
+		c3ga::vectorE3GA center;
+		float width;
+		float height;
+	};
+
+	mutable Portrait portrait;
 };
 
 // FtaPerson.h

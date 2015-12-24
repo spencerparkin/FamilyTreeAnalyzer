@@ -5,6 +5,8 @@
 
 wxIMPLEMENT_DYNAMIC_CLASS( FtaGraphPanel, FtaPanel );
 
+// TODO: Implement kinetic camera model for 2D and 3D space examination.
+
 FtaGraphPanel::FtaGraphPanel( void )
 {
 	canvas = nullptr;

@@ -69,8 +69,13 @@ FtaGraph::FtaGraph( void )
 
 /*virtual*/ bool FtaGraph::Draw( GLenum renderMode )
 {
-	if( layoutNeeded && !Layout() )
-		return false;
+	if( layoutNeeded )
+	{
+		if( !Layout() )
+			return false;
+
+		layoutNeeded = false;
+	}
 
 	//...
 

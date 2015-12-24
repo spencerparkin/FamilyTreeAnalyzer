@@ -3,6 +3,7 @@
 #include "FtaGraphViz.h"
 #include "FtaTreeCache.h"
 #include "FtaApp.h"
+#include "graphviz/gvc.h"
 
 FtaGraphViz::FtaGraphViz( void )
 {
@@ -18,6 +19,8 @@ FtaGraphViz::FtaGraphViz( void )
 {
 	bool success = false;
 	Agraph_t* G = nullptr;
+	GVC_t* gvc = nullptr;
+	char* renderBuffer = nullptr;
 
 	do
 	{
@@ -25,7 +28,7 @@ FtaGraphViz::FtaGraphViz( void )
 		if( !G )
 			break;
 
-		// TODO: Setup graph attributes here.
+		agsafeset( G, "rankdir", "LR", "LR" );
 
 		if( !GenerateNodes(G) )
 			break;
@@ -33,22 +36,45 @@ FtaGraphViz::FtaGraphViz( void )
 		if( !GenerateEdges(G) )
 			break;
 
-		//...
+		gvc = gvContext();
+		if( !gvc )
+			break;
 
-		// TODO: We may want to write out the DOT language here for debugging purposes.
+		int result = gvLayout( gvc, G, "dot" );
+		if( result != 0 )
+			break;
 
-		// TODO: Layout and render graph; capture positional information.
+		// This is supposed to put the layout data in the attribute data.
+		result = gvRender( gvc, G, "dot", nullptr );
+		if( result != 0 )
+			break;
+
+		if( !PlacePersons( G ) )
+			break;
+
+#if 0
+		unsigned int renderBufferLength = 0;
+		result = gvRenderData( gvc, G, "plain", &renderBuffer, &renderBufferLength );
+		if( result != 0 )
+			break;
+#endif
 
 		success = true;
 	}
 	while( false );
 
-	if(G)
-	{
-		agclose(G);
-		G = nullptr;
-	}
+	if( G && gvc )
+		gvFreeLayout( gvc, G );
 
+	if( gvc )
+		gvFreeContext( gvc );
+
+	if(G)
+		agclose(G);
+
+	if( renderBuffer )
+		gvFreeRenderData( renderBuffer );
+	
 	return success;
 }
 
@@ -59,11 +85,22 @@ bool FtaGraphViz::GenerateNodes( Agraph_t* G )
 	{
 		wxString personId = *iter;
 
+		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::FAIL_ON_CACHE_MISS );
+		if( !person )
+			return false;
+
 		Agnode_t* personNode = agnode( G, ( char* )( const char* )personId, 1 );
 		if( !personNode )
 			return false;
 
-		//...
+		if( person->GetGender() == FtaPerson::GENDER_MALE )
+			agsafeset( personNode, "color", "blue", "yellow" );
+		else
+			agsafeset( personNode, "color", "red", "yellow" );
+
+		agsafeset( personNode, "shape", "record", "record" );
+		agsafeset( personNode, "width", "2.0", "1.0" );
+		agsafeset( personNode, "height", "2.0", "1.0" );
 
 		iter++;
 	}
@@ -139,6 +176,36 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 
 			spouseIter++;
 		}
+
+		iter++;
+	}
+
+	return true;
+}
+
+bool FtaGraphViz::PlacePersons( Agraph_t* G )
+{
+	FtaPersonIdSet::iterator iter = personIdSet.begin();
+	while( iter != personIdSet.end() )
+	{
+		wxString personId = *iter;
+
+		FtaPerson* person = wxGetApp().GetTreeCache()->Lookup( personId, FtaTreeCache::FAIL_ON_CACHE_MISS );
+		if( !person )
+			return false;
+
+		Agnode_t* personNode = agnode( G, ( char* )( const char* )personId, 0 );
+		if( !personNode )
+			return false;
+
+		const char* pos = agget( personNode, "pos" );
+		if( !pos )
+			return false;
+
+		const char* width = agget( personNode, "width" );
+		const char* height = agget( personNode, "height" );
+
+		// TODO: Parse the data here.
 
 		iter++;
 	}

@@ -18,6 +18,8 @@ private:
 
 	bool GenerateNodes( Agraph_t* G );
 	bool GenerateEdges( Agraph_t* G );
+
+	bool PlacePersons( Agraph_t* G );
 };
 
 // FtaGraphViz.h

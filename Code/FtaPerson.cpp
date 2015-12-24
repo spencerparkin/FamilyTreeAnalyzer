@@ -13,7 +13,10 @@ FtaPerson::FtaPerson( const wxString& personId )
 	this->personId = personId;
 	flags = 0;
 	gender = GENDER_UNKNOWN;
-	portraitTexture = GL_INVALID_VALUE;
+	portrait.texture = GL_INVALID_VALUE;
+	portrait.center.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, 0.0 );
+	portrait.width = 0.f;
+	portrait.height = 0.f;
 }
 
 /*virtual*/ FtaPerson::~FtaPerson( void )
@@ -183,20 +186,20 @@ bool FtaPerson::GetToLuaTable( lua_State* L ) const
 
 bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
 {
-	if( this->portraitTexture != GL_INVALID_VALUE )
+	if( portrait.texture != GL_INVALID_VALUE )
 	{
 		FtaFrame* frame = wxGetApp().GetFrame();
 		if( frame )
-			frame->GetPanel< FtaGraphPanel >()->GetCanvas()->FreeTexture( this->portraitTexture );
+			frame->GetPanel< FtaGraphPanel >()->GetCanvas()->FreeTexture( portrait.texture );
 	}
 
-	this->portraitTexture = portraitTexture;
+	portrait.texture = portraitTexture;
 	return true;
 }
 
 GLuint FtaPerson::GetPortraitTexture( bool wait /*= true*/, int signature /*= -1*/ )
 {
-	if( portraitTexture == GL_INVALID_VALUE && ( flags & FLAG_PORTRAIT ) != 0 )
+	if( portrait.texture == GL_INVALID_VALUE && ( flags & FLAG_PORTRAIT ) != 0 )
 	{
 		FtaClient* client = wxGetApp().GetClient();
 		client->AddAsyncRequest( new FtaPersonPortraitDataRequest( personId, nullptr, signature ) );
@@ -204,7 +207,7 @@ GLuint FtaPerson::GetPortraitTexture( bool wait /*= true*/, int signature /*= -1
 			client->CompleteAllAsyncRequests( false, signature );
 	}
 
-	return portraitTexture;
+	return portrait.texture;
 }
 
 // FtaPerson.cpp
