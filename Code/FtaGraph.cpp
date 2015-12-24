@@ -122,7 +122,7 @@ bool FtaGraph::CreateConnectedComponents( FtaPersonIdSetList& personIdSetList )
 bool FtaGraph::GenerateConnectedComponent( const wxString& personId, FtaPersonIdSet& remainingPersons, FtaPersonIdSet& connectedComponent )
 {
 	// Do we want to graph this person?
-	if( personIdSet.find( personId ) == personIdSet.end() )
+	if( !GraphPerson( personId ) )
 		return true;
 
 	// Have we already visited this person?
@@ -174,6 +174,14 @@ bool FtaGraph::DestroyConnectedComponents( FtaPersonIdSetList& personIdSetList )
 	}
 
 	return true;
+}
+
+bool FtaGraph::GraphPerson( const wxString& personId )
+{
+	if( personIdSet.find( personId ) != personIdSet.end() )
+		return true;
+
+	return false;
 }
 
 // FtaGraph.cpp

@@ -20,6 +20,9 @@
     <Filter Include="Code\C3GA">
       <UniqueIdentifier>{df0b70b1-a833-483c-bf30-1c556e255ce9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{c8bf91f3-9c16-4624-8a9f-5d5ea6ff57d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\FtaApp.h">
@@ -258,5 +261,13 @@
     <ClCompile Include="Code\c3ga\c3ga_parse_mv.cpp">
       <Filter>Code\C3GA</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\GraphAncestors.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\PrintAllAPIHelp.lua">
+      <Filter>Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

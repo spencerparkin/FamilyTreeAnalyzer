@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FtaGraph.h"
+#include "graphviz/cgraph.h"
 
 class FtaGraphViz : public FtaGraph
 {
@@ -12,6 +13,11 @@ public:
 	virtual ~FtaGraphViz( void );
 
 	virtual bool Layout( void ) override;
+
+private:
+
+	bool GenerateNodes( Agraph_t* G );
+	bool GenerateEdges( Agraph_t* G );
 };
 
 // FtaGraphViz.h

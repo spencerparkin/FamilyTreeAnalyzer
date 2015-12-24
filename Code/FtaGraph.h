@@ -23,6 +23,8 @@ public:
 
 protected:
 
+	bool GraphPerson( const wxString& personId );
+
 	virtual bool LayoutConnectedComponent( FtaPersonIdSet& connectedComponent );
 	virtual bool PackConnectedComponents( FtaPersonIdSetList& personIdSetList );
 
