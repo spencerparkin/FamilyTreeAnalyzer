@@ -1,22 +1,22 @@
-// FtaGraphPanel.cpp
+// FtaVizPanel.cpp
 
-#include "FtaGraphPanel.h"
+#include "FtaVizPanel.h"
 #include <wx/sizer.h>
 
-wxIMPLEMENT_DYNAMIC_CLASS( FtaGraphPanel, FtaPanel );
+wxIMPLEMENT_DYNAMIC_CLASS( FtaVizPanel, FtaPanel );
 
 // TODO: Implement kinetic camera model for 2D and 3D space examination.
 
-FtaGraphPanel::FtaGraphPanel( void )
+FtaVizPanel::FtaVizPanel( void )
 {
 	canvas = nullptr;
 }
 
-/*virtual*/ FtaGraphPanel::~FtaGraphPanel( void )
+/*virtual*/ FtaVizPanel::~FtaVizPanel( void )
 {
 }
 
-/*virtual*/ bool FtaGraphPanel::GetPaneInfo( wxAuiPaneInfo& paneInfo )
+/*virtual*/ bool FtaVizPanel::GetPaneInfo( wxAuiPaneInfo& paneInfo )
 {
 	paneInfo.Caption( "Graph" );
 	paneInfo.CenterPane();
@@ -24,7 +24,7 @@ FtaGraphPanel::FtaGraphPanel( void )
 	return true;
 }
 
-/*virtual*/ bool FtaGraphPanel::MakeControls( void )
+/*virtual*/ bool FtaVizPanel::MakeControls( void )
 {
 	canvas = new Canvas( this );
 
@@ -35,55 +35,69 @@ FtaGraphPanel::FtaGraphPanel( void )
 	return true;
 }
 
-/*virtual*/ bool FtaGraphPanel::TimerUpdate( void )
+/*virtual*/ bool FtaVizPanel::TimerUpdate( void )
 {
 	return true;
 }
 
-int FtaGraphPanel::Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
+int FtaVizPanel::Canvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
-FtaGraphPanel::Canvas::Canvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList )
+FtaVizPanel::Canvas::Canvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList )
 {
 	context = nullptr;
-	graph = nullptr;
+	viz = nullptr;
+	camera = nullptr;
 
 	Bind( wxEVT_PAINT, &Canvas::OnPaint, this );
 	Bind( wxEVT_SIZE, &Canvas::OnSize, this );
 }
 
-/*virtual*/ FtaGraphPanel::Canvas::~Canvas( void )
+/*virtual*/ FtaVizPanel::Canvas::~Canvas( void )
 {
 	delete context;
 
-	SetGraph( nullptr );
+	SetVisualization( nullptr );
+	SetCamera( nullptr );
 }
 
-void FtaGraphPanel::Canvas::SetGraph( FtaGraph* graph )
+void FtaVizPanel::Canvas::SetVisualization( FtaVisualization* viz )
 {
-	if( this->graph )
-		delete this->graph;
+	if( this->viz )
+		delete this->viz;
 
-	this->graph = graph;
+	this->viz = viz;
 
 	Refresh();
 }
 
-void FtaGraphPanel::Canvas::OnPaint( wxPaintEvent& event )
+void FtaVizPanel::Canvas::SetCamera( FtaCamera* camera )
+{
+	if( this->camera )
+		delete this->camera;
+
+	this->camera = camera;
+
+	Refresh();
+}
+
+void FtaVizPanel::Canvas::OnPaint( wxPaintEvent& event )
 {
 	BindContext();
 
 	glClearColor( 1.f, 1.f, 1.f, 1.f );
 	glClear( GL_COLOR_BUFFER_BIT );
 
-	if( graph )
-		graph->Draw( GL_RENDER );
+	// TODO: Call upon camera to setup our projection matrix, etc.
+
+	if( viz )
+		viz->Draw( GL_RENDER );
 
 	glFlush();
 
 	SwapBuffers();
 }
 
-void FtaGraphPanel::Canvas::OnSize( wxSizeEvent& event )
+void FtaVizPanel::Canvas::OnSize( wxSizeEvent& event )
 {
 	BindContext();
 
@@ -93,7 +107,7 @@ void FtaGraphPanel::Canvas::OnSize( wxSizeEvent& event )
 	Refresh();
 }
 
-void FtaGraphPanel::Canvas::BindContext( void )
+void FtaVizPanel::Canvas::BindContext( void )
 {
 	if( !context )
 		context = new wxGLContext( this );
@@ -101,7 +115,7 @@ void FtaGraphPanel::Canvas::BindContext( void )
 	SetCurrent( *context );
 }
 
-GLuint FtaGraphPanel::Canvas::GenerateTexture( const wxImage& image )
+GLuint FtaVizPanel::Canvas::GenerateTexture( const wxImage& image )
 {
 	BindContext();
 
@@ -123,11 +137,11 @@ GLuint FtaGraphPanel::Canvas::GenerateTexture( const wxImage& image )
 	return texture;
 }
 
-void FtaGraphPanel::Canvas::FreeTexture( GLuint texture )
+void FtaVizPanel::Canvas::FreeTexture( GLuint texture )
 {
 	BindContext();
 
 	glDeleteTextures( 1, &texture );
 }
 
-// FtaGraphPanel.cpp
+// FtaVizPanel.cpp

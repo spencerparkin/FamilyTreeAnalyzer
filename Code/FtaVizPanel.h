@@ -1,19 +1,20 @@
-// FtaGraphPanel.h
+// FtaVizPanel.h
 
 #pragma once
 
 #include "FtaPanel.h"
-#include "FtaGraph.h"
+#include "FtaVisualization.h"
+#include "FtaCamera.h"
 #include <wx/glcanvas.h>
 
-class FtaGraphPanel : public FtaPanel
+class FtaVizPanel : public FtaPanel
 {
 public:
 
-	wxDECLARE_DYNAMIC_CLASS( FtaGraphPanel );
+	wxDECLARE_DYNAMIC_CLASS( FtaVizPanel );
 
-	FtaGraphPanel( void );
-	virtual ~FtaGraphPanel( void );
+	FtaVizPanel( void );
+	virtual ~FtaVizPanel( void );
 
 	virtual bool GetPaneInfo( wxAuiPaneInfo& paneInfo );
 	virtual bool MakeControls( void );
@@ -32,8 +33,11 @@ public:
 		GLuint GenerateTexture( const wxImage& image );
 		void FreeTexture( GLuint texture );
 
-		FtaGraph* GetGraph( void ) { return graph; }
-		void SetGraph( FtaGraph* graph );
+		FtaVisualization* GetVisualization( void ) { return viz; }
+		void SetVisualization( FtaVisualization* viz );
+
+		FtaCamera* GetCamera( void ) { return camera; }
+		void SetCamera( FtaCamera* camera );
 
 	private:
 
@@ -41,7 +45,8 @@ public:
 
 		wxGLContext* context;
 		static int attributeList[];
-		FtaGraph* graph;
+		FtaVisualization* viz;
+		FtaCamera* camera;
 	};
 
 	Canvas* GetCanvas( void ) { return canvas; }
@@ -51,4 +56,4 @@ private:
 	Canvas* canvas;
 };
 
-// FtaGraphPanel.h
+// FtaVizPanel.h

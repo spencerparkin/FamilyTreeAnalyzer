@@ -5,7 +5,7 @@
 #include "FtaFrame.h"
 #include "FtaClient.h"
 #include "FtaPersonPortraitDataRequest.h"
-#include "FtaGraphPanel.h"
+#include "FtaVizPanel.h"
 #include "FtaApp.h"
 
 FtaPerson::FtaPerson( const wxString& personId )
@@ -190,7 +190,7 @@ bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
 	{
 		FtaFrame* frame = wxGetApp().GetFrame();
 		if( frame )
-			frame->GetPanel< FtaGraphPanel >()->GetCanvas()->FreeTexture( portrait.texture );
+			frame->GetPanel< FtaVizPanel >()->GetCanvas()->FreeTexture( portrait.texture );
 	}
 
 	portrait.texture = portraitTexture;

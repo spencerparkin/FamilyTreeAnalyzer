@@ -1,26 +1,26 @@
-// FtaSetGraphFunction.cpp
+// FtaDrawGraphFunction.cpp
 
-#include "FtaSetGraphFunction.h"
+#include "FtaDrawGraphFunction.h"
 #include "FtaGraph.h"
 #include "FtaGraphViz.h"
 #include "FtaFrame.h"
 #include "FtaApp.h"
-#include "FtaGraphPanel.h"
+#include "FtaVizPanel.h"
 
-wxIMPLEMENT_DYNAMIC_CLASS( FtaSetGraphFunction, FtaLuaFunction );
+wxIMPLEMENT_DYNAMIC_CLASS( FtaDrawGraphFunction, FtaLuaFunction );
 
-FtaSetGraphFunction::FtaSetGraphFunction( void )
+FtaDrawGraphFunction::FtaDrawGraphFunction( void )
 {
 }
 
-/*virtual*/ FtaSetGraphFunction::~FtaSetGraphFunction( void )
+/*virtual*/ FtaDrawGraphFunction::~FtaDrawGraphFunction( void )
 {
 }
 
-/*virtual*/ int FtaSetGraphFunction::Help( lua_State* L )
+/*virtual*/ int FtaDrawGraphFunction::Help( lua_State* L )
 {
 	wxGetApp().GetFrame()->AddLogMessage(
-		"Use the setGraph() function to tell FamilyTreeAnalyzer what set of people "
+		"Use the drawGraph() function to tell FamilyTreeAnalyzer what set of people "
 		"you would like to visualize and in what way.  The first argument is the graph type.  "
 		"As of this writing, \"default\" is the only acceptable value for this argument.  "
 		"The second argument is an array consisting of person-IDs in the form of string.  "
@@ -28,7 +28,7 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 	return 0;
 }
 
-/*virtual*/ int FtaSetGraphFunction::Call( lua_State* L )
+/*virtual*/ int FtaDrawGraphFunction::Call( lua_State* L )
 {
 	bool success = false;
 	wxString errorMsg;
@@ -93,11 +93,11 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 		if( i < len )
 			break;
 
-		FtaGraphPanel* graphPanel = wxGetApp().GetFrame()->GetPanel< FtaGraphPanel >();
+		FtaVizPanel* graphPanel = wxGetApp().GetFrame()->GetPanel< FtaVizPanel >();
 		if( !graphPanel )
 			break;
 
-		graphPanel->GetCanvas()->SetGraph( graph );
+		graphPanel->GetCanvas()->SetVisualization( graph );
 
 		success = true;
 	}
@@ -116,4 +116,4 @@ FtaSetGraphFunction::FtaSetGraphFunction( void )
 	return 0;
 }
 
-// FtaSetGraphFunction.cpp
+// FtaDrawGraphFunction.cpp

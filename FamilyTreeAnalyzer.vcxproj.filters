@@ -14,14 +14,14 @@
     <Filter Include="Code\LuaFunctions">
       <UniqueIdentifier>{e65f29a3-7e5a-4c5f-9733-a82809991df6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\Graphs">
-      <UniqueIdentifier>{3badbd0c-d0ae-4c5b-95c0-5eb454b35fa1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Code\C3GA">
       <UniqueIdentifier>{df0b70b1-a833-483c-bf30-1c556e255ce9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scripts">
       <UniqueIdentifier>{c8bf91f3-9c16-4624-8a9f-5d5ea6ff57d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Visualizations">
+      <UniqueIdentifier>{3badbd0c-d0ae-4c5b-95c0-5eb454b35fa1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -67,9 +67,6 @@
     <ClInclude Include="Code\FtaLogPanel.h">
       <Filter>Code\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FtaGraphPanel.h">
-      <Filter>Code\Panels</Filter>
-    </ClInclude>
     <ClInclude Include="Code\FtaLuaPanel.h">
       <Filter>Code\Panels</Filter>
     </ClInclude>
@@ -93,12 +90,6 @@
     </ClInclude>
     <ClInclude Include="Code\FtaPersonPortraitDataRequest.h">
       <Filter>Code\AsyncRequests</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\FtaGraph.h">
-      <Filter>Code</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\FtaSetGraphFunction.h">
-      <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
     <ClInclude Include="Code\FtaOrdinancesPrivilegeRequest.h">
       <Filter>Code\AsyncRequests</Filter>
@@ -137,10 +128,25 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
     <ClInclude Include="Code\FtaGraphViz.h">
-      <Filter>Code\Graphs</Filter>
+      <Filter>Code\Visualizations</Filter>
     </ClInclude>
     <ClInclude Include="Code\c3ga\c3ga.h">
       <Filter>Code\C3GA</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaVizPanel.h">
+      <Filter>Code\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaVisualization.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaGraph.h">
+      <Filter>Code\Visualizations</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaDrawGraphFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaCamera.h">
+      <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -186,9 +192,6 @@
     <ClCompile Include="Code\FtaLogPanel.cpp">
       <Filter>Code\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="Code\FtaGraphPanel.cpp">
-      <Filter>Code\Panels</Filter>
-    </ClCompile>
     <ClCompile Include="Code\FtaLuaPanel.cpp">
       <Filter>Code\Panels</Filter>
     </ClCompile>
@@ -212,12 +215,6 @@
     </ClCompile>
     <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaGraph.cpp">
-      <Filter>Code</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaSetGraphFunction.cpp">
-      <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaOrdinancesPrivilegeRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
@@ -253,13 +250,28 @@
       <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaGraphViz.cpp">
-      <Filter>Code\Graphs</Filter>
+      <Filter>Code\Visualizations</Filter>
     </ClCompile>
     <ClCompile Include="Code\c3ga\c3ga.cpp">
       <Filter>Code\C3GA</Filter>
     </ClCompile>
     <ClCompile Include="Code\c3ga\c3ga_parse_mv.cpp">
       <Filter>Code\C3GA</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaVizPanel.cpp">
+      <Filter>Code\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaGraph.cpp">
+      <Filter>Code\Visualizations</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaDrawGraphFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaVisualization.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaCamera.cpp">
+      <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

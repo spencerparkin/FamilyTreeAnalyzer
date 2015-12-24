@@ -3,9 +3,10 @@
 #pragma once
 
 #include "FtaContainers.h"
-#include <wx/glcanvas.h>
+#include "FtaVisualization.h"
 
-class FtaGraph
+// Derivatives of this class implement various ways of laying out and drawing a graph of related persons.
+class FtaGraph : public FtaVisualization
 {
 public:
 
@@ -13,7 +14,7 @@ public:
 	virtual ~FtaGraph( void );
 
 	virtual bool Layout( void );
-	virtual bool Draw( GLenum renderMode );
+	virtual bool Draw( GLenum renderMode ) override;
 
 	void AddPerson( const wxString& personId );
 	void RemovePerson( const wxString& personId );

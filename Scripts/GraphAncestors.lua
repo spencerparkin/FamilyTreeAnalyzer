@@ -32,6 +32,6 @@ local personId = fta.whoAmI()
 personId = 'KWZC-XN7'
 CollectAncestors( personId, ancestors, 0, maxGen )
 
-fta.setGraph( "graphviz", ancestors )
+fta.drawGraph( "graphviz", ancestors )
 
 -- GraphAncestors.lua

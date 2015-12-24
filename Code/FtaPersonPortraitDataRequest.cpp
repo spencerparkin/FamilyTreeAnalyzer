@@ -3,7 +3,7 @@
 #include "FtaPersonPortraitDataRequest.h"
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
-#include "FtaGraphPanel.h"
+#include "FtaVizPanel.h"
 #include "FtaApp.h"
 
 wxIMPLEMENT_CLASS( FtaPersonPortraitDataRequest, FtaPersonInfoRequest );
@@ -58,11 +58,11 @@ FtaPersonPortraitDataRequest::FtaPersonPortraitDataRequest( const wxString& pers
 	if( !image.IsOk() )
 		return false;
 
-	FtaGraphPanel* graphPanel = wxGetApp().GetFrame()->GetPanel< FtaGraphPanel >();
-	if( !graphPanel )
+	FtaVizPanel* vizPanel = wxGetApp().GetFrame()->GetPanel< FtaVizPanel >();
+	if( !vizPanel )
 		return false;
 
-	GLuint portraitTexture = graphPanel->GetCanvas()->GenerateTexture( image );
+	GLuint portraitTexture = vizPanel->GetCanvas()->GenerateTexture( image );
 	if( portraitTexture == GL_INVALID_VALUE )
 		return false;
 

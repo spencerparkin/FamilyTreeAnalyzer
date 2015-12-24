@@ -15,6 +15,7 @@
     <ClInclude Include="Code\FtaAmLoggedInFunction.h" />
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
+    <ClInclude Include="Code\FtaCamera.h" />
     <ClInclude Include="Code\FtaClearFunction.h" />
     <ClInclude Include="Code\FtaClient.h" />
     <ClInclude Include="Code\FtaContainers.h" />
@@ -25,7 +26,8 @@
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
-    <ClInclude Include="Code\FtaGraphPanel.h" />
+    <ClInclude Include="Code\FtaVisualization.h" />
+    <ClInclude Include="Code\FtaVizPanel.h" />
     <ClInclude Include="Code\FtaGraphViz.h" />
     <ClInclude Include="Code\FtaLoginFunction.h" />
     <ClInclude Include="Code\FtaLogoutFunction.h" />
@@ -45,7 +47,7 @@
     <ClInclude Include="Code\FtaPrintFunction.h" />
     <ClInclude Include="Code\FtaQueryUserForInteger.h" />
     <ClInclude Include="Code\FtaQueryUserForString.h" />
-    <ClInclude Include="Code\FtaSetGraphFunction.h" />
+    <ClInclude Include="Code\FtaDrawGraphFunction.h" />
     <ClInclude Include="Code\FtaSetPersonFunction.h" />
     <ClInclude Include="Code\FtaTreeCache.h" />
     <ClInclude Include="Code\FtaWhoAmIFunction.h" />
@@ -57,6 +59,7 @@
     <ClCompile Include="Code\FtaAmLoggedInFunction.cpp" />
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />
+    <ClCompile Include="Code\FtaCamera.cpp" />
     <ClCompile Include="Code\FtaClearFunction.cpp" />
     <ClCompile Include="Code\FtaClient.cpp" />
     <ClCompile Include="Code\FtaContainers.cpp" />
@@ -66,7 +69,8 @@
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
-    <ClCompile Include="Code\FtaGraphPanel.cpp" />
+    <ClCompile Include="Code\FtaVisualization.cpp" />
+    <ClCompile Include="Code\FtaVizPanel.cpp" />
     <ClCompile Include="Code\FtaGraphViz.cpp" />
     <ClCompile Include="Code\FtaHelpFunction.cpp" />
     <ClCompile Include="Code\FtaLoginFunction.cpp" />
@@ -87,7 +91,7 @@
     <ClCompile Include="Code\FtaPrintFunction.cpp" />
     <ClCompile Include="Code\FtaQueryUserForInteger.cpp" />
     <ClCompile Include="Code\FtaQueryUserForString.cpp" />
-    <ClCompile Include="Code\FtaSetGraphFunction.cpp" />
+    <ClCompile Include="Code\FtaDrawGraphFunction.cpp" />
     <ClCompile Include="Code\FtaSetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaTreeCache.cpp" />
     <ClCompile Include="Code\FtaWhoAmIFunction.cpp" />
