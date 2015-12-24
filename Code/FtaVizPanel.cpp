@@ -18,9 +18,9 @@ FtaVizPanel::FtaVizPanel( void )
 
 /*virtual*/ bool FtaVizPanel::GetPaneInfo( wxAuiPaneInfo& paneInfo )
 {
-	paneInfo.Caption( "Graph" );
+	paneInfo.Caption( "Visualization" );
 	paneInfo.CenterPane();
-	paneInfo.Name( "GraphPanel" );
+	paneInfo.Name( "VizPanel" );
 	return true;
 }
 

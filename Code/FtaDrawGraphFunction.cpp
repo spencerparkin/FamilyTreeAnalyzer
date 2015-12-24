@@ -93,11 +93,11 @@ FtaDrawGraphFunction::FtaDrawGraphFunction( void )
 		if( i < len )
 			break;
 
-		FtaVizPanel* graphPanel = wxGetApp().GetFrame()->GetPanel< FtaVizPanel >();
-		if( !graphPanel )
+		FtaVizPanel* vizPanel = wxGetApp().GetFrame()->GetPanel< FtaVizPanel >();
+		if( !vizPanel )
 			break;
 
-		graphPanel->GetCanvas()->SetVisualization( graph );
+		vizPanel->GetCanvas()->SetVisualization( graph );
 
 		success = true;
 	}
