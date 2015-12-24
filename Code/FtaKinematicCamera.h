@@ -21,6 +21,7 @@ protected:
 
 	//c3ga::vectorE3GA subject;
 	c3ga::vectorE3GA velocity, acceleration;
+	//float dragCoeficient;
 };
 
 // FtaKinematicCamera.h

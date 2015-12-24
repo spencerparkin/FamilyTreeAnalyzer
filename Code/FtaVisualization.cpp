@@ -10,8 +10,9 @@ FtaVisualization::FtaVisualization( void )
 {
 }
 
-/*virtual*/ void FtaVisualization::ProcessHitBuffer( GLuint* hitBuffer, GLuint hitBufferSize, GLuint hitCount )
+/*virtual*/ bool FtaVisualization::ProcessHitBuffer( GLuint* hitBuffer, GLuint hitBufferSize, GLuint hitCount )
 {
+	return false;
 }
 
 /*virtual*/ bool FtaVisualization::Animate( void )

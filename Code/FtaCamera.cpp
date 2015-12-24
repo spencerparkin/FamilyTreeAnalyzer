@@ -75,7 +75,10 @@ void FtaCamera::ProcessHitBuffer( FtaCanvas* canvas, bool freeHitBuffer /*= true
 
 	FtaVisualization* viz = canvas->GetVisualization();
 	if( viz )
-		viz->ProcessHitBuffer( hitBuffer, hitBufferSize, hitCount );
+	{
+		if( viz->ProcessHitBuffer( hitBuffer, hitBufferSize, hitCount ) )
+			canvas->Refresh();
+	}
 
 	if( freeHitBuffer )
 	{
