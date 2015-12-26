@@ -10,6 +10,9 @@
 // TODO: You should be able to throw the camera into motion with a click and drag just as
 //       you might do while swiping with your phone screen.
 
+// TODO: Alternate click-&-drag should have you look in different directions.  This also
+//       changes your panning plane.
+
 FtaKinematicCamera::FtaKinematicCamera( void )
 {
 	dragCoeficient = 1.5;
