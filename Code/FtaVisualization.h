@@ -15,7 +15,6 @@ public:
 
 	virtual bool Draw( GLenum renderMode ) = 0;
 	virtual bool ProcessHitBuffer( GLuint* hitBuffer, GLuint hitBufferSize, GLuint hitCount );
-	virtual bool Animate( void );
 };
 
 // FtaVisualization.h

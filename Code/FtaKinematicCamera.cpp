@@ -2,28 +2,36 @@
 
 #include "FtaKinematicCamera.h"
 #include "FtaVisualization.h"
+#include "FtaVizPanel.h"
 #include "FtaCanvas.h"
+#include "FtaFrame.h"
+#include "FtaApp.h"
+
+// TODO: You should be able to throw the camera into motion with a click and drag just as
+//       you might do while swiping with your phone screen.
 
 FtaKinematicCamera::FtaKinematicCamera( void )
 {
+	dragCoeficient = 1.5;
+	mass = 1.0;
 }
 
 /*virtual*/ FtaKinematicCamera::~FtaKinematicCamera( void )
 {
 }
 
-/*virtual*/ void FtaKinematicCamera::PreRender( GLenum renderMode, FtaCanvas* canvas )
+/*virtual*/ void FtaKinematicCamera::PreRender( GLenum renderMode )
 {
 	if( renderMode == GL_SELECT )
 		PrepareHitBuffer();
 
 	glClearColor( 1.f, 1.f, 1.f, 1.f );
-	glClear( GL_COLOR_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	SetupViewMatrices( renderMode, canvas );
+	SetupViewMatrices( renderMode );
 }
 
-/*virtual*/ void FtaKinematicCamera::PostRender( GLenum renderMode, FtaCanvas* canvas )
+/*virtual*/ void FtaKinematicCamera::PostRender( GLenum renderMode )
 {
 	glFlush();
 	
@@ -31,17 +39,86 @@ FtaKinematicCamera::FtaKinematicCamera( void )
 		canvas->SwapBuffers();
 
 	if( renderMode == GL_SELECT )
-		ProcessHitBuffer( canvas, true );
+		ProcessHitBuffer( true );
 }
 
 /*virtual*/ bool FtaKinematicCamera::Bind( void )
 {
+	canvas->Bind( wxEVT_LEFT_DOWN, &FtaKinematicCamera::OnMouseLeftDown, this );
+	canvas->Bind( wxEVT_KEY_DOWN, &FtaKinematicCamera::OnKeyDown, this );
+	canvas->Bind( wxEVT_CHAR_HOOK, &FtaKinematicCamera::OnCharHook, this );
+
 	return true;
 }
 
 /*virtual*/ bool FtaKinematicCamera::Unbind( void )
 {
+	canvas->Unbind( wxEVT_LEFT_DOWN, &FtaKinematicCamera::OnMouseLeftDown, this );
+	canvas->Unbind( wxEVT_KEY_DOWN, &FtaKinematicCamera::OnKeyDown, this );
+	canvas->Unbind( wxEVT_CHAR_HOOK, &FtaKinematicCamera::OnCharHook, this );
+
 	return true;
+}
+
+/*virtual*/ bool FtaKinematicCamera::Animate( void )
+{
+	double speed = c3ga::norm( velocity );
+	if( speed == 0.0 )
+		return false;
+
+	double deltaTime = 1.0 / canvas->GetFPS();
+	eye += velocity * deltaTime;
+
+	c3ga::vectorE3GA dragForce = -velocity * dragCoeficient;
+	c3ga::vectorE3GA acceleration = dragForce * ( 1.0 / mass );
+	velocity += acceleration * deltaTime;
+
+	return true;
+}
+
+void FtaKinematicCamera::OnMouseLeftDown( wxMouseEvent& event )
+{
+	canvas->SetFocus();
+}
+
+void FtaKinematicCamera::OnKeyDown( wxKeyEvent& event )
+{
+}
+
+void FtaKinematicCamera::OnCharHook( wxKeyEvent& event )
+{
+	c3ga::vectorE3GA panDir( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 0.f );
+
+	switch( event.GetKeyCode() )
+	{
+		case WXK_LEFT:
+		{
+			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, -1.f, 0.f, 0.f );
+			break;
+		}
+		case WXK_RIGHT:
+		{
+			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 1.f, 0.f, 0.f );
+			break;
+		}
+		case WXK_UP:
+		{
+			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
+			break;
+		}
+		case WXK_DOWN:
+		{
+			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, -1.f, 0.f );
+			break;
+		}
+	}
+
+	double newtons = 20.0;
+	c3ga::vectorE3GA force = panDir * newtons;
+	c3ga::vectorE3GA acceleration = force * ( 1.0 / mass );
+
+	double deltaTime = 1.0 / canvas->GetFPS();
+	velocity += acceleration * deltaTime;
 }
 
 // FtaKinematicCamera.cpp

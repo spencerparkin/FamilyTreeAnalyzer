@@ -15,9 +15,4 @@ FtaVisualization::FtaVisualization( void )
 	return false;
 }
 
-/*virtual*/ bool FtaVisualization::Animate( void )
-{
-	return false;
-}
-
 // FtaVisualization.cpp

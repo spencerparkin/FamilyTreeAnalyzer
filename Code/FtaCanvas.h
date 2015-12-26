@@ -27,6 +27,10 @@ public:
 	FtaCamera* GetCamera( void ) { return camera; }
 	void SetCamera( FtaCamera* camera );
 
+	bool TimerUpdate( void );
+
+	double GetFPS( void ) { return framesPerSecond; }
+
 private:
 
 	void SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlugin );
@@ -37,6 +41,8 @@ private:
 	static int attributeList[];
 	FtaVisualization* viz;
 	FtaCamera* camera;
+	double lastFrameTimeSeconds;
+	double framesPerSecond;
 };
 
 // FtaCanvas.h

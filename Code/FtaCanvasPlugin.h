@@ -4,6 +4,8 @@
 
 #include <wx/event.h>
 
+class FtaCanvas;
+
 class FtaCanvasPlugin : public wxEvtHandler
 {
 public:
@@ -13,6 +15,10 @@ public:
 
 	virtual bool Bind( void ) = 0;
 	virtual bool Unbind( void ) = 0;
+
+	virtual bool Animate( void );
+
+	FtaCanvas* canvas;
 };
 
 // FtaCanvasPlugin.h

@@ -36,11 +36,7 @@ FtaVizPanel::FtaVizPanel( void )
 
 /*virtual*/ bool FtaVizPanel::TimerUpdate( void )
 {
-	FtaVisualization* viz = canvas->GetVisualization();
-	if( viz && viz->Animate() )
-		canvas->Refresh();
-
-	return true;
+	return canvas->TimerUpdate();
 }
 
 // FtaVizPanel.cpp

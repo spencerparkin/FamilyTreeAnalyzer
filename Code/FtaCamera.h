@@ -15,18 +15,18 @@ public:
 	FtaCamera( void );
 	virtual ~FtaCamera( void );
 
-	virtual void PreRender( GLenum renderMode, FtaCanvas* canvas ) = 0;
-	virtual void PostRender( GLenum renderMode, FtaCanvas* canvas ) = 0;
+	virtual void PreRender( GLenum renderMode ) = 0;
+	virtual void PostRender( GLenum renderMode ) = 0;
 
 	GLuint* GetHitBuffer( void ) { return hitBuffer; }
 	GLuint GetHitBufferSize( void ) const { return hitBufferSize; }
 
 protected:
 
-	void SetupViewMatrices( GLenum renderMode, FtaCanvas* canvas );
+	void SetupViewMatrices( GLenum renderMode );
 
 	void PrepareHitBuffer( void );
-	void ProcessHitBuffer( FtaCanvas* canvas, bool freeHitBuffer = true );
+	void ProcessHitBuffer( bool freeHitBuffer = true );
 
 	c3ga::vectorE3GA eye;
 	c3ga::vectorE3GA xAxis, yAxis, zAxis;

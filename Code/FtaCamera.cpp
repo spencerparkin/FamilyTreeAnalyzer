@@ -9,13 +9,19 @@ FtaCamera::FtaCamera( void )
 {
 	hitBuffer = nullptr;
 	hitBufferSize = 0;
+
+	eye.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 20.f );
+
+	xAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 1.f, 0.f, 0.f );
+	yAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
+	zAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 1.f );
 }
 
 /*virtual*/ FtaCamera::~FtaCamera( void )
 {
 }
 
-void FtaCamera::SetupViewMatrices( GLenum renderMode, FtaCanvas* canvas )
+void FtaCamera::SetupViewMatrices( GLenum renderMode )
 {
 	GLint viewport[4];
 	glGetIntegerv( GL_VIEWPORT, viewport );
@@ -34,34 +40,39 @@ void FtaCamera::SetupViewMatrices( GLenum renderMode, FtaCanvas* canvas )
 	gluPerspective( foviAngle, aspectRatio, 0.1, 1000.0 );
 
 	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
 	
-	GLfloat viewMatrix[4][4];
+	GLfloat viewMatrix[16];
 
-	viewMatrix[0][0] = xAxis.get_e1();
-	viewMatrix[1][0] = xAxis.get_e2();
-	viewMatrix[2][0] = xAxis.get_e3();
-	viewMatrix[3][0] = 0.f;
+	// That that the inverse is of the orignation sub-matrix is its transpose.
 
-	viewMatrix[0][1] = yAxis.get_e1();
-	viewMatrix[1][1] = yAxis.get_e2();
-	viewMatrix[2][1] = yAxis.get_e3();
-	viewMatrix[3][1] = 0.f;
+	viewMatrix[0] = xAxis.get_e1();
+	viewMatrix[1] = yAxis.get_e1();
+	viewMatrix[2] = zAxis.get_e1();
+	viewMatrix[3] = 0.f;
 
-	viewMatrix[0][2] = zAxis.get_e1();
-	viewMatrix[1][2] = zAxis.get_e2();
-	viewMatrix[2][2] = zAxis.get_e3();
-	viewMatrix[3][2] = 0.f;
+	viewMatrix[4] = xAxis.get_e2();
+	viewMatrix[5] = yAxis.get_e2();
+	viewMatrix[6] = zAxis.get_e2();
+	viewMatrix[7] = 0.f;
 
-	viewMatrix[0][3] = eye.get_e1();
-	viewMatrix[1][3] = eye.get_e2();
-	viewMatrix[2][3] = eye.get_e3();
-	viewMatrix[3][3] = 1.f;
+	viewMatrix[8] = xAxis.get_e3();
+	viewMatrix[9] = yAxis.get_e3();
+	viewMatrix[10] = zAxis.get_e3();
+	viewMatrix[11] = 0.f;
 
-	glLoadMatrixf( ( GLfloat* )viewMatrix );
+	viewMatrix[12] = -eye.get_e1();
+	viewMatrix[13] = -eye.get_e2();
+	viewMatrix[14] = -eye.get_e3();
+	viewMatrix[15] = 1.f;
+
+	glMultMatrixf( viewMatrix );
 }
 
 void FtaCamera::PrepareHitBuffer( void )
 {
+	wxASSERT( hitBuffer == nullptr );
+
 	hitBufferSize = 512;
 	hitBuffer = new GLuint[ hitBufferSize ];
 	glSelectBuffer( hitBufferSize, hitBuffer );
@@ -69,7 +80,7 @@ void FtaCamera::PrepareHitBuffer( void )
 	glInitNames();
 }
 
-void FtaCamera::ProcessHitBuffer( FtaCanvas* canvas, bool freeHitBuffer /*= true*/ )
+void FtaCamera::ProcessHitBuffer( bool freeHitBuffer /*= true*/ )
 {
 	GLuint hitCount = glRenderMode( GL_RENDER );
 

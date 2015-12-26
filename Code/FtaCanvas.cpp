@@ -10,9 +10,14 @@ int FtaCanvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
 FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList )
 {
+	lastFrameTimeSeconds = 0.0;
+	framesPerSecond = 0.0;
+
 	context = nullptr;
 	viz = nullptr;
-	camera = new FtaKinematicCamera();
+	camera = nullptr;
+
+	SetCamera( new FtaKinematicCamera() );
 
 	Bind( wxEVT_PAINT, &FtaCanvas::OnPaint, this );
 	Bind( wxEVT_SIZE, &FtaCanvas::OnSize, this );
@@ -43,7 +48,6 @@ void FtaCanvas::SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlu
 	if( curPlugin )
 	{
 		curPlugin->Unbind();
-		RemoveEventHandler( curPlugin );
 		delete curPlugin;
 	}
 
@@ -51,9 +55,8 @@ void FtaCanvas::SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlu
 
 	if( curPlugin )
 	{
+		curPlugin->canvas = this;
 		curPlugin->Bind();
-		SetNextHandler( curPlugin );
-		curPlugin->SetPreviousHandler( this );
 	}
 }
 
@@ -62,14 +65,40 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 	if( !camera )
 		return;
 
+	double curFrameTimeSeconds = double( clock() ) / double( CLOCKS_PER_SEC );
+	double deltaFrameTimeSeconds = 0.0;
+	if( lastFrameTimeSeconds != 0.0 )
+		deltaFrameTimeSeconds = curFrameTimeSeconds - lastFrameTimeSeconds;
+	if( deltaFrameTimeSeconds != 0.0 )
+		framesPerSecond = 1.0 / deltaFrameTimeSeconds;
+	lastFrameTimeSeconds = curFrameTimeSeconds;
+
 	BindContext();
 
-	camera->PreRender( GL_RENDER, this );
+	camera->PreRender( GL_RENDER );
 
 	if( viz )
 		viz->Draw( GL_RENDER );
 
-	camera->PostRender( GL_RENDER, this );
+	glBegin( GL_LINES );
+
+	glColor3f( 1.f, 0.f, 0.f );
+	glVertex3f( 0.f, 0.f, 0.f );
+	glVertex3f( 5.f, 0.f, 0.f );
+
+	glColor3f( 0.f, 1.f, 0.f );
+	glVertex3f( 0.f, 0.f, 0.f );
+	glVertex3f( 0.f, 5.f, 0.f );
+
+	glColor3f( 0.f, 0.f, 1.f );
+	glVertex3f( 0.f, 0.f, 0.f );
+	glVertex3f( 0.f, 0.f, 5.f );
+
+	glEnd();
+
+	// TODO: Render FPS in upper-right hande corner?
+
+	camera->PostRender( GL_RENDER );
 }
 
 void FtaCanvas::OnSize( wxSizeEvent& event )
@@ -89,9 +118,26 @@ void FtaCanvas::PerformPick( void )
 
 	BindContext();
 
-	camera->PreRender( GL_SELECT, this );
+	camera->PreRender( GL_SELECT );
 	viz->Draw( GL_SELECT );
-	camera->PostRender( GL_SELECT, this );
+	camera->PostRender( GL_SELECT );
+}
+
+bool FtaCanvas::TimerUpdate( void )
+{
+	bool animating = false;
+	if( viz && viz->Animate() )
+		animating = true;
+
+	if( camera && camera->Animate() )
+		animating = true;
+
+	// TODO: Maybe service async-requests here if we know there's one pending with a texture signature?
+
+	// TODO: Only request refresh if we're animating?
+	Refresh();
+
+	return true;
 }
 
 void FtaCanvas::BindContext( void )
