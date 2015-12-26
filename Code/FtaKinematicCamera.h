@@ -25,6 +25,8 @@ public:
 
 protected:
 
+	// TODO: If a subject is set, then the camera always looks at the subject.  Paning moves you
+	//       around the object.  You can still zoom toward/away-from it.
 	//c3ga::vectorE3GA subject;
 	c3ga::vectorE3GA velocity;
 	double dragCoeficient;
