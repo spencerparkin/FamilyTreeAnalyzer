@@ -9,7 +9,7 @@
 
 class FtaGraphElement;
 
-WX_DECLARE_STRING_HASH_MAP( FtaGraphElement*, FtaGraphElementMap );
+WX_DECLARE_LIST( FtaGraphElement, FtaGraphElementList );
 
 // Derivatives of this class implement various ways of laying out and drawing a graph of related persons.
 class FtaGraph : public FtaVisualization
@@ -40,10 +40,10 @@ protected:
 
 	bool GenerateConnectedComponent( const wxString& personId, FtaPersonIdSet& remainingPersons, FtaPersonIdSet& connectedComponent );
 
-	void DeleteGraphElementMap( void );
+	void DeleteGraphElementList( void );
 
 	FtaPersonIdSet personIdSet;
-	FtaGraphElementMap graphElementMap;
+	FtaGraphElementList graphElementList;
 	bool layoutNeeded;
 };
 

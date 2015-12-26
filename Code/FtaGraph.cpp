@@ -6,6 +6,9 @@
 #include "FtaClient.h"
 #include "FtaCanvas.h"
 #include "FtaApp.h"
+#include "wx/listimpl.cpp"
+
+WX_DEFINE_LIST( FtaGraphElementList );
 
 FtaGraph::FtaGraph( void )
 {
@@ -14,17 +17,17 @@ FtaGraph::FtaGraph( void )
 
 /*virtual*/ FtaGraph::~FtaGraph( void )
 {
-	DeleteGraphElementMap();
+	DeleteGraphElementList();
 }
 
-void FtaGraph::DeleteGraphElementMap( void )
+void FtaGraph::DeleteGraphElementList( void )
 {
-	while( graphElementMap.size() > 0 )
+	while( graphElementList.size() > 0 )
 	{
-		FtaGraphElementMap::iterator iter = graphElementMap.begin();
-		FtaGraphElement* element = iter->second;
+		FtaGraphElementList::iterator iter = graphElementList.begin();
+		FtaGraphElement* element = *iter;
 		delete element;
-		graphElementMap.erase( iter );
+		graphElementList.erase( iter );
 	}
 }
 
@@ -86,7 +89,7 @@ void FtaGraph::DeleteGraphElementMap( void )
 {
 	if( layoutNeeded )
 	{
-		DeleteGraphElementMap();
+		DeleteGraphElementList();
 
 		if( !Layout() )
 			return false;
@@ -94,10 +97,10 @@ void FtaGraph::DeleteGraphElementMap( void )
 		layoutNeeded = false;
 	}
 
-	FtaGraphElementMap::iterator iter = graphElementMap.begin();
-	while( iter != graphElementMap.end() )
+	FtaGraphElementList::iterator iter = graphElementList.begin();
+	while( iter != graphElementList.end() )
 	{
-		FtaGraphElement* element = iter->second;
+		FtaGraphElement* element = *iter;
 		element->Draw( renderMode );
 		iter++;
 	}
@@ -226,10 +229,10 @@ bool FtaGraph::PersonInGraphSet( const wxString& personId )
 {
 	bool animating = false;
 
-	FtaGraphElementMap::iterator iter = graphElementMap.begin();
-	while( iter != graphElementMap.end() )
+	FtaGraphElementList::iterator iter = graphElementList.begin();
+	while( iter != graphElementList.end() )
 	{
-		FtaGraphElement* element = iter->second;
+		FtaGraphElement* element = *iter;
 		if( element->Animate() )
 			animating = true;
 		iter++;

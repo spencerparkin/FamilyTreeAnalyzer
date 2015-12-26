@@ -49,7 +49,7 @@ FtaGraphViz::FtaGraphViz( void )
 		if( result != 0 )
 			break;
 
-		if( !PlacePersons( G ) )
+		if( !GenerateGraphForDrawing( G ) )
 			break;
 
 #if 0
@@ -183,7 +183,7 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 	return true;
 }
 
-bool FtaGraphViz::PlacePersons( Agraph_t* G )
+bool FtaGraphViz::GenerateGraphForDrawing( Agraph_t* G )
 {
 	FtaPersonIdSet::iterator iter = personIdSet.begin();
 	while( iter != personIdSet.end() )
@@ -198,17 +198,29 @@ bool FtaGraphViz::PlacePersons( Agraph_t* G )
 		if( !personNode )
 			return false;
 
-		const char* pos = agget( personNode, "pos" );
-		if( !pos )
-			return false;
+		FtaGraphNode* graphNode = new FtaGraphNode( this );
+		graphNode->personId = personId;
 
-		const char* width = agget( personNode, "width" );
-		const char* height = agget( personNode, "height" );
+		wxString posString = agget( personNode, "pos" );
+		int comma = posString.find( ',' );
+		wxString xCoordString = posString.SubString( 0, comma );
+		wxString yCoordString = posString.SubString( comma + 1, posString.Length() );
+		xCoordString.ToDouble( &graphNode->center.m_e1 );
+		yCoordString.ToDouble( &graphNode->center.m_e2 );
+		graphNode->center.m_e3 = 0.0;
 
-		// TODO: Parse the data here.
+		wxString widthString = agget( personNode, "width" );
+		wxString heightString = agget( personNode, "height" );
+
+		widthString.ToDouble( &graphNode->width );
+		heightString.ToDouble( &graphNode->height );
+
+		graphElementList.push_back( graphNode );
 
 		iter++;
 	}
+
+	// TODO: Generate edges for drawing here.
 
 	return true;
 }
