@@ -70,10 +70,16 @@ FtaImageRequest::FtaImageRequest( const wxString& imageUrl, ResponseProcessor* p
 
 /*virtual*/ bool FtaImageRequest::MakeUrl( wxString& url )
 {
-	if( !FtaAsyncRequest::MakeUrl( url ) )
-		return false;
+	if( imageUrl.find( "http" ) == 0 )
+		url = imageUrl;
+	else
+	{
+		if( !FtaAsyncRequest::MakeUrl( url ) )
+			return false;
 
-	url += imageUrl;		// TODO: What if it's not a relative path?
+		url += imageUrl;
+	}
+
 	return true;
 }
 

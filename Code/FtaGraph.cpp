@@ -2,6 +2,9 @@
 
 #include "FtaGraph.h"
 #include "FtaTreeCache.h"
+#include "FtaImageRequest.h"
+#include "FtaClient.h"
+#include "FtaCanvas.h"
 #include "FtaApp.h"
 
 FtaGraph::FtaGraph( void )
@@ -11,6 +14,18 @@ FtaGraph::FtaGraph( void )
 
 /*virtual*/ FtaGraph::~FtaGraph( void )
 {
+	DeleteGraphElementMap();
+}
+
+void FtaGraph::DeleteGraphElementMap( void )
+{
+	while( graphElementMap.size() > 0 )
+	{
+		FtaGraphElementMap::iterator iter = graphElementMap.begin();
+		FtaGraphElement* element = iter->second;
+		delete element;
+		graphElementMap.erase( iter );
+	}
 }
 
 /*virtual*/ bool FtaGraph::Layout( void )
@@ -71,13 +86,21 @@ FtaGraph::FtaGraph( void )
 {
 	if( layoutNeeded )
 	{
+		DeleteGraphElementMap();
+
 		if( !Layout() )
 			return false;
 
 		layoutNeeded = false;
 	}
 
-	//...
+	FtaGraphElementMap::iterator iter = graphElementMap.begin();
+	while( iter != graphElementMap.end() )
+	{
+		FtaGraphElement* element = iter->second;
+		element->Draw( renderMode );
+		iter++;
+	}
 
 	return false;
 }
@@ -127,7 +150,7 @@ bool FtaGraph::CreateConnectedComponents( FtaPersonIdSetList& personIdSetList )
 bool FtaGraph::GenerateConnectedComponent( const wxString& personId, FtaPersonIdSet& remainingPersons, FtaPersonIdSet& connectedComponent )
 {
 	// Do we want to graph this person?
-	if( !GraphPerson( personId ) )
+	if( !PersonInGraphSet( personId ) )
 		return true;
 
 	// Have we already visited this person?
@@ -181,7 +204,7 @@ bool FtaGraph::DestroyConnectedComponents( FtaPersonIdSetList& personIdSetList )
 	return true;
 }
 
-bool FtaGraph::GraphPerson( const wxString& personId )
+bool FtaGraph::PersonInGraphSet( const wxString& personId )
 {
 	if( personIdSet.find( personId ) != personIdSet.end() )
 		return true;
@@ -197,6 +220,116 @@ bool FtaGraph::GraphPerson( const wxString& personId )
 /*virtual*/ bool FtaGraph::Unbind( void )
 {
 	return true;
+}
+
+/*virtual*/ bool FtaGraph::Animate( void )
+{
+	bool animating = false;
+
+	FtaGraphElementMap::iterator iter = graphElementMap.begin();
+	while( iter != graphElementMap.end() )
+	{
+		FtaGraphElement* element = iter->second;
+		if( element->Animate() )
+			animating = true;
+		iter++;
+	}
+
+	return animating;
+}
+
+FtaGraphElement::FtaGraphElement( FtaGraph* graph )
+{
+	this->graph = graph;
+}
+
+/*virtual*/ FtaGraphElement::~FtaGraphElement( void )
+{
+}
+
+/*virtual*/ bool FtaGraphElement::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )
+{
+	return false;
+}
+
+FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
+{
+	textureRequestSignature = -1;
+	center.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, 0.0 );
+	texture = GL_INVALID_VALUE;
+	width = 0.0;
+	height = 0.0;
+}
+
+/*virtual*/ FtaGraphNode::~FtaGraphNode( void )
+{
+	if( textureRequestSignature >= 0 )
+	{
+		// Don't let the pending request list hang on to a stale pointer.
+		FtaClient* client = wxGetApp().GetClient();
+		client->CancelAllAsyncRequests( textureRequestSignature );
+	}
+}
+
+/*virtual*/ bool FtaGraphNode::Animate( void )
+{
+	if( textureRequestSignature >= 0 )
+	{
+		FtaClient* client = wxGetApp().GetClient();
+		client->ServiceAllAsyncRequests( false, textureRequestSignature );
+		return true;
+	}
+
+	return false;
+}
+
+/*virtual*/ void FtaGraphNode::Draw( GLenum renderMode )
+{
+	FtaTreeCache* cache = wxGetApp().GetTreeCache();
+
+	FtaPerson* person = cache->Lookup( personId, FtaTreeCache::FAIL_ON_CACHE_MISS );
+	if( !person )
+		return;
+
+	wxString portraitUrl = person->GetPortraitUrl();
+	if( !( portraitUrl.IsEmpty() || portraitUrl == "No Content" ) && texture == GL_INVALID_VALUE )
+	{
+		if( textureRequestSignature == -1 )
+		{
+			textureRequestSignature = FtaClient::NewSignature();
+			FtaClient* client = wxGetApp().GetClient();
+			bool added = client->AddAsyncRequest( new FtaImageRequest( portraitUrl, this, textureRequestSignature ) );
+			wxASSERT( added );
+		}
+	}
+
+	// TODO: Draw textured quad here.
+}
+
+/*virtual*/ bool FtaGraphNode::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )
+{
+	if( !request->IsKindOf( &FtaImageRequest::ms_classInfo ) )
+		return false;
+
+	FtaImageRequest* imageRequest = ( FtaImageRequest* )request;
+	texture = graph->canvas->GenerateTexture( *imageRequest->GetImage() );
+
+	textureRequestSignature = -2;
+	return true;
+}
+
+FtaGraphEdge::FtaGraphEdge( FtaGraph* graph ) : FtaGraphElement( graph )
+{
+}
+
+/*virtual*/ FtaGraphEdge::~FtaGraphEdge( void )
+{
+}
+
+/*virtual*/ void FtaGraphEdge::Draw( GLenum renderMode )
+{
+	// TODO: We could do CGA-based edge-routing here using a divde-and-conqur algorithm.
+	//       A derivative of this class, however, may use dot-generated edge-spline data, which would be better.
 }
 
 // FtaGraph.cpp

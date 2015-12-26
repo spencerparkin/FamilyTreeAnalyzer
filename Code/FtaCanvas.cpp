@@ -132,8 +132,6 @@ bool FtaCanvas::TimerUpdate( void )
 	if( camera && camera->Animate() )
 		animating = true;
 
-	// TODO: Maybe service async-requests here if we know there's one pending with a texture signature?
-
 	// TODO: Only request refresh if we're animating?
 	Refresh();
 

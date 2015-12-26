@@ -4,6 +4,12 @@
 
 #include "FtaContainers.h"
 #include "FtaVisualization.h"
+#include "FtaAsyncRequest.h"
+#include "c3ga/c3ga.h"
+
+class FtaGraphElement;
+
+WX_DECLARE_STRING_HASH_MAP( FtaGraphElement*, FtaGraphElementMap );
 
 // Derivatives of this class implement various ways of laying out and drawing a graph of related persons.
 class FtaGraph : public FtaVisualization
@@ -17,6 +23,7 @@ public:
 	virtual bool Draw( GLenum renderMode ) override;
 	virtual bool Bind( void ) override;
 	virtual bool Unbind( void ) override;
+	virtual bool Animate( void ) override;
 
 	void AddPerson( const wxString& personId );
 	void RemovePerson( const wxString& personId );
@@ -26,16 +33,63 @@ public:
 
 protected:
 
-	bool GraphPerson( const wxString& personId );
+	bool PersonInGraphSet( const wxString& personId );
 
 	virtual bool LayoutConnectedComponent( FtaPersonIdSet& connectedComponent );
 	virtual bool PackConnectedComponents( FtaPersonIdSetList& personIdSetList );
 
 	bool GenerateConnectedComponent( const wxString& personId, FtaPersonIdSet& remainingPersons, FtaPersonIdSet& connectedComponent );
 
-	FtaPersonIdSet personIdSet;
+	void DeleteGraphElementMap( void );
 
+	FtaPersonIdSet personIdSet;
+	FtaGraphElementMap graphElementMap;
 	bool layoutNeeded;
+};
+
+class FtaGraphElement : public FtaAsyncRequest::ResponseProcessor
+{
+public:
+	FtaGraphElement( FtaGraph* graph );
+	virtual ~FtaGraphElement( void );
+
+	virtual void Draw( GLenum renderMode ) = 0;
+	virtual bool Animate( void ) { return false; }
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
+
+protected:
+
+	FtaGraph* graph;
+};
+
+class FtaGraphNode : public FtaGraphElement
+{
+public:
+	FtaGraphNode( FtaGraph* graph );
+	virtual ~FtaGraphNode( void );
+
+	virtual void Draw( GLenum renderMode ) override;
+	virtual bool Animate( void ) override;
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
+
+	wxString personId;
+	c3ga::vectorE3GA center;
+	GLuint texture;
+	int textureRequestSignature;
+	double width, height;
+};
+
+class FtaGraphEdge : public FtaGraphElement
+{
+public:
+	FtaGraphEdge( FtaGraph* graph );
+	virtual ~FtaGraphEdge( void );
+
+	virtual void Draw( GLenum renderMode ) override;
+
+	FtaGraphNode* nodeTail;
+	FtaGraphNode* nodeHead;
+	// TODO: Add spline data.
 };
 
 // FtaGraph.h

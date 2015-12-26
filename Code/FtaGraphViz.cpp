@@ -123,7 +123,7 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 		if( !person )
 			return false;
 
-		if( GraphPerson( person->GetFatherId() ) )
+		if( PersonInGraphSet( person->GetFatherId() ) )
 		{
 			Agnode_t* fatherNode = agnode( G, ( char* )( const char* )person->GetFatherId(), 0 );
 			if( !fatherNode )
@@ -138,7 +138,7 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 			}
 		}
 
-		if( GraphPerson( person->GetMotherId() ) )
+		if( PersonInGraphSet( person->GetMotherId() ) )
 		{
 			Agnode_t* motherNode = agnode( G, ( char* )( const char* )person->GetMotherId(), 0 );
 			if( !motherNode )
@@ -159,7 +159,7 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 		{
 			wxString spouseId = *spouseIter;
 
-			if( GraphPerson( spouseId ) )
+			if( PersonInGraphSet( spouseId ) )
 			{
 				Agnode_t* spouseNode = agnode( G, ( char* )( const char* )spouseId, 0 );
 				if( !spouseNode )

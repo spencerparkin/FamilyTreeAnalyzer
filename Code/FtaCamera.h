@@ -28,6 +28,7 @@ protected:
 	void PrepareHitBuffer( void );
 	void ProcessHitBuffer( bool freeHitBuffer = true );
 
+	// TODO: This is stupid and needs to be rewritten.
 	c3ga::vectorE3GA eye;
 	c3ga::rotorE3GA orient;
 
