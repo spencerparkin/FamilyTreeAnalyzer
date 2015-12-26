@@ -90,34 +90,40 @@ void FtaKinematicCamera::OnKeyDown( wxKeyEvent& event )
 
 void FtaKinematicCamera::OnCharHook( wxKeyEvent& event )
 {
-	c3ga::vectorE3GA panDir( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 0.f );
+	c3ga::vectorE3GA moveDir( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 0.f );
 
 	switch( event.GetKeyCode() )
 	{
 		case WXK_LEFT:
 		{
-			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, -1.f, 0.f, 0.f );
+			moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, -1.f, 0.f, 0.f );
 			break;
 		}
 		case WXK_RIGHT:
 		{
-			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 1.f, 0.f, 0.f );
+			moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 1.f, 0.f, 0.f );
 			break;
 		}
 		case WXK_UP:
 		{
-			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
+			if( event.ControlDown() )
+				moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, -1.f );
+			else
+				moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
 			break;
 		}
 		case WXK_DOWN:
 		{
-			panDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, -1.f, 0.f );
+			if( event.ControlDown() )
+				moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 1.f );
+			else
+				moveDir += c3ga::vectorE3GA( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, -1.f, 0.f );
 			break;
 		}
 	}
 
 	double newtons = 40.0;
-	c3ga::vectorE3GA force = panDir * newtons;
+	c3ga::vectorE3GA force = moveDir * newtons;
 	c3ga::vectorE3GA acceleration = force * ( 1.0 / mass );
 
 	double deltaTime = 1.0 / canvas->GetFPS();
