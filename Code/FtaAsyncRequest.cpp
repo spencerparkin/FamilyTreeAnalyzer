@@ -126,7 +126,7 @@ int FtaAsyncRequest::FindHeaderLine( const wxString& pattern, int requiredStartL
 
 		if( processor )
 		{
-			if( !processor->ProcessResponse( this, responseValue ) )
+			if( !processor->ProcessResponse( this, &responseValue ) )
 				return false;
 		}
 		else if( !ProcessJSONResponse( responseValue ) )

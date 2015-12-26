@@ -102,7 +102,7 @@ bool FtaTreeCache::Dump( void )
 	return true;
 }
 
-/*virtual*/ bool FtaTreeCache::ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue )
+/*virtual*/ bool FtaTreeCache::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )
 {
 	if( !request->IsKindOf( &FtaPersonInfoRequest::ms_classInfo ) )
 		return false;
@@ -112,7 +112,8 @@ bool FtaTreeCache::Dump( void )
 	wxString personId = personInfoRequest->GetPersonId();
 	FtaPerson* person = Lookup( personId, ALLOCATE_ON_CACHE_MISS );
 
-	if( !personInfoRequest->AccumulateInfoInCache( responseValue ) )
+	wxASSERT( responseValue != nullptr );
+	if( !personInfoRequest->AccumulateInfoInCache( *responseValue ) )
 		return false;
 
 	if( ( signed )personMap.size() < personCountThreshold )

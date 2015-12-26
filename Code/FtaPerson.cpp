@@ -4,9 +4,6 @@
 #include "FtaTreeCache.h"
 #include "FtaFrame.h"
 #include "FtaClient.h"
-#include "FtaPersonPortraitDataRequest.h"
-#include "FtaVizPanel.h"
-#include "FtaCanvas.h"
 #include "FtaApp.h"
 
 FtaPerson::FtaPerson( const wxString& personId )
@@ -14,15 +11,10 @@ FtaPerson::FtaPerson( const wxString& personId )
 	this->personId = personId;
 	flags = 0;
 	gender = GENDER_UNKNOWN;
-	portrait.texture = GL_INVALID_VALUE;
-	portrait.center.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, 0.0 );
-	portrait.width = 0.f;
-	portrait.height = 0.f;
 }
 
 /*virtual*/ FtaPerson::~FtaPerson( void )
 {
-	SetPortraitTexture( GL_INVALID_VALUE );
 }
 
 bool FtaPerson::IsInfoComplete( void ) const
@@ -183,32 +175,6 @@ bool FtaPerson::GetToLuaTable( lua_State* L ) const
 	lua_setfield( L, -2, "spouseIds" );
 
 	return true;
-}
-
-bool FtaPerson::SetPortraitTexture( GLuint portraitTexture )
-{
-	if( portrait.texture != GL_INVALID_VALUE )
-	{
-		FtaFrame* frame = wxGetApp().GetFrame();
-		if( frame )
-			frame->GetPanel< FtaVizPanel >()->GetCanvas()->FreeTexture( portrait.texture );
-	}
-
-	portrait.texture = portraitTexture;
-	return true;
-}
-
-GLuint FtaPerson::GetPortraitTexture( bool wait /*= true*/, int signature /*= -1*/ )
-{
-	if( portrait.texture == GL_INVALID_VALUE && ( flags & FLAG_PORTRAIT ) != 0 )
-	{
-		FtaClient* client = wxGetApp().GetClient();
-		client->AddAsyncRequest( new FtaPersonPortraitDataRequest( personId, nullptr, signature ) );
-		if( wait )
-			client->CompleteAllAsyncRequests( false, signature );
-	}
-
-	return portrait.texture;
 }
 
 // FtaPerson.cpp

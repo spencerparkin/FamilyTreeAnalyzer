@@ -27,7 +27,7 @@ public:
 	bool Fill( const wxString& rootPersonId, int personCountThreshold );
 	bool IsEmpty( void ) const { return( personMap.size() == 0 ? true : false ); }
 
-	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
 
 	int GetPersonCount( void ) const { return personMap.size(); }
 	const FtaPersonMap& GetPersonMap( void ) const { return personMap; }

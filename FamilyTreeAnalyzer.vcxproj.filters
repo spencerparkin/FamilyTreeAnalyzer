@@ -91,9 +91,6 @@
     <ClInclude Include="Code\FtaClearFunction.h">
       <Filter>Code\LuaFunctions</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FtaPersonPortraitDataRequest.h">
-      <Filter>Code\AsyncRequests</Filter>
-    </ClInclude>
     <ClInclude Include="Code\FtaOrdinancesPrivilegeRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
@@ -160,6 +157,9 @@
     <ClInclude Include="Code\FtaCanvas.h">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaImageRequest.h">
+      <Filter>Code\AsyncRequests</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -224,9 +224,6 @@
     </ClCompile>
     <ClCompile Include="Code\FtaClearFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
-    </ClCompile>
-    <ClCompile Include="Code\FtaPersonPortraitDataRequest.cpp">
-      <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
     <ClCompile Include="Code\FtaOrdinancesPrivilegeRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
@@ -293,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaKinematicCamera.cpp">
       <Filter>Code\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaImageRequest.cpp">
+      <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

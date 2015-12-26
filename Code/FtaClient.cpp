@@ -224,7 +224,7 @@ bool FtaClient::DeleteAccessToken( void )
 	return success;
 }
 
-/*virtual*/ bool FtaClient::ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue )
+/*virtual*/ bool FtaClient::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )
 {
 	return true;
 }

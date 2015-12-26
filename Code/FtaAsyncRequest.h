@@ -27,7 +27,7 @@ public:
 	class ResponseProcessor
 	{
 	public:
-		virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) = 0;
+		virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) = 0;
 	};
 
 	CURL* GetCurlHandle( void ) { return curlHandleEasy; }

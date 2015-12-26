@@ -26,7 +26,7 @@ public:
 	bool CancelAllAsyncRequests( int signature = -1 );
 	bool AsyncRequestsPending( int signature = -1 );
 
-	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue& responseValue ) override;
+	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
 
 	const wxString& GetAccessToken( void ) { return accessToken; }
 

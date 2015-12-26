@@ -79,9 +79,6 @@ public:
 	bool SetFromLuaTable( lua_State* L, int idx );
 	bool GetToLuaTable( lua_State* L ) const;
 
-	bool SetPortraitTexture( GLuint portraitTexture );
-	GLuint GetPortraitTexture( bool wait = true, int signature = -1 );
-
 private:
 
 	int flags;
@@ -94,16 +91,6 @@ private:
 	wxString lifeSpan;
 	wxString birthPlace;
 	wxString portraitUrl;
-
-	struct Portrait
-	{
-		GLuint texture;
-		c3ga::vectorE3GA center;
-		float width;
-		float height;
-	};
-
-	mutable Portrait portrait;
 };
 
 // FtaPerson.h
