@@ -12,9 +12,7 @@ FtaCamera::FtaCamera( void )
 
 	eye.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 20.f );
 
-	xAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 1.f, 0.f, 0.f );
-	yAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
-	zAxis.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 1.f );
+	orient.set( c3ga::rotorE3GA::coord_scalar_e1e2_e2e3_e3e1, 1.0, 0.0, 0.0, 0.0 );
 }
 
 /*virtual*/ FtaCamera::~FtaCamera( void )
@@ -42,31 +40,17 @@ void FtaCamera::SetupViewMatrices( GLenum renderMode )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 	
-	GLfloat viewMatrix[16];
+	c3ga::vectorE3GA up( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 1.0, 0.0 );
+	c3ga::vectorE3GA forward( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, -1.0 );
 
-	// That that the inverse is of the orignation sub-matrix is its transpose.
+	c3ga::applyUnitVersor( orient, up );
+	c3ga::applyUnitVersor( orient, forward );
 
-	viewMatrix[0] = xAxis.get_e1();
-	viewMatrix[1] = yAxis.get_e1();
-	viewMatrix[2] = zAxis.get_e1();
-	viewMatrix[3] = 0.f;
+	c3ga::vectorE3GA target = eye + forward;
 
-	viewMatrix[4] = xAxis.get_e2();
-	viewMatrix[5] = yAxis.get_e2();
-	viewMatrix[6] = zAxis.get_e2();
-	viewMatrix[7] = 0.f;
-
-	viewMatrix[8] = xAxis.get_e3();
-	viewMatrix[9] = yAxis.get_e3();
-	viewMatrix[10] = zAxis.get_e3();
-	viewMatrix[11] = 0.f;
-
-	viewMatrix[12] = -eye.get_e1();
-	viewMatrix[13] = -eye.get_e2();
-	viewMatrix[14] = -eye.get_e3();
-	viewMatrix[15] = 1.f;
-
-	glMultMatrixf( viewMatrix );
+	gluLookAt( eye.get_e1(), eye.get_e2(), eye.get_e3(),
+				target.get_e1(), target.get_e2(), target.get_e3(),
+				up.get_e1(), up.get_e2(), up.get_e3() );
 }
 
 void FtaCamera::PrepareHitBuffer( void )

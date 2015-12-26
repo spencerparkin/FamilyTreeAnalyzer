@@ -29,7 +29,7 @@ protected:
 	void ProcessHitBuffer( bool freeHitBuffer = true );
 
 	c3ga::vectorE3GA eye;
-	c3ga::vectorE3GA xAxis, yAxis, zAxis;
+	c3ga::rotorE3GA orient;
 
 	GLuint* hitBuffer;
 	GLuint hitBufferSize;

@@ -28,6 +28,9 @@ FtaKinematicCamera::FtaKinematicCamera( void )
 	glClearColor( 1.f, 1.f, 1.f, 1.f );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+	glShadeModel( GL_SMOOTH );
+	glEnable( GL_DEPTH_TEST );
+
 	SetupViewMatrices( renderMode );
 }
 
@@ -113,7 +116,7 @@ void FtaKinematicCamera::OnCharHook( wxKeyEvent& event )
 		}
 	}
 
-	double newtons = 20.0;
+	double newtons = 40.0;
 	c3ga::vectorE3GA force = panDir * newtons;
 	c3ga::vectorE3GA acceleration = force * ( 1.0 / mass );
 
