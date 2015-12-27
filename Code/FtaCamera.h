@@ -21,6 +21,8 @@ public:
 	GLuint* GetHitBuffer( void ) { return hitBuffer; }
 	GLuint GetHitBufferSize( void ) const { return hitBufferSize; }
 
+	// TODO: Every camera should support a routine that positions the camera in a way to view a given bounds.
+
 protected:
 
 	void SetupViewMatrices( GLenum renderMode );

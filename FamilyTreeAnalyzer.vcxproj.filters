@@ -160,6 +160,9 @@
     <ClInclude Include="Code\FtaImageRequest.h">
       <Filter>Code\AsyncRequests</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaFillCacheFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -293,6 +296,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaImageRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaFillCacheFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,8 @@ private:
 	bool GenerateEdges( Agraph_t* G );
 
 	bool GenerateGraphForDrawing( Agraph_t* G );
+
+	void ParseArray( wxArrayString& stringArray, const wxString& string, char delimeter );
 };
 
 // FtaGraphViz.h

@@ -73,10 +73,9 @@ public:
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
 
 	wxString personId;
-	c3ga::vectorE3GA center;
 	GLuint texture;
 	int textureRequestSignature;
-	double width, height;
+	c3ga::vectorE3GA minRect, maxRect;	// TODO: Should probably put this in an FtaBox class.
 };
 
 class FtaGraphEdge : public FtaGraphElement
@@ -87,9 +86,9 @@ public:
 
 	virtual void Draw( GLenum renderMode ) override;
 
-	FtaGraphNode* nodeTail;
-	FtaGraphNode* nodeHead;
-	// TODO: Add spline data.
+	FtaGraphNode* tailNode;
+	FtaGraphNode* headNode;
+	// TODO: Add spline data.  In general, we could use a poly-line that gets smooted out by splineage.
 };
 
 // FtaGraph.h

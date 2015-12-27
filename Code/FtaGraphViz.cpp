@@ -21,6 +21,7 @@ FtaGraphViz::FtaGraphViz( void )
 	Agraph_t* G = nullptr;
 	GVC_t* gvc = nullptr;
 	char* renderBuffer = nullptr;
+	FILE* fp = nullptr;
 
 	do
 	{
@@ -28,7 +29,9 @@ FtaGraphViz::FtaGraphViz( void )
 		if( !G )
 			break;
 
-		agsafeset( G, "rankdir", "LR", "LR" );
+		agsafeset( G, "rankdir", "TB", "LR" );
+		agsafeset( G, "lwidth", "100", "100" );
+		agsafeset( G, "lheight", "100", "100" );
 
 		if( !GenerateNodes(G) )
 			break;
@@ -52,11 +55,17 @@ FtaGraphViz::FtaGraphViz( void )
 		if( !GenerateGraphForDrawing( G ) )
 			break;
 
-#if 0
+#if 1
 		unsigned int renderBufferLength = 0;
-		result = gvRenderData( gvc, G, "plain", &renderBuffer, &renderBufferLength );
+		result = gvRenderData( gvc, G, "dot", &renderBuffer, &renderBufferLength );
 		if( result != 0 )
 			break;
+
+		fp = fopen( "test.dot", "w" );
+		if( !fp )
+			break;
+
+		fwrite( renderBuffer, renderBufferLength, 1, fp );
 #endif
 
 		success = true;
@@ -75,6 +84,9 @@ FtaGraphViz::FtaGraphViz( void )
 	if( renderBuffer )
 		gvFreeRenderData( renderBuffer );
 	
+	if( fp )
+		fclose( fp );
+
 	return success;
 }
 
@@ -185,6 +197,8 @@ bool FtaGraphViz::GenerateEdges( Agraph_t* G )
 
 bool FtaGraphViz::GenerateGraphForDrawing( Agraph_t* G )
 {
+	double scale = 0.1;
+
 	FtaPersonIdSet::iterator iter = personIdSet.begin();
 	while( iter != personIdSet.end() )
 	{
@@ -201,19 +215,19 @@ bool FtaGraphViz::GenerateGraphForDrawing( Agraph_t* G )
 		FtaGraphNode* graphNode = new FtaGraphNode( this );
 		graphNode->personId = personId;
 
-		wxString posString = agget( personNode, "pos" );
-		int comma = posString.find( ',' );
-		wxString xCoordString = posString.SubString( 0, comma );
-		wxString yCoordString = posString.SubString( comma + 1, posString.Length() );
-		xCoordString.ToDouble( &graphNode->center.m_e1 );
-		yCoordString.ToDouble( &graphNode->center.m_e2 );
-		graphNode->center.m_e3 = 0.0;
+		wxString rectString = agget( personNode, "rects" );
 
-		wxString widthString = agget( personNode, "width" );
-		wxString heightString = agget( personNode, "height" );
-
-		widthString.ToDouble( &graphNode->width );
-		heightString.ToDouble( &graphNode->height );
+		wxArrayString stringArray;
+		ParseArray( stringArray, rectString, ',' );
+		wxASSERT( stringArray.Count() == 4 );
+		stringArray[0].ToDouble( &graphNode->minRect.m_e1 );
+		stringArray[1].ToDouble( &graphNode->minRect.m_e2 );
+		stringArray[2].ToDouble( &graphNode->maxRect.m_e1 );
+		stringArray[3].ToDouble( &graphNode->maxRect.m_e2 );
+		
+		// TODO: Why can't I tell GraphViz to scale it down?
+		graphNode->minRect *= scale;
+		graphNode->maxRect *= scale;
 
 		graphElementList.push_back( graphNode );
 
@@ -223,6 +237,31 @@ bool FtaGraphViz::GenerateGraphForDrawing( Agraph_t* G )
 	// TODO: Generate edges for drawing here.
 
 	return true;
+}
+
+void FtaGraphViz::ParseArray( wxArrayString& stringArray, const wxString& string, char delimeter )
+{
+	stringArray.clear();
+
+	int i = 0, j;
+
+	do
+	{
+		wxString subString;
+		j = string.find( delimeter, i );
+		if( j > 0 )
+		{
+			subString = string.SubString( i, j );
+			subString.Truncate( subString.Length() - 1 );
+		}
+		else
+			subString = string.SubString( i, string.Length() );
+
+		stringArray.Add( subString );
+
+		i = j + 1;
+	}
+	while( i > 0 );
 }
 
 // FtaGraphViz.cpp

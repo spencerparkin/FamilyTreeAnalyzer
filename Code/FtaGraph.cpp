@@ -258,10 +258,7 @@ FtaGraphElement::FtaGraphElement( FtaGraph* graph )
 FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 {
 	textureRequestSignature = -1;
-	center.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, 0.0 );
 	texture = GL_INVALID_VALUE;
-	width = 0.0;
-	height = 0.0;
 }
 
 /*virtual*/ FtaGraphNode::~FtaGraphNode( void )
@@ -270,7 +267,8 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 	{
 		// Don't let the pending request list hang on to a stale pointer.
 		FtaClient* client = wxGetApp().GetClient();
-		client->CancelAllAsyncRequests( textureRequestSignature );
+		if( client )
+			client->CancelAllAsyncRequests( textureRequestSignature );
 	}
 }
 
@@ -307,6 +305,19 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 	}
 
 	// TODO: Draw textured quad here.
+
+	// TODO: Use free-type library to render node labels?  Ugh...wonder how hard that will be.
+
+	glBegin( GL_LINE_LOOP );
+
+	glColor3f( 0.f, 0.f, 0.f );
+
+	glVertex3f( minRect.get_e1(), minRect.get_e2(), 0.0 );
+	glVertex3f( maxRect.get_e1(), minRect.get_e2(), 0.0 );
+	glVertex3f( maxRect.get_e1(), maxRect.get_e2(), 0.0 );
+	glVertex3f( minRect.get_e1(), maxRect.get_e2(), 0.0 );
+
+	glEnd();
 }
 
 /*virtual*/ bool FtaGraphNode::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )
@@ -323,6 +334,8 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 
 FtaGraphEdge::FtaGraphEdge( FtaGraph* graph ) : FtaGraphElement( graph )
 {
+	tailNode = nullptr;
+	headNode = nullptr;
 }
 
 /*virtual*/ FtaGraphEdge::~FtaGraphEdge( void )
