@@ -24,6 +24,7 @@
     <ClInclude Include="Code\FtaCurrentUserRequest.h" />
     <ClInclude Include="Code\FtaDumpFunction.h" />
     <ClInclude Include="Code\FtaFillCacheFunction.h" />
+    <ClInclude Include="Code\FtaFontSystem.h" />
     <ClInclude Include="Code\FtaFrame.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonIdsFunction.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
@@ -71,6 +72,7 @@
     <ClCompile Include="Code\FtaContainers.cpp" />
     <ClCompile Include="Code\FtaCurrentUserRequest.cpp" />
     <ClCompile Include="Code\FtaFillCacheFunction.cpp" />
+    <ClCompile Include="Code\FtaFontSystem.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
     <ClCompile Include="Code\FtaGetAllCachedPersonIdsFunction.cpp" />
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
@@ -155,13 +157,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;__WXMSW__;_UNICODE_;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;CURL_STATICLIB;SANDBOX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/;lua-5.3.2/Code/;../Program Files (x86)/Graphviz2.38/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../wxWidgets-3.0.2/include/msvc;../../wxWidgets-3.0.2/include/;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/include;%(AdditionalIncludeDirectories);../../wxJSON/include/;lua-5.3.2/Code/;../Program Files (x86)/Graphviz2.38/include/;../freetype-2.4.7/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../wxWidgets-3.0.2/lib/vc_lib;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/lib;%(AdditionalLibraryDirectories);../../wxJSON/lib/vc_lib;Build/Lua/Debug/;../Program Files (x86)/Graphviz2.38/lib/debug/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>wxmsw30ud_core.lib;wxbase30ud.lib;wxmsw30ud_gl.lib;wxcode_msw30ud_wxjson.lib;libcurl_a_debug.lib;Lua.lib;gvc.lib;cgraph.lib;cdt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../wxWidgets-3.0.2/lib/vc_lib;../../curl-7.45.0/builds/libcurl-vc14-x86-debug-static-ipv6-sspi-winssl/lib;%(AdditionalLibraryDirectories);../../wxJSON/lib/vc_lib;Build/Lua/Debug/;../Program Files (x86)/Graphviz2.38/lib/debug/lib;../freetype-2.4.7/objs/win32/vc2010</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw30ud_core.lib;wxbase30ud.lib;wxmsw30ud_gl.lib;wxcode_msw30ud_wxjson.lib;libcurl_a_debug.lib;Lua.lib;gvc.lib;cgraph.lib;cdt.lib;freetype247_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

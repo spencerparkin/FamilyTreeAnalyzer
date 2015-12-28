@@ -27,6 +27,8 @@ public:
 	FtaTreeCache* GetTreeCache( void ) { return treeCache; }
 	lua_State* GetLuaState( void ) { return L; }
 
+	wxString GetResourceFolder( void );
+
 private:
 
 	FtaClient* client;

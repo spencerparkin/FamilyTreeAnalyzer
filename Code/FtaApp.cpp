@@ -63,4 +63,11 @@ FtaApp::FtaApp( void )
 	return 0;
 }
 
+wxString FtaApp::GetResourceFolder( void )
+{
+	// TODO: Clearly we need a way of finding our resource folder; hard-code it for now.
+	wxString resourceFolder = "C:\\FamilyTreeAnalyzer\\Resources\\";
+	return resourceFolder;
+}
+
 // FtaApp.cpp
