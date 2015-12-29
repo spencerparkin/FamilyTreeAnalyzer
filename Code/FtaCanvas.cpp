@@ -88,9 +88,8 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 	if( viz )
 		viz->Draw( GL_RENDER );
 
-	// TODO: How can I get this color to change the font color?
-	glColor3f( 0.f, 0.f, 0.f );
-	fontSystem->DrawText( 0.f, 0.f, "The quick brown fox jumped over the lazy dog.", "ChanticleerRomanNF.ttf", 0.f, FtaFontSystem::JUSTIFY_LEFT );
+	glColor3f( 1.f, 0.f, 0.f );
+	fontSystem->DrawText( "The quick brown fox jumped over the lazy dog.", "ChanticleerRomanNF.ttf", 0.f, FtaFontSystem::JUSTIFY_LEFT );
 
 	glBegin( GL_LINES );
 

@@ -4,6 +4,7 @@
 #include "FtaApp.h"
 #include FT_MODULE_H
 #include FT_TRUETYPE_IDS_H
+#include <gl/GLU.h>
 
 // TODO: Find and plug mem-leak.
 
@@ -67,11 +68,7 @@ bool FtaFontSystem::Finalize( void )
 	return success;
 }
 
-bool FtaFontSystem::DrawText( GLfloat x, GLfloat y,
-								const wxString& text,
-								const wxString& font,
-								GLfloat wrapLength,
-								Justification justification )
+bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification )
 {
 	bool success = false;
 
@@ -103,7 +100,7 @@ bool FtaFontSystem::DrawText( GLfloat x, GLfloat y,
 		if( !cachedFont )
 			break;
 
-		if( !cachedFont->DrawText( x, y, text, wrapLength, justification ) )
+		if( !cachedFont->DrawText( text, wrapLength, justification ) )
 			break;
 
 		success = true;
@@ -163,7 +160,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		if( error != FT_Err_Ok )
 			break;
 
-		error = FT_Set_Char_Size( face, 0, 16*64, 300, 300 );
+		error = FT_Set_Char_Size( face, 0, 32*64, 300, 300 );
 		if( error != FT_Err_Ok )
 			break;
 
@@ -237,21 +234,21 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
-/*virtual*/ bool FtaFont::DrawText( GLfloat x, GLfloat y,
-									const wxString& text,
-									GLfloat wrapLength,
-									FtaFontSystem::Justification justification )
+/*virtual*/ bool FtaFont::DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification )
 {
 	bool success = false;
 
 	do
 	{
-		// TODO: We actually need to push/pop our own projection/modelview matrices here.
-		//       Even if we track pixels per unit, the camera may not by viewing the XY-plane.
-
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+		glEnable( GL_TEXTURE_2D );
+		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND );
+
+		GLfloat color[4];
+		glGetFloatv( GL_CURRENT_COLOR, color );
+		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
 		const wchar_t* charCode = text.wc_str();
 
@@ -276,6 +273,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	while( false );
 
 	glDisable( GL_BLEND );
+	glDisable( GL_TEXTURE_2D );
 
 	return success;
 }
@@ -299,6 +297,8 @@ bool FtaFont::EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, G
 		glyphRender.glyph = glyph;
 		glyphRender.x = x;
 		glyphRender.y = y;
+		glyphRender.w = 1.f;
+		glyphRender.h = 1.f;
 
 		lineOfText.push_back( glyphRender );
 
@@ -320,8 +320,22 @@ bool FtaFont::RenderLineOfText( const LineOfText& lineOfText )
 	while( iter != lineOfText.end() )
 	{
 		const GlyphRender& glyphRender = *iter;
-		glRasterPos2f( glyphRender.x, glyphRender.y );
-		glCallList( glyphRender.glyph->GetDisplayList() );
+		
+		GLuint texture = glyphRender.glyph->GetTexture();
+		if( texture != 0 )
+		{
+			glBindTexture( GL_TEXTURE_2D, texture );
+
+			glBegin( GL_QUADS );
+
+			glTexCoord2f( 0.f, 0.f );	glVertex2f( glyphRender.x, glyphRender.y );
+			glTexCoord2f( 1.f, 0.f );	glVertex2f( glyphRender.x + glyphRender.w, glyphRender.y );
+			glTexCoord2f( 1.f, 1.f );	glVertex2f( glyphRender.x + glyphRender.w, glyphRender.y + glyphRender.h );
+			glTexCoord2f( 0.f, 1.f );	glVertex2f( glyphRender.x, glyphRender.y + glyphRender.h );
+
+			glEnd();
+		}
+
 		iter++;
 	}
 
@@ -330,7 +344,11 @@ bool FtaFont::RenderLineOfText( const LineOfText& lineOfText )
 
 FtaGlyph::FtaGlyph( void )
 {
-	displayList = 0;
+	texture = 0;
+	width = 0;
+	height = 0;
+	left = 0;
+	top = 0;
 }
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )
@@ -341,14 +359,10 @@ FtaGlyph::FtaGlyph( void )
 bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 {
 	bool success = false;
-	GLubyte* imageBuffer = nullptr;
+	GLubyte* textureBuffer = nullptr;
 
 	do
 	{
-		displayList = glGenLists(1);
-		if( displayList == 0 )
-			break;
-
 		FT_Bitmap& bitmap = glyphSlot->bitmap;
 		if( bitmap.pixel_mode != FT_PIXEL_MODE_GRAY )
 			break;
@@ -356,37 +370,81 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 		if( bitmap.pitch != bitmap.width )
 			break;
 
-		GLubyte* imageBuffer = new GLubyte[ bitmap.width * bitmap.rows ];
-		if( !imageBuffer )
-			break;
+		left = glyphSlot->bitmap_left;
+		top = glyphSlot->bitmap_top;
+		width = bitmap.width;
+		height = bitmap.rows;
 
+		// Some glyphs are just spaces.
 		GLubyte* bitmapBuffer = ( GLubyte* )bitmap.buffer;
+		if( bitmapBuffer != nullptr )
+		{
+			GLuint textureWidth = 128;
+			GLuint textureHeight = 128;
+			GLuint bytesPerTexel = 4;
+			textureBuffer = new GLubyte[ textureWidth * textureHeight * bytesPerTexel ];
 
-		// Flip the image for OpenGL.
-		for( int i = 0; i < bitmap.rows; i++ )
-			for( int j = 0; j < bitmap.width; j++ )
-				imageBuffer[ i * bitmap.width + j ] = bitmapBuffer[ ( bitmap.rows - 1 - i ) * bitmap.width + j ];
+			// Flip the image and make it of appropriate dimensions for OpenGL.
+			for( GLuint i = 0; i < textureHeight; i++ )
+			{
+				GLfloat u = 1.f - GLfloat(i) / GLfloat( textureHeight - 1 );
+				GLuint bitmap_i = GLuint( u * GLfloat( height ) );
+				if( bitmap_i >= height )
+					bitmap_i = height - 1;
 
-		glNewList( displayList, GL_COMPILE );
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		glDrawPixels( bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, imageBuffer );
-		glEndList();
+				for( GLuint j = 0; j < textureWidth; j++ )
+				{
+					GLfloat v = GLfloat(j) / GLfloat( textureWidth - 1 );
+					GLuint bitmap_j = GLuint( v * GLfloat( width ) );
+					if( bitmap_j >= width )
+						bitmap_j = width - 1;
+				
+					GLubyte grey = bitmapBuffer[ bitmap_i * width + bitmap_j ];
 
-		// TODO: Save off advancement information, etc...
+					GLubyte* texel = &textureBuffer[ ( i * textureWidth + j ) * bytesPerTexel ];
+
+					for( GLuint k = 0; k < bytesPerTexel; k++ )
+						texel[k] = grey;
+				}
+			}
+
+			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+			glGenTextures( 1, &texture );
+			if( texture == 0 )
+				break;
+
+			glBindTexture( GL_TEXTURE_2D, texture );
+
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+
+			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer );
+
+			GLenum error = glGetError();
+			if( error != GL_NO_ERROR )
+			{
+				const GLubyte* errorStr = gluErrorString( error );
+				errorStr = nullptr;
+				break;
+			}
+		}
 
 		success = true;
 	}
 	while( false );
 
-	delete[] imageBuffer;
+	delete[] textureBuffer;
 
 	return success;
 }
 
 bool FtaGlyph::Finalize( void )
 {
-	if( displayList != 0 )
-		glDeleteLists( displayList, 1 );
+	if( texture != 0 )
+		glDeleteTextures( 1, &texture );
 
 	return true;
 }

@@ -6,6 +6,7 @@
 #include <wx/glcanvas.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include "c3ga/c3ga.h"
 
 class FtaFont;
 class FtaGlyph;
@@ -35,7 +36,7 @@ public:
 
 	// When called, we assume that an OpenGL context is already bound.  Only one font
 	// system should be used per context since the system caches display lists.
-	bool DrawText( GLfloat x, GLfloat y, const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification );
+	bool DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification );
 
 	FT_Library& GetLibrary( void ) { return library; }
 
@@ -60,13 +61,14 @@ public:
 	virtual bool Initialize( const wxString& font );
 	virtual bool Finalize( void );
 
-	virtual bool DrawText( GLfloat x, GLfloat y, const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification );
+	virtual bool DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification );
 
 private:
 
 	struct GlyphRender
 	{
 		GLfloat x, y;
+		GLfloat w, h;
 		FtaGlyph* glyph;
 	};
 
@@ -90,11 +92,14 @@ public:
 	bool Initialize( FT_GlyphSlot& glyphSlot );
 	bool Finalize( void );
 
-	GLuint GetDisplayList( void ) { return displayList; }
+	GLuint GetTexture( void ) { return texture; }
 
 private:
 
-	GLuint displayList;
+	GLuint texture;
+	GLuint width, height;
+	GLuint left, top;
+
 	//...also own info about character width and moving to the next character, etc...
 };
 
