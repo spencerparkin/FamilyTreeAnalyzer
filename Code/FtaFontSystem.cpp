@@ -11,6 +11,10 @@
 FtaFontSystem::FtaFontSystem( void )
 {
 	initialized = false;
+	font = "ChanticleerRomanNF.ttf";
+	lineWidth = 0.f;
+	lineHeight = 1.f;
+	justification = JUSTIFY_LEFT;
 }
 
 /*virtual*/ FtaFontSystem::~FtaFontSystem( void )
@@ -68,13 +72,16 @@ bool FtaFontSystem::Finalize( void )
 	return success;
 }
 
-bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification )
+bool FtaFontSystem::DrawText( const wxString& text )
 {
 	bool success = false;
 
 	do
 	{
 		if( !initialized )
+			break;
+
+		if( font.IsEmpty() )
 			break;
 
 		wxString key = MakeFontKey( font );
@@ -100,7 +107,7 @@ bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloa
 		if( !cachedFont )
 			break;
 
-		if( !cachedFont->DrawText( text, wrapLength, justification ) )
+		if( !cachedFont->DrawText( text ) )
 			break;
 
 		success = true;
@@ -121,6 +128,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 {
 	initialized = false;
 	this->fontSystem = fontSystem;
+	faceHeight = 0;
 }
 
 /*virtual*/ FtaFont::~FtaFont( void )
@@ -198,6 +206,8 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		if( charCodeString[i] != '\0' )
 			break;
 
+		faceHeight = face->height;
+
 		initialized = true;
 
 		success = true;
@@ -234,7 +244,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
-/*virtual*/ bool FtaFont::DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification )
+/*virtual*/ bool FtaFont::DrawText( const wxString& text )
 {
 	bool success = false;
 
@@ -253,11 +263,11 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		const wchar_t* charCode = text.wc_str();
 
 		LineOfText lineOfText;
-		GLfloat baseLine = 0.f;
+		GLfloat baseLine = -fontSystem->GetLineHeight();
 		
 		do
 		{
-			if( !EatLineOfText( lineOfText, charCode, baseLine, wrapLength, justification ) )
+			if( !FormatLineOfText( lineOfText, charCode, baseLine ) )
 				break;
 
 			if( !RenderLineOfText( lineOfText ) )
@@ -278,12 +288,15 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
-bool FtaFont::EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine, GLfloat wrapLength, FtaFontSystem::Justification justification )
+bool FtaFont::FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine )
 {
 	lineOfText.clear();
 
-	GLfloat x = 0.f;
-	GLfloat y = baseLine;
+	GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( faceHeight );
+
+	GLuint spaceCount = 0;
+	GLfloat totalSpaceAdvance = 0.f;
+	GLfloat totalAdvance = 0.f;
 
 	while( *charCode != '\0' )
 	{
@@ -295,22 +308,65 @@ bool FtaFont::EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, G
 
 		GlyphRender glyphRender;
 		glyphRender.glyph = glyph;
-		glyphRender.x = x;
-		glyphRender.y = y;
-		glyphRender.w = 1.f;
-		glyphRender.h = 1.f;
+
+		GLfloat advance = GLfloat( glyph->GetMetrics().horiAdvance ) * conversionFactor;
+		//if( totalAdvance + advance > fontSystem->GetLineWidth() )
+		//	break;
+
+		totalAdvance += advance;
+
+		if( *charCode == ' ' )
+		{
+			spaceCount++;
+			totalSpaceAdvance += advance;
+		}
 
 		lineOfText.push_back( glyphRender );
-
-		x += 2.f;		// Total hack for now.
-
-		// TODO: Know when we need to stop eating due to wrap length.
 
 		charCode++;
 	}
 
-	// TODO: Make another pass, this type formatting by given justification.
+	// This offset is used for centering and right-justification by
+	// simply adding to it to the left-justification calculations.
+	GLfloat justifyOffset = 0.f;
 
+	switch( fontSystem->GetJustification() )
+	{
+		// If this case we left-justify, but alter the advance of all spaces.
+		// Note that if the altered advance is too big, we'll probably just want to left-justify.
+		case FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT:
+		{
+			break;
+		}
+		case FtaFontSystem::JUSTIFY_RIGHT:
+		{
+			break;
+		}
+		case FtaFontSystem::JUSTIFY_CENTER:
+		{
+			break;
+		}
+	}
+
+	GLfloat xPen = 0.f;
+	GLfloat yPen = baseLine;
+
+	LineOfText::iterator iter = lineOfText.begin();
+	while( iter != lineOfText.end() )
+	{
+		GlyphRender& glyphRender = *iter;
+
+		glyphRender.x = xPen;
+		glyphRender.y = yPen;
+		glyphRender.w = 1.f;
+		glyphRender.h = 1.f;
+
+		xPen += 2.f;
+
+		iter++;
+	}
+
+	baseLine -= fontSystem->GetLineHeight();
 	return true;
 }
 
@@ -345,10 +401,7 @@ bool FtaFont::RenderLineOfText( const LineOfText& lineOfText )
 FtaGlyph::FtaGlyph( void )
 {
 	texture = 0;
-	width = 0;
-	height = 0;
-	left = 0;
-	top = 0;
+	alteredAdvance = 0.f;
 }
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )
@@ -370,15 +423,17 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 		if( bitmap.pitch != bitmap.width )
 			break;
 
-		left = glyphSlot->bitmap_left;
-		top = glyphSlot->bitmap_top;
-		width = bitmap.width;
-		height = bitmap.rows;
+		metrics = glyphSlot->metrics;
 
-		// Some glyphs are just spaces.
+		GLuint width = bitmap.width;
+		GLuint height = bitmap.rows;
+
+		// Note that the formatting code will depend on the texture map fitting the glyph as tightly as possible.
+		// Some glyphs are just spaces, in which cases, there will be no buffer.
 		GLubyte* bitmapBuffer = ( GLubyte* )bitmap.buffer;
 		if( bitmapBuffer != nullptr )
 		{
+			// TODO: We could probably save on memory by using smaller resolution here and maybe smaller size.
 			GLuint textureWidth = 128;
 			GLuint textureHeight = 128;
 			GLuint bytesPerTexel = 4;
@@ -400,9 +455,7 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 						bitmap_j = width - 1;
 				
 					GLubyte grey = bitmapBuffer[ bitmap_i * width + bitmap_j ];
-
 					GLubyte* texel = &textureBuffer[ ( i * textureWidth + j ) * bytesPerTexel ];
-
 					for( GLuint k = 0; k < bytesPerTexel; k++ )
 						texel[k] = grey;
 				}

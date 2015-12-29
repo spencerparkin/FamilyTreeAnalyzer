@@ -89,7 +89,7 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 		viz->Draw( GL_RENDER );
 
 	glColor3f( 1.f, 0.f, 0.f );
-	fontSystem->DrawText( "The quick brown fox jumped over the lazy dog.", "ChanticleerRomanNF.ttf", 0.f, FtaFontSystem::JUSTIFY_LEFT );
+	fontSystem->DrawText( "The quick brown fox jumped over the lazy dog." );
 
 	glBegin( GL_LINES );
 

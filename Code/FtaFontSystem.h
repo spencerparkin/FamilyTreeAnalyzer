@@ -34,9 +34,23 @@ public:
 		JUSTIFY_LEFT_AND_RIGHT,
 	};
 
+	void SetJustification( Justification justification ) { this->justification = justification; }
+	Justification GetJustification( void ) { return justification; }
+
+	void SetLineWidth( GLfloat lineWidth ) { this->lineWidth = lineWidth; }
+	GLfloat GetLineWidth( void ) { return lineWidth; }
+
+	void SetLineHeight( GLfloat lineheight ) { this->lineHeight = lineHeight; }
+	GLfloat GetLineHeight( void ) { return lineHeight; }
+
+	void SetFont( const wxString& font ) { this->font = font; }
+	const wxString& GetFont( void ) { return font; }
+
 	// When called, we assume that an OpenGL context is already bound.  Only one font
-	// system should be used per context since the system caches display lists.
-	bool DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification );
+	// system should be used per context since the system caches texture objects.
+	// To position and orient text, the caller must setup the appropriate modelview matrix.
+	// The object-space of the text is the 4th quadrant of the XY-plane.
+	bool DrawText( const wxString& text );
 
 	FT_Library& GetLibrary( void ) { return library; }
 
@@ -44,6 +58,9 @@ private:
 
 	wxString MakeFontKey( const wxString& font );
 
+	wxString font;
+	GLfloat lineWidth, lineHeight;
+	Justification justification;
 	bool initialized;
 	FT_Library library;
 	FtaFontMap fontMap;
@@ -61,7 +78,7 @@ public:
 	virtual bool Initialize( const wxString& font );
 	virtual bool Finalize( void );
 
-	virtual bool DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification );
+	virtual bool DrawText( const wxString& text );
 
 private:
 
@@ -74,12 +91,13 @@ private:
 
 	typedef wxVector< GlyphRender > LineOfText;
 
-	bool EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine, GLfloat wrapLength, FtaFontSystem::Justification justification );
+	bool FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine );
 	bool RenderLineOfText( const LineOfText& lineOfText );
 
 	bool initialized;
 	FtaFontSystem* fontSystem;
 	FtaGlyphMap glyphMap;
+	GLuint faceHeight;
 };
 
 class FtaGlyph
@@ -93,14 +111,14 @@ public:
 	bool Finalize( void );
 
 	GLuint GetTexture( void ) { return texture; }
+	const FT_Glyph_Metrics& GetMetrics( void ) { return metrics; }
+
+	mutable GLfloat alteredAdvance;
 
 private:
 
 	GLuint texture;
-	GLuint width, height;
-	GLuint left, top;
-
-	//...also own info about character width and moving to the next character, etc...
+	FT_Glyph_Metrics metrics;
 };
 
 // FtaFontSystem.h
