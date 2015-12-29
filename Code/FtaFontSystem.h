@@ -33,12 +33,9 @@ public:
 		JUSTIFY_LEFT_AND_RIGHT,
 	};
 
-	// Text is always drawn in the 4th-quadrant of the XY-plane.
-	// It is up to the caller to setup the appropriate transformation matrices to
-	// get the text drawn where they would like it, and in what orientation.
 	// When called, we assume that an OpenGL context is already bound.  Only one font
 	// system should be used per context since the system caches display lists.
-	bool DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification );
+	bool DrawText( GLfloat x, GLfloat y, const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification );
 
 	FT_Library& GetLibrary( void ) { return library; }
 
@@ -63,7 +60,7 @@ public:
 	virtual bool Initialize( const wxString& font );
 	virtual bool Finalize( void );
 
-	virtual bool DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification );
+	virtual bool DrawText( GLfloat x, GLfloat y, const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification );
 
 private:
 

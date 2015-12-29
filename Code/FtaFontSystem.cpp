@@ -5,6 +5,8 @@
 #include FT_MODULE_H
 #include FT_TRUETYPE_IDS_H
 
+// TODO: Find and plug mem-leak.
+
 FtaFontSystem::FtaFontSystem( void )
 {
 	initialized = false;
@@ -65,7 +67,11 @@ bool FtaFontSystem::Finalize( void )
 	return success;
 }
 
-bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloat wrapLength, Justification justification )
+bool FtaFontSystem::DrawText( GLfloat x, GLfloat y,
+								const wxString& text,
+								const wxString& font,
+								GLfloat wrapLength,
+								Justification justification )
 {
 	bool success = false;
 
@@ -79,7 +85,9 @@ bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloa
 		FtaFont* cachedFont = nullptr;
 
 		FtaFontMap::iterator iter = fontMap.find( key );
-		if( iter == fontMap.end() )
+		if( iter != fontMap.end() )
+			cachedFont = iter->second;
+		else
 		{
 			cachedFont = new FtaFont( this );
 
@@ -95,7 +103,7 @@ bool FtaFontSystem::DrawText( const wxString& text, const wxString& font, GLfloa
 		if( !cachedFont )
 			break;
 
-		if( !cachedFont->DrawText( text, wrapLength, justification ) )
+		if( !cachedFont->DrawText( x, y, text, wrapLength, justification ) )
 			break;
 
 		success = true;
@@ -229,12 +237,22 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
-/*virtual*/ bool FtaFont::DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification )
+/*virtual*/ bool FtaFont::DrawText( GLfloat x, GLfloat y,
+									const wxString& text,
+									GLfloat wrapLength,
+									FtaFontSystem::Justification justification )
 {
 	bool success = false;
 
 	do
 	{
+		// TODO: We actually need to push/pop our own projection/modelview matrices here.
+		//       Even if we track pixels per unit, the camera may not by viewing the XY-plane.
+
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
 		const wchar_t* charCode = text.wc_str();
 
 		LineOfText lineOfText;
@@ -256,6 +274,8 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		success = true;
 	}
 	while( false );
+
+	glDisable( GL_BLEND );
 
 	return success;
 }
@@ -282,7 +302,7 @@ bool FtaFont::EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, G
 
 		lineOfText.push_back( glyphRender );
 
-		x += 10.f;		// Total hack for now.
+		x += 2.f;		// Total hack for now.
 
 		// TODO: Know when we need to stop eating due to wrap length.
 
@@ -321,6 +341,7 @@ FtaGlyph::FtaGlyph( void )
 bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 {
 	bool success = false;
+	GLubyte* imageBuffer = nullptr;
 
 	do
 	{
@@ -332,9 +353,23 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 		if( bitmap.pixel_mode != FT_PIXEL_MODE_GRAY )
 			break;
 
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		if( bitmap.pitch != bitmap.width )
+			break;
+
+		GLubyte* imageBuffer = new GLubyte[ bitmap.width * bitmap.rows ];
+		if( !imageBuffer )
+			break;
+
+		GLubyte* bitmapBuffer = ( GLubyte* )bitmap.buffer;
+
+		// Flip the image for OpenGL.
+		for( int i = 0; i < bitmap.rows; i++ )
+			for( int j = 0; j < bitmap.width; j++ )
+				imageBuffer[ i * bitmap.width + j ] = bitmapBuffer[ ( bitmap.rows - 1 - i ) * bitmap.width + j ];
+
 		glNewList( displayList, GL_COMPILE );
-		glDrawPixels( bitmap.pitch, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		glDrawPixels( bitmap.width, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, imageBuffer );
 		glEndList();
 
 		// TODO: Save off advancement information, etc...
@@ -343,12 +378,15 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 	}
 	while( false );
 
+	delete[] imageBuffer;
+
 	return success;
 }
 
 bool FtaGlyph::Finalize( void )
 {
-	// TODO: I suppose here we could delete the display list, but will the context be current and valid?
+	if( displayList != 0 )
+		glDeleteLists( displayList, 1 );
 
 	return true;
 }
