@@ -244,6 +244,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
+// TODO: Add cached display-list optimization for static text.
 /*virtual*/ bool FtaFont::DrawText( const wxString& text )
 {
 	bool success = false;
@@ -261,6 +262,8 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
 		const wchar_t* charCode = text.wc_str();
+
+		// TODO: This needs to be completely rewritten.  Use delta-chain idea.
 
 		LineOfText lineOfText;
 		GLfloat baseLine = -fontSystem->GetLineHeight();
