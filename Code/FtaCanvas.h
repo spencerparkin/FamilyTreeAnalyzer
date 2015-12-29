@@ -5,6 +5,7 @@
 #include <wx/glcanvas.h>
 #include "FtaVisualization.h"
 #include "FtaCamera.h"
+#include "FtaFontSystem.h"
 
 class FtaCanvas : public wxGLCanvas
 {
@@ -39,6 +40,7 @@ private:
 
 	wxGLContext* context;
 	static int attributeList[];
+	FtaFontSystem* fontSystem;
 	FtaVisualization* viz;
 	FtaCamera* camera;
 	double lastFrameTimeSeconds;

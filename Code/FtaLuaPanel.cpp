@@ -135,6 +135,9 @@ void FtaLuaPanel::OnCharHook( wxKeyEvent& event )
 		return;
 	}
 
+	if( historyLocation == -1 )
+		return;
+
 	// TODO: I need to fix this, but my mind is mush right now.
 	switch( event.GetKeyCode() )
 	{

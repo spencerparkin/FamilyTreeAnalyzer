@@ -12,10 +12,7 @@ FtaFontSystem::FtaFontSystem( void )
 
 /*virtual*/ FtaFontSystem::~FtaFontSystem( void )
 {
-	if( initialized )
-		Finalize();
-
-	WipeFontCache();
+	Finalize();
 }
 
 bool FtaFontSystem::Initialize( void )
@@ -46,8 +43,14 @@ bool FtaFontSystem::Finalize( void )
 	
 	do
 	{
-		if( !initialized )
-			break;
+		while( fontMap.size() > 0 )
+		{
+			FtaFontMap::iterator iter = fontMap.begin();
+			FtaFont* font = iter->second;
+			font->Finalize();
+			delete font;
+			fontMap.erase( iter );
+		}
 
 		FT_Error error = FT_Done_Library( library );
 		if( error != FT_Err_Ok )
@@ -109,18 +112,6 @@ wxString FtaFontSystem::MakeFontKey( const wxString& font )
 	return key;
 }
 
-void FtaFontSystem::WipeFontCache( void )
-{
-	while( fontMap.size() > 0 )
-	{
-		FtaFontMap::iterator iter = fontMap.begin();
-		FtaFont* font = iter->second;
-		font->Finalize();
-		delete font;
-		fontMap.erase( iter );
-	}
-}
-
 FtaFont::FtaFont( FtaFontSystem* fontSystem )
 {
 	initialized = false;
@@ -149,28 +140,35 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		if( error != FT_Err_Ok )
 			break;
 
-		if( face->num_charmaps == 0 )
-			break;
-
-		// TODO: How do we know we have the right charmap for our purposes?
-		if( face->charmap == nullptr )
+		int i, j = -1;
+		for( i = 0; i < face->num_charmaps && j == -1; i++ )
 		{
-			error = FT_Set_Charmap( face, face->charmaps[0] );
-			if( error != FT_Err_Ok )
-				break;
+			FT_CharMapRec* charmapRec = face->charmaps[i];
+			if( charmapRec->encoding == FT_ENCODING_UNICODE )
+				j = i;
 		}
 
-		// TODO: We only care about basic characters in ASCII, so we may need to do our own Unicode to ASCII conversion.
-		FT_ULong charcode;
-		FT_ULong maxCharcode = sizeof( char ) * 8;
-		for( charcode = 0; charcode < maxCharcode; charcode++ )
+		if( j == -1 )
+			break;
+
+		error = FT_Set_Charmap( face, face->charmaps[j] );
+		if( error != FT_Err_Ok )
+			break;
+
+		error = FT_Set_Char_Size( face, 0, 16*64, 300, 300 );
+		if( error != FT_Err_Ok )
+			break;
+
+		const wchar_t* charCodeString = L"abcdefghijklmnopqrstuvwxyz"
+										"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+										"`~!@#$%^&*()_+-={}[],.<>/?'\";: ";
+
+		for( i = 0; charCodeString[i] != '\0'; i++ )
 		{
-			FT_UInt glyph_index = FT_Get_Char_Index( face, charcode );
+			FT_ULong charCode = charCodeString[i];
+			FT_UInt glyph_index = FT_Get_Char_Index( face, charCode );
 			if( glyph_index == 0 )
-			{
-				glyphArray.push_back( nullptr );
 				continue;
-			}
 
 			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_DEFAULT );
 			if( error != FT_Err_Ok )
@@ -186,13 +184,13 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			}
 
 			FtaGlyph* cachedGlyph = new FtaGlyph();
-			glyphArray.push_back( cachedGlyph );
+			glyphMap[ charCode ] = cachedGlyph;
 
 			if( !cachedGlyph->Initialize( glyph ) )
 				break;
 		}
 
-		if( charcode != maxCharcode )
+		if( charCodeString[i] != '\0' )
 			break;
 
 		initialized = true;
@@ -202,9 +200,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	while( false );
 
 	if( face )
-	{
-		//...release face?...
-	}
+		FT_Done_Face( face );
 
 	return success;
 }
@@ -215,16 +211,14 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 
 	do
 	{
-		if( !initialized )
-			break;
-	
-		for( int i = 0; i < ( signed )glyphArray.size(); i++ )
+		while( glyphMap.size() > 0 )
 		{
-			FtaGlyph* glyph = glyphArray[i];
+			FtaGlyphMap::iterator iter = glyphMap.begin();
+			FtaGlyph* glyph = iter->second;
+			glyph->Finalize();
 			delete glyph;
+			glyphMap.erase( iter );
 		}
-
-		glyphArray.Clear();
 
 		initialized = false;
 
@@ -237,6 +231,80 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 
 /*virtual*/ bool FtaFont::DrawText( const wxString& text, GLfloat wrapLength, FtaFontSystem::Justification justification )
 {
+	bool success = false;
+
+	do
+	{
+		const wchar_t* charCode = text.wc_str();
+
+		LineOfText lineOfText;
+		GLfloat baseLine = 0.f;
+		
+		do
+		{
+			if( !EatLineOfText( lineOfText, charCode, baseLine, wrapLength, justification ) )
+				break;
+
+			if( !RenderLineOfText( lineOfText ) )
+				break;
+		}
+		while( *charCode != '\0' );
+
+		if( *charCode != '\0' )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	return success;
+}
+
+bool FtaFont::EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine, GLfloat wrapLength, FtaFontSystem::Justification justification )
+{
+	lineOfText.clear();
+
+	GLfloat x = 0.f;
+	GLfloat y = baseLine;
+
+	while( *charCode != '\0' )
+	{
+		FtaGlyphMap::iterator iter = glyphMap.find( FT_ULong( *charCode ) );
+		if( iter == glyphMap.end() )
+			return false;
+
+		FtaGlyph* glyph = iter->second;
+
+		GlyphRender glyphRender;
+		glyphRender.glyph = glyph;
+		glyphRender.x = x;
+		glyphRender.y = y;
+
+		lineOfText.push_back( glyphRender );
+
+		x += 10.f;		// Total hack for now.
+
+		// TODO: Know when we need to stop eating due to wrap length.
+
+		charCode++;
+	}
+
+	// TODO: Make another pass, this type formatting by given justification.
+
+	return true;
+}
+
+bool FtaFont::RenderLineOfText( const LineOfText& lineOfText )
+{
+	LineOfText::const_iterator iter = lineOfText.begin();
+	while( iter != lineOfText.end() )
+	{
+		const GlyphRender& glyphRender = *iter;
+		glRasterPos2f( glyphRender.x, glyphRender.y );
+		glCallList( glyphRender.glyph->GetDisplayList() );
+		iter++;
+	}
+
 	return true;
 }
 
@@ -247,6 +315,7 @@ FtaGlyph::FtaGlyph( void )
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )
 {
+	Finalize();
 }
 
 bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
@@ -259,13 +328,16 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 		if( displayList == 0 )
 			break;
 
-		//glyphSlot->format
+		FT_Bitmap& bitmap = glyphSlot->bitmap;
+		if( bitmap.pixel_mode != FT_PIXEL_MODE_GRAY )
+			break;
 
-		//...
-
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glNewList( displayList, GL_COMPILE );
-
+		glDrawPixels( bitmap.pitch, bitmap.rows, GL_ALPHA, GL_UNSIGNED_BYTE, bitmap.buffer );
 		glEndList();
+
+		// TODO: Save off advancement information, etc...
 
 		success = true;
 	}

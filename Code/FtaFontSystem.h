@@ -11,7 +11,7 @@ class FtaFont;
 class FtaGlyph;
 
 WX_DECLARE_STRING_HASH_MAP( FtaFont*, FtaFontMap );
-WX_DEFINE_ARRAY( FtaGlyph*, FtaGlyphArray );
+WX_DECLARE_HASH_MAP( FT_ULong, FtaGlyph*, wxIntegerHash, wxIntegerEqual, FtaGlyphMap );
 
 // An instance of this class is a layer of software that sits between
 // our application and the free-type library.
@@ -46,8 +46,6 @@ private:
 
 	wxString MakeFontKey( const wxString& font );
 
-	void WipeFontCache( void );
-
 	bool initialized;
 	FT_Library library;
 	FtaFontMap fontMap;
@@ -69,9 +67,20 @@ public:
 
 private:
 
+	struct GlyphRender
+	{
+		GLfloat x, y;
+		FtaGlyph* glyph;
+	};
+
+	typedef wxVector< GlyphRender > LineOfText;
+
+	bool EatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine, GLfloat wrapLength, FtaFontSystem::Justification justification );
+	bool RenderLineOfText( const LineOfText& lineOfText );
+
 	bool initialized;
 	FtaFontSystem* fontSystem;
-	FtaGlyphArray glyphArray;
+	FtaGlyphMap glyphMap;
 };
 
 class FtaGlyph
@@ -83,6 +92,8 @@ public:
 
 	bool Initialize( FT_GlyphSlot& glyphSlot );
 	bool Finalize( void );
+
+	GLuint GetDisplayList( void ) { return displayList; }
 
 private:
 

@@ -13,6 +13,10 @@ FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attribu
 	lastFrameTimeSeconds = 0.0;
 	framesPerSecond = 0.0;
 
+	fontSystem = new FtaFontSystem();
+	bool initialized = fontSystem->Initialize();
+	wxASSERT( initialized );
+
 	context = nullptr;
 	viz = nullptr;
 	camera = nullptr;
@@ -25,6 +29,10 @@ FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attribu
 
 /*virtual*/ FtaCanvas::~FtaCanvas( void )
 {
+	fontSystem->Finalize();
+
+	// Must delete this before our context.
+	delete fontSystem;
 	delete context;
 
 	SetVisualization( nullptr );
@@ -79,6 +87,9 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 
 	if( viz )
 		viz->Draw( GL_RENDER );
+
+	glColor3f( 0.f, 0.f, 0.f );
+	fontSystem->DrawText( "The quick brown fox jumped over the lazy dog.", "ChanticleerRomanNF.ttf", 0.f, FtaFontSystem::JUSTIFY_LEFT );
 
 	glBegin( GL_LINES );
 
