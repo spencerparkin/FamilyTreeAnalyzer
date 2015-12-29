@@ -183,7 +183,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			if( glyph_index == 0 )
 				continue;
 
-			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_DEFAULT );
+			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_NO_SCALE );
 			if( error != FT_Err_Ok )
 				break;
 
@@ -288,6 +288,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
+// My first presentable pass at these calculations won't be perfect, but it may be good enough.
 bool FtaFont::FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine )
 {
 	lineOfText.clear();
@@ -310,7 +311,7 @@ bool FtaFont::FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode
 		glyphRender.glyph = glyph;
 
 		GLfloat advance = GLfloat( glyph->GetMetrics().horiAdvance ) * conversionFactor;
-		//if( totalAdvance + advance > fontSystem->GetLineWidth() )
+		//if( fontSystem->GetLineWidth() != 0.f && totalAdvance + advance > fontSystem->GetLineWidth() )
 		//	break;
 
 		totalAdvance += advance;
@@ -330,21 +331,24 @@ bool FtaFont::FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode
 	// simply adding to it to the left-justification calculations.
 	GLfloat justifyOffset = 0.f;
 
-	switch( fontSystem->GetJustification() )
+	if( fontSystem->GetLineWidth() != 0.f )
 	{
-		// If this case we left-justify, but alter the advance of all spaces.
-		// Note that if the altered advance is too big, we'll probably just want to left-justify.
-		case FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT:
+		switch( fontSystem->GetJustification() )
 		{
-			break;
-		}
-		case FtaFontSystem::JUSTIFY_RIGHT:
-		{
-			break;
-		}
-		case FtaFontSystem::JUSTIFY_CENTER:
-		{
-			break;
+			// If this case we left-justify, but alter the advance of all spaces.
+			// Note that if the altered advance is too big, we'll probably just want to left-justify.
+			case FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT:
+			{
+				break;
+			}
+			case FtaFontSystem::JUSTIFY_RIGHT:
+			{
+				break;
+			}
+			case FtaFontSystem::JUSTIFY_CENTER:
+			{
+				break;
+			}
 		}
 	}
 
