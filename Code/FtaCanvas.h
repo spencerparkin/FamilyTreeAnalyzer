@@ -37,6 +37,7 @@ private:
 	void SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlugin );
 
 	void BindContext( void );
+	void RenderHUD( void );
 
 	wxGLContext* context;
 	static int attributeList[];

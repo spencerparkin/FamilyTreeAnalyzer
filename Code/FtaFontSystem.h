@@ -42,7 +42,7 @@ public:
 	void SetLineWidth( GLfloat lineWidth ) { this->lineWidth = lineWidth; }
 	GLfloat GetLineWidth( void ) { return lineWidth; }
 
-	void SetLineHeight( GLfloat lineheight ) { this->lineHeight = lineHeight; }
+	void SetLineHeight( GLfloat lineHeight ) { this->lineHeight = lineHeight; }
 	GLfloat GetLineHeight( void ) { return lineHeight; }
 
 	bool SetBaseLineDelta( GLfloat baseLineDelta );
@@ -59,6 +59,9 @@ public:
 	// us to use and cache a display list for rendering.  If the flag is falsely set for dynamic text,
 	// OpenGL may run out of display list memory and/or otherwise bog down!
 	bool DrawText( const wxString& text, bool staticText = false );
+
+	// This is provided for convenience when a simple translation is all that's required.
+	bool DrawText( GLfloat x, GLfloat y, const wxString& text, bool staticText = false );
 
 	// This ignores wrapping.
 	bool CalcTextLength( const wxString& text, GLfloat& length );

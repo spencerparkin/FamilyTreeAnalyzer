@@ -85,6 +85,20 @@ bool FtaFontSystem::Finalize( void )
 	return success;
 }
 
+bool FtaFontSystem::DrawText( GLfloat x, GLfloat y, const wxString& text, bool staticText /*= false*/ )
+{
+	bool success = false;
+
+	glPushMatrix();
+	glTranslatef( x, y, 0.f );
+
+	success = DrawText( text, staticText );
+
+	glPopMatrix();
+
+	return success;
+}
+
 bool FtaFontSystem::DrawText( const wxString& text, bool staticText /*= false*/ )
 {
 	bool success = false;
