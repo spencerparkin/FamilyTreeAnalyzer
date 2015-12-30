@@ -322,6 +322,14 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			glyphMap.erase( iter );
 		}
 
+		while( textDisplayListMap.size() > 0 )
+		{
+			FtaTextDisplayListMap::iterator iter = textDisplayListMap.begin();
+			GLuint displayList = iter->second;
+			glDeleteLists( displayList, 1 );
+			textDisplayListMap.erase( iter );
+		}
+
 		initialized = false;
 
 		success = true;
@@ -779,55 +787,27 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex, FT_ULong
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
 			GLuint bytesPerTexel = 4;
-			GLuint textureWidth = 128;
-			GLuint textureHeight = 128;
-			GLuint mipLevel = 0;
-			while( textureWidth > 0 && textureHeight > 0 )
+			GLubyte* textureBuffer = new GLubyte[ width * height * bytesPerTexel ];
+
+			// We have to flip the image for OpenGL.
+			for( GLuint i = 0; i < height; i++ )
 			{
-				GLubyte* textureBuffer = new GLubyte[ textureWidth * textureHeight * bytesPerTexel ];
-
-				// Flip the image and make it of appropriate dimensions for OpenGL.
-				for( GLuint i = 0; i < textureHeight; i++ )
+				for( GLuint j = 0; j < width; j++ )
 				{
-					GLfloat u = 1.f - GLfloat(i) / GLfloat( textureHeight - 1 );
-					GLuint bitmap_i = GLuint( u * GLfloat( height ) );
-					if( bitmap_i >= height )
-						bitmap_i = height - 1;
+					GLubyte grey = bitmapBuffer[ ( height - i - 1 ) * width + j ];
 
-					for( GLuint j = 0; j < textureWidth; j++ )
-					{
-						GLfloat v = GLfloat(j) / GLfloat( textureWidth - 1 );
-						GLuint bitmap_j = GLuint( v * GLfloat( width ) );
-						if( bitmap_j >= width )
-							bitmap_j = width - 1;
+					GLubyte* texel = &textureBuffer[ ( i * width + j  ) * bytesPerTexel ];
 
-						GLubyte grey = bitmapBuffer[ bitmap_i * width + bitmap_j ];
-						GLubyte* texel = &textureBuffer[ ( i * textureWidth + j ) * bytesPerTexel ];
-						for( GLuint k = 0; k < bytesPerTexel; k++ )
-							texel[k] = grey;
-					}
+					texel[0] = grey;
+					texel[1] = grey;
+					texel[2] = grey;
+					texel[3] = grey;
 				}
-
-				glTexImage2D( GL_TEXTURE_2D, mipLevel, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer );
-
-				delete[] textureBuffer;
-
-				GLenum error = glGetError();
-				if( error != GL_NO_ERROR )
-				{
-					const GLubyte* errorStr = gluErrorString( error );
-					errorStr = nullptr;
-					break;
-				}
-
-				mipLevel++;
-
-				textureWidth >>= 1;
-				textureHeight >>= 1;
 			}
 
-			if( textureWidth > 0 || textureHeight > 0 )
-				break;
+			gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, width, height, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer );
+
+			delete[] textureBuffer;
 		}
 
 		success = true;
