@@ -101,7 +101,6 @@ private:
 		GLfloat x, y;		// This is the lower-left cornder position of the glyph.
 		GLfloat w, h;		// This is the width and height of the glyph.
 		FtaGlyph* glyph;
-		//bool canStretch;
 		GlyphLink* nextGlyphLink;
 
 		void GetMetrics( FT_Glyph_Metrics& metrics ) const;
@@ -117,6 +116,8 @@ private:
 	void DeleteGlyphChain( GlyphLink* glyphLink );
 	GLfloat CalcGlyphChainLength( GlyphLink* glyphLink );
 	GlyphLink* BreakGlyphChain( GlyphLink* glyphLink );
+	void JustifyGlyphChain( GlyphLink* glyphLink );
+	int CountGlyphsInChain( GlyphLink* glyphLink, FT_ULong charCode );
 
 	FT_ULong MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphIndex );
 

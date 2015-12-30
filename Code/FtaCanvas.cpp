@@ -90,6 +90,7 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 
 	glColor3f( 0.f, 0.f, 0.f );
 	fontSystem->SetLineWidth( 30.f );
+	fontSystem->SetJustification( FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT );
 	fontSystem->DrawText( "The quick brown fox jumps over the lazy dog.", true );
 
 	glBegin( GL_LINES );
@@ -105,6 +106,13 @@ void FtaCanvas::OnPaint( wxPaintEvent& event )
 	glColor3f( 0.f, 0.f, 1.f );
 	glVertex3f( 0.f, 0.f, 0.f );
 	glVertex3f( 0.f, 0.f, 5.f );
+
+	glColor3f( 0.f, 0.f, 0.f );
+	glVertex3f( 30.f, 5.f, 0.f );
+	glVertex3f( 30.f, -40.f, 0.f );
+
+	glVertex3f( 0.f, 5.f, 0.f );
+	glVertex3f( 0.f, -40.f, 0.f );
 
 	glEnd();
 

@@ -390,6 +390,15 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 					glyphLink->dx = 0.f;
 					glyphChainVector.push_back( glyphLink );
 				}
+
+				if( fontSystem->GetJustification() != FtaFontSystem::JUSTIFY_LEFT )
+				{
+					for( unsigned int i = 0; i < glyphChainVector.size(); i++ )
+					{
+						glyphLink = glyphChainVector[i];
+						JustifyGlyphChain( glyphLink );
+					}
+				}
 			}
 
 			if( staticText )
@@ -607,6 +616,7 @@ GLfloat FtaFont::CalcGlyphChainLength( GlyphLink* glyphLink )
 	return length;
 }
 
+// TODO: We should force a break on new-line characters.
 FtaFont::GlyphLink* FtaFont::BreakGlyphChain( GlyphLink* glyphLink )
 {
 	GLfloat ox = 0.f;
@@ -620,10 +630,10 @@ FtaFont::GlyphLink* FtaFont::BreakGlyphChain( GlyphLink* glyphLink )
 		if( !glyphLink )
 			return nullptr;		// All glyphs are in bounds.
 
+		ox += glyphLink->dx;
+
 		if( ox + glyphLink->x + glyphLink->w >= fontSystem->GetLineWidth() )
 			break;				// We reached a glyph out of bounds.
-
-		ox += glyphLink->dx;
 
 		if( !glyphLink->glyph || glyphLink->glyph->GetCharCode() == ' ' )
 		{
@@ -640,6 +650,67 @@ FtaFont::GlyphLink* FtaFont::BreakGlyphChain( GlyphLink* glyphLink )
 
 	prevGlyphLinkBreak->nextGlyphLink = nullptr;
 	return glyphLinkBreak;
+}
+
+void FtaFont::JustifyGlyphChain( GlyphLink* glyphLink )
+{
+	GLfloat length = CalcGlyphChainLength( glyphLink );
+	wxASSERT( length <= fontSystem->GetLineWidth() );
+
+	GLfloat delta = fontSystem->GetLineWidth() - length;
+
+	switch( fontSystem->GetJustification() )
+	{
+		case FtaFontSystem::JUSTIFY_LEFT:
+		{
+			// We assume that the given chain is already left-justify; so in this case, we're done!
+			break;
+		}
+		case FtaFontSystem::JUSTIFY_RIGHT:
+		{
+			glyphLink->dx += delta;
+			break;
+		}
+		case FtaFontSystem::JUSTIFY_CENTER:
+		{
+			glyphLink->dx += delta / 2.f;
+			break;
+		}
+		case FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT:
+		{
+			int spaceCount = CountGlyphsInChain( glyphLink, ' ' );
+			if( spaceCount > 0 )
+			{
+				delta /= GLfloat( spaceCount );
+
+				// TODO: We may want to leave it left-justified if the delta is too big.
+				while( glyphLink )
+				{
+					if( glyphLink->glyph && glyphLink->glyph->GetCharCode() == ' ' )
+						glyphLink->dx += delta;
+
+					glyphLink = glyphLink->nextGlyphLink;
+				}
+			}
+
+			break;
+		}
+	}
+}
+
+int FtaFont::CountGlyphsInChain( GlyphLink* glyphLink, FT_ULong charCode )
+{
+	int count = 0;
+
+	while( glyphLink )
+	{
+		if( glyphLink->glyph && glyphLink->glyph->GetCharCode() == charCode )
+			count++;
+
+		glyphLink = glyphLink->nextGlyphLink;
+	}
+
+	return count;
 }
 
 FtaGlyph::FtaGlyph( void )
