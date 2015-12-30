@@ -13,7 +13,7 @@ FtaFontSystem::FtaFontSystem( void )
 	initialized = false;
 	font = "ChanticleerRomanNF.ttf";
 	lineWidth = 0.f;
-	lineHeight = 1.f;
+	lineHeight = 4.f;
 	justification = JUSTIFY_LEFT;
 }
 
@@ -168,7 +168,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		if( error != FT_Err_Ok )
 			break;
 
-		error = FT_Set_Char_Size( face, 0, 32*64, 300, 300 );
+		error = FT_Set_Char_Size( face, 0, 32*64, 0, 0 );
 		if( error != FT_Err_Ok )
 			break;
 
@@ -248,9 +248,13 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 /*virtual*/ bool FtaFont::DrawText( const wxString& text )
 {
 	bool success = false;
+	GlyphLink* glyphLink = nullptr;
 
 	do
 	{
+		if( text.IsEmpty() )
+			break;
+
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
@@ -261,25 +265,17 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		glGetFloatv( GL_CURRENT_COLOR, color );
 		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
-		const wchar_t* charCode = text.wc_str();
+		GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( faceHeight );
 
-		// TODO: This needs to be completely rewritten.  Use delta-chain idea.
+		const wchar_t* charCodeString = text.wc_str();
 
-		LineOfText lineOfText;
-		GLfloat baseLine = -fontSystem->GetLineHeight();
-		
-		do
-		{
-			if( !FormatLineOfText( lineOfText, charCode, baseLine ) )
-				break;
-
-			if( !RenderLineOfText( lineOfText ) )
-				break;
-		}
-		while( *charCode != '\0' );
-
-		if( *charCode != '\0' )
+		glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
+		if( !glyphLink )
 			break;
+
+		// TODO: Manipulate and split glyph-chain according to desired justification here.
+
+		RenderGlyphChain( glyphLink, 0.f, 0.f );
 
 		success = true;
 	}
@@ -288,127 +284,115 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
 
+	DeleteGlyphChain( glyphLink );
+
 	return success;
 }
 
-// My first presentable pass at these calculations won't be perfect, but it may be good enough.
-bool FtaFont::FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine )
+void FtaFont::GlyphLink::GetMetrics( FT_Glyph_Metrics& metrics ) const
 {
-	lineOfText.clear();
-
-	GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( faceHeight );
-
-	GLuint spaceCount = 0;
-	GLfloat totalSpaceAdvance = 0.f;
-	GLfloat totalAdvance = 0.f;
-
-	while( *charCode != '\0' )
+	if( glyph )
+		metrics = glyph->GetMetrics();
+	else
 	{
-		FtaGlyphMap::iterator iter = glyphMap.find( FT_ULong( *charCode ) );
-		if( iter == glyphMap.end() )
-			return false;
-
-		FtaGlyph* glyph = iter->second;
-
-		GlyphRender glyphRender;
-		glyphRender.glyph = glyph;
-
-		GLfloat advance = GLfloat( glyph->GetMetrics().horiAdvance ) * conversionFactor;
-		//if( fontSystem->GetLineWidth() != 0.f && totalAdvance + advance > fontSystem->GetLineWidth() )
-		//	break;
-
-		totalAdvance += advance;
-
-		if( *charCode == ' ' )
-		{
-			spaceCount++;
-			totalSpaceAdvance += advance;
-		}
-
-		lineOfText.push_back( glyphRender );
-
-		charCode++;
+		memset( &metrics, 0, sizeof( FT_Glyph_Metrics ) );
+		metrics.width = 500;
+		metrics.height = 500;
 	}
-
-	// This offset is used for centering and right-justification by
-	// simply adding to it to the left-justification calculations.
-	GLfloat justifyOffset = 0.f;
-
-	if( fontSystem->GetLineWidth() != 0.f )
-	{
-		switch( fontSystem->GetJustification() )
-		{
-			// If this case we left-justify, but alter the advance of all spaces.
-			// Note that if the altered advance is too big, we'll probably just want to left-justify.
-			case FtaFontSystem::JUSTIFY_LEFT_AND_RIGHT:
-			{
-				break;
-			}
-			case FtaFontSystem::JUSTIFY_RIGHT:
-			{
-				break;
-			}
-			case FtaFontSystem::JUSTIFY_CENTER:
-			{
-				break;
-			}
-		}
-	}
-
-	GLfloat xPen = 0.f;
-	GLfloat yPen = baseLine;
-
-	LineOfText::iterator iter = lineOfText.begin();
-	while( iter != lineOfText.end() )
-	{
-		GlyphRender& glyphRender = *iter;
-
-		glyphRender.x = xPen;
-		glyphRender.y = yPen;
-		glyphRender.w = 1.f;
-		glyphRender.h = 1.f;
-
-		xPen += 2.f;
-
-		iter++;
-	}
-
-	baseLine -= fontSystem->GetLineHeight();
-	return true;
 }
 
-bool FtaFont::RenderLineOfText( const LineOfText& lineOfText )
+FtaFont::GlyphLink* FtaFont::GenerateGlyphChain( const wchar_t* charCodeString, GLfloat conversionFactor )
 {
-	LineOfText::const_iterator iter = lineOfText.begin();
-	while( iter != lineOfText.end() )
+	GlyphLink* firstGlyphLink = nullptr;
+	GlyphLink* prevGlyphLink = nullptr;
+
+	for( int i = 0; charCodeString[i] != '\0'; i++ )
 	{
-		const GlyphRender& glyphRender = *iter;
-		
-		GLuint texture = glyphRender.glyph->GetTexture();
-		if( texture != 0 )
+		wchar_t charCode = charCodeString[i];
+
+		FtaGlyph* glyph = nullptr;
+		FtaGlyphMap::iterator iter = glyphMap.find( charCode );
+		if( iter != glyphMap.end() )
+			glyph = iter->second;
+
+		GlyphLink* glyphLink = new GlyphLink();
+		glyphLink->glyph = glyph;
+
+		FT_Glyph_Metrics metrics;
+		glyphLink->GetMetrics( metrics );
+
+		glyphLink->w = GLfloat( metrics.width ) * conversionFactor;
+		glyphLink->h = GLfloat( metrics.height ) * conversionFactor;
+
+		if( !prevGlyphLink )
 		{
-			glBindTexture( GL_TEXTURE_2D, texture );
+			glyphLink->dx = 0.f;
+			glyphLink->dy = 0.f;
 
-			glBegin( GL_QUADS );
+			glyphLink->x = 0.f;
+			glyphLink->y = GLfloat( metrics.horiBearingY - metrics.height ) * conversionFactor;
 
-			glTexCoord2f( 0.f, 0.f );	glVertex2f( glyphRender.x, glyphRender.y );
-			glTexCoord2f( 1.f, 0.f );	glVertex2f( glyphRender.x + glyphRender.w, glyphRender.y );
-			glTexCoord2f( 1.f, 1.f );	glVertex2f( glyphRender.x + glyphRender.w, glyphRender.y + glyphRender.h );
-			glTexCoord2f( 0.f, 1.f );	glVertex2f( glyphRender.x, glyphRender.y + glyphRender.h );
+			firstGlyphLink = glyphLink;
+		}
+		else
+		{
+			FT_Glyph_Metrics prevMetrics;
+			prevGlyphLink->GetMetrics( prevMetrics );
 
-			glEnd();
+			glyphLink->dx = GLfloat( prevMetrics.horiAdvance ) * conversionFactor;
+			glyphLink->dy = 0.f;
+
+			glyphLink->x = GLfloat( metrics.horiBearingX ) * conversionFactor;
+			glyphLink->y = GLfloat( metrics.horiBearingY - metrics.height ) * conversionFactor;
+
+			prevGlyphLink->nextGlyphLink = glyphLink;
 		}
 
-		iter++;
+		prevGlyphLink = glyphLink;
 	}
 
-	return true;
+	return firstGlyphLink;
+}
+
+void FtaFont::RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy )
+{
+	while( glyphLink )
+	{
+		ox += glyphLink->dx;
+		oy += glyphLink->dy;
+
+		GLuint texture = 0;
+		if( glyphLink->glyph )
+			texture = glyphLink->glyph->GetTexture();
+
+		// Note that if the 0-texture is bound, we should just draw a solid quad.
+		glBindTexture( GL_TEXTURE_2D, texture );
+		glBegin( GL_QUADS );
+
+		glTexCoord2f( 0.f, 0.f );	glVertex2f( ox + glyphLink->x, oy + glyphLink->y );
+		glTexCoord2f( 1.f, 0.f );	glVertex2f( ox + glyphLink->x + glyphLink->w, oy + glyphLink->y );
+		glTexCoord2f( 1.f, 1.f );	glVertex2f( ox + glyphLink->x + glyphLink->w, oy + glyphLink->y + glyphLink->h );
+		glTexCoord2f( 0.f, 1.f );	glVertex2f( ox + glyphLink->x, oy + glyphLink->y + glyphLink->h );
+
+		glEnd();
+
+		glyphLink = glyphLink->nextGlyphLink;
+	}
+}
+
+void FtaFont::DeleteGlyphChain( GlyphLink* glyphLink )
+{
+	while( glyphLink )
+	{
+		GlyphLink* nextGlyphLink = glyphLink->nextGlyphLink;
+		delete glyphLink;
+		glyphLink = nextGlyphLink;
+	}
 }
 
 FtaGlyph::FtaGlyph( void )
 {
 	texture = 0;
-	alteredAdvance = 0.f;
 }
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )

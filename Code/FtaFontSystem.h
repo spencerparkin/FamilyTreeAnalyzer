@@ -47,7 +47,7 @@ public:
 	const wxString& GetFont( void ) { return font; }
 
 	// When called, we assume that an OpenGL context is already bound.  Only one font
-	// system should be used per context since the system caches texture objects.
+	// system should be used per context since the system caches texture objects and display lists.
 	// To position and orient text, the caller must setup the appropriate modelview matrix.
 	// The object-space of the text is the 4th quadrant of the XY-plane.
 	bool DrawText( const wxString& text );
@@ -66,8 +66,7 @@ private:
 	FtaFontMap fontMap;
 };
 
-// An instance of this class maintains a means of rendering a cached
-// font as quickly as possible using OpenGL.
+// An instance of this class maintains a means of rendering a cached font using OpenGL.
 class FtaFont
 {
 public:
@@ -82,17 +81,21 @@ public:
 
 private:
 
-	struct GlyphRender
+	struct GlyphLink
 	{
-		GLfloat x, y;
-		GLfloat w, h;
+		GLfloat dx, dy;		// Adding this to the previous glyph origin gives us our origin.
+		GLfloat x, y;		// This is the lower-left cornder position of the glyph.
+		GLfloat w, h;		// This is the width and height of the glyph.
 		FtaGlyph* glyph;
+		//bool canStretch;
+		GlyphLink* nextGlyphLink;
+
+		void GetMetrics( FT_Glyph_Metrics& metrics ) const;
 	};
 
-	typedef wxVector< GlyphRender > LineOfText;
-
-	bool FormatLineOfText( LineOfText& lineOfText, const wchar_t*& charCode, GLfloat& baseLine );
-	bool RenderLineOfText( const LineOfText& lineOfText );
+	GlyphLink* GenerateGlyphChain( const wchar_t* charCodeString, GLfloat conversionFactor );
+	void RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy );
+	void DeleteGlyphChain( GlyphLink* glyphLink );
 
 	bool initialized;
 	FtaFontSystem* fontSystem;
@@ -112,8 +115,6 @@ public:
 
 	GLuint GetTexture( void ) { return texture; }
 	const FT_Glyph_Metrics& GetMetrics( void ) { return metrics; }
-
-	mutable GLfloat alteredAdvance;
 
 private:
 
