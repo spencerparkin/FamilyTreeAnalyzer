@@ -13,7 +13,7 @@ FtaFontSystem::FtaFontSystem( void )
 	initialized = false;
 	font = "ChanticleerRomanNF.ttf";
 	lineWidth = 0.f;
-	lineHeight = 4.f;
+	lineHeight = 5.f;
 	justification = JUSTIFY_LEFT;
 }
 
@@ -128,7 +128,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 {
 	initialized = false;
 	this->fontSystem = fontSystem;
-	faceHeight = 0;
+	lineHeightMetric = 0;
 }
 
 /*virtual*/ FtaFont::~FtaFont( void )
@@ -137,6 +137,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		Finalize();
 }
 
+// TODO: Dare I tackle kerning?  It would make the text look a bit better.
 /*virtual*/ bool FtaFont::Initialize( const wxString& font )
 {
 	bool success = false;
@@ -168,13 +169,15 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		if( error != FT_Err_Ok )
 			break;
 
-		error = FT_Set_Char_Size( face, 0, 32*64, 0, 0 );
+		error = FT_Set_Char_Size( face, 0, 128*64, 0, 0 );
 		if( error != FT_Err_Ok )
 			break;
 
 		const wchar_t* charCodeString = L"abcdefghijklmnopqrstuvwxyz"
 										"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 										"`~!@#$%^&*()_+-={}[],.<>/?'\";: ";
+
+		lineHeightMetric = 0;
 
 		for( i = 0; charCodeString[i] != '\0'; i++ )
 		{
@@ -183,7 +186,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			if( glyph_index == 0 )
 				continue;
 
-			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_NO_SCALE );
+			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_DEFAULT );
 			if( error != FT_Err_Ok )
 				break;
 
@@ -201,12 +204,17 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 
 			if( !cachedGlyph->Initialize( glyph ) )
 				break;
+
+			if( glyph->metrics.height == glyph->metrics.horiBearingY )
+				if( glyph->metrics.height > lineHeightMetric )
+					lineHeightMetric = glyph->metrics.height;
 		}
 
 		if( charCodeString[i] != '\0' )
 			break;
 
-		faceHeight = face->height;
+		if( lineHeightMetric == 0 )
+			break;
 
 		initialized = true;
 
@@ -265,7 +273,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		glGetFloatv( GL_CURRENT_COLOR, color );
 		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
-		GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( faceHeight );
+		GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( lineHeightMetric );
 
 		const wchar_t* charCodeString = text.wc_str();
 

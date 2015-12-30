@@ -100,7 +100,7 @@ private:
 	bool initialized;
 	FtaFontSystem* fontSystem;
 	FtaGlyphMap glyphMap;
-	GLuint faceHeight;
+	GLuint lineHeightMetric;
 };
 
 class FtaGlyph
