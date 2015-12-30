@@ -11,7 +11,7 @@
 FtaFontSystem::FtaFontSystem( void )
 {
 	initialized = false;
-	font = "ChanticleerRomanNF.ttf";
+	font = "OpenSans-Regular.ttf"; //"Anonymous_Pro.ttf";
 	lineWidth = 0.f;
 	lineHeight = 5.f;
 	justification = JUSTIFY_LEFT;
@@ -206,7 +206,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 				break;
 
 			if( glyph->metrics.height == glyph->metrics.horiBearingY )
-				if( glyph->metrics.height > lineHeightMetric )
+				if( ( unsigned )glyph->metrics.height > lineHeightMetric )
 					lineHeightMetric = glyph->metrics.height;
 		}
 
