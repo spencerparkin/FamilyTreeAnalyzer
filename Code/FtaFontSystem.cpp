@@ -14,12 +14,25 @@ FtaFontSystem::FtaFontSystem( void )
 	font = "ChanticleerRomanNF.ttf"; //"OpenSans-Regular.ttf"; //"Anonymous_Pro.ttf";
 	lineWidth = 0.f;
 	lineHeight = 5.f;
+	baseLineDelta = -7.f;
 	justification = JUSTIFY_LEFT;
 }
 
 /*virtual*/ FtaFontSystem::~FtaFontSystem( void )
 {
 	Finalize();
+}
+
+bool FtaFontSystem::SetBaseLineDelta( GLfloat baseLineDelta )
+{
+	if( baseLineDelta >= 0.f )
+		return false;
+
+	if( -baseLineDelta < lineHeight )
+		return false;
+
+	this->baseLineDelta = baseLineDelta;
+	return true;
 }
 
 bool FtaFontSystem::Initialize( void )
@@ -227,7 +240,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			FtaGlyph* cachedGlyph = new FtaGlyph();
 			glyphMap[ charCode ] = cachedGlyph;
 
-			if( !cachedGlyph->Initialize( glyph, glyphIndex ) )
+			if( !cachedGlyph->Initialize( glyph, glyphIndex, charCode ) )
 				break;
 
 			if( glyph->metrics.height == glyph->metrics.horiBearingY )
@@ -317,7 +330,7 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 /*virtual*/ bool FtaFont::DrawText( const wxString& text, bool staticText /*= false*/ )
 {
 	bool success = false;
-	GlyphLink* glyphLink = nullptr;
+	GlyphChainVector glyphChainVector;
 	GLuint displayList = 0;
 
 	do
@@ -350,14 +363,34 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 			GLfloat conversionFactor = CalcConversionFactor();
 			const wchar_t* charCodeString = text.wc_str();
 
-			glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
+			GlyphLink* glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
 			if( !glyphLink )
 				break;
 
 			if( kerningMap.size() > 0 )
 				KernGlyphChain( glyphLink, conversionFactor );
 
-			// TODO: Manipulate and split glyph-chain according to desired justification here.
+			glyphChainVector.push_back( glyphLink );
+
+			if( fontSystem->GetLineWidth() > 0.f )
+			{
+				while( true )
+				{
+					glyphLink = BreakGlyphChain( glyphLink );
+					if( !glyphLink )
+						break;
+
+					while( !glyphLink->glyph || glyphLink->glyph->GetCharCode() == ' ' )
+					{
+						GlyphLink* deleteGlyphLink = glyphLink;
+						glyphLink = glyphLink->nextGlyphLink;
+						delete deleteGlyphLink;
+					}
+
+					glyphLink->dx = 0.f;
+					glyphChainVector.push_back( glyphLink );
+				}
+			}
 
 			if( staticText )
 			{
@@ -365,7 +398,13 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 				glNewList( displayList, GL_COMPILE_AND_EXECUTE );
 			}
 
-			RenderGlyphChain( glyphLink, 0.f, 0.f );
+			GLfloat baseLine = 0.f;
+			for( unsigned int i = 0; i < glyphChainVector.size(); i++ )
+			{
+				glyphLink = glyphChainVector[i];
+				RenderGlyphChain( glyphLink, 0.f, baseLine );
+				baseLine += fontSystem->GetBaseLineDelta();
+			}
 
 			if( staticText )
 			{
@@ -381,7 +420,11 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
 
-	DeleteGlyphChain( glyphLink );
+	for( unsigned int i = 0; i < glyphChainVector.size(); i++ )
+	{
+		GlyphLink* glyphLink = glyphChainVector[i];
+		DeleteGlyphChain( glyphLink );
+	}
 
 	return success;
 }
@@ -564,10 +607,46 @@ GLfloat FtaFont::CalcGlyphChainLength( GlyphLink* glyphLink )
 	return length;
 }
 
+FtaFont::GlyphLink* FtaFont::BreakGlyphChain( GlyphLink* glyphLink )
+{
+	GLfloat ox = 0.f;
+
+	GlyphLink* prevGlyphLink = nullptr;
+	GlyphLink* glyphLinkBreak = nullptr;
+	GlyphLink* prevGlyphLinkBreak = nullptr;
+
+	while( true )
+	{
+		if( !glyphLink )
+			return nullptr;		// All glyphs are in bounds.
+
+		if( ox + glyphLink->x + glyphLink->w >= fontSystem->GetLineWidth() )
+			break;				// We reached a glyph out of bounds.
+
+		ox += glyphLink->dx;
+
+		if( !glyphLink->glyph || glyphLink->glyph->GetCharCode() == ' ' )
+		{
+			glyphLinkBreak = glyphLink;
+			prevGlyphLinkBreak = prevGlyphLink;
+		}
+
+		prevGlyphLink = glyphLink;
+		glyphLink = glyphLink->nextGlyphLink;
+	}
+
+	if( !prevGlyphLinkBreak )
+		return nullptr;
+
+	prevGlyphLinkBreak->nextGlyphLink = nullptr;
+	return glyphLinkBreak;
+}
+
 FtaGlyph::FtaGlyph( void )
 {
 	texture = 0;
 	glyphIndex = 0;
+	charCode = 0;
 }
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )
@@ -575,13 +654,14 @@ FtaGlyph::FtaGlyph( void )
 	Finalize();
 }
 
-bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex )
+bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex, FT_ULong charCode )
 {
 	bool success = false;
 	
 	do
 	{
 		this->glyphIndex = glyphIndex;
+		this->charCode = charCode;
 
 		FT_Bitmap& bitmap = glyphSlot->bitmap;
 		if( bitmap.pixel_mode != FT_PIXEL_MODE_GRAY )

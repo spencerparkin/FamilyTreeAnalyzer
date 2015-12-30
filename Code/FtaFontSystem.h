@@ -45,18 +45,22 @@ public:
 	void SetLineHeight( GLfloat lineheight ) { this->lineHeight = lineHeight; }
 	GLfloat GetLineHeight( void ) { return lineHeight; }
 
+	bool SetBaseLineDelta( GLfloat baseLineDelta );
+	GLfloat GetBaseLineDelta( void ) { return baseLineDelta; }
+
 	void SetFont( const wxString& font ) { this->font = font; }
 	const wxString& GetFont( void ) { return font; }
 
 	// When called, we assume that an OpenGL context is already bound.  Only one font
 	// system should be used per context since the system caches texture objects and display lists.
 	// To position and orient text, the caller must setup the appropriate modelview matrix.
-	// The object-space of the text is the 4th quadrant of the XY-plane.
+	// The object-space of the text begins on the positive X-axis and then subsequent lines fill the 4th quadrant of the XY-plane.
 	// The given flag can be set to true in the case that the text will never change.  This causes
 	// us to use and cache a display list for rendering.  If the flag is falsely set for dynamic text,
 	// OpenGL may run out of display list memory and/or otherwise bog down!
 	bool DrawText( const wxString& text, bool staticText = false );
 
+	// This ignores wrapping.
 	bool CalcTextLength( const wxString& text, GLfloat& length );
 
 	FT_Library& GetLibrary( void ) { return library; }
@@ -68,6 +72,7 @@ private:
 
 	wxString font;
 	GLfloat lineWidth, lineHeight;
+	GLfloat baseLineDelta;
 	Justification justification;
 	bool initialized;
 	FT_Library library;
@@ -102,6 +107,8 @@ private:
 		void GetMetrics( FT_Glyph_Metrics& metrics ) const;
 	};
 
+	typedef wxVector< GlyphLink* > GlyphChainVector;
+
 	GLfloat CalcConversionFactor( void );
 
 	GlyphLink* GenerateGlyphChain( const wchar_t* charCodeString, GLfloat conversionFactor );
@@ -109,6 +116,7 @@ private:
 	void RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy );
 	void DeleteGlyphChain( GlyphLink* glyphLink );
 	GLfloat CalcGlyphChainLength( GlyphLink* glyphLink );
+	GlyphLink* BreakGlyphChain( GlyphLink* glyphLink );
 
 	FT_ULong MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphIndex );
 
@@ -127,18 +135,20 @@ public:
 	FtaGlyph( void );
 	virtual ~FtaGlyph( void );
 
-	bool Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex );
+	bool Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex, FT_ULong charCode );
 	bool Finalize( void );
 
 	GLuint GetTexture( void ) { return texture; }
 	const FT_Glyph_Metrics& GetMetrics( void ) { return metrics; }
 	FT_UInt GetIndex( void ) { return glyphIndex; }
+	FT_ULong GetCharCode( void ) { return charCode; }
 
 private:
 
 	GLuint texture;
-	FT_UInt glyphIndex;
 	FT_Glyph_Metrics metrics;
+	FT_UInt glyphIndex;
+	FT_ULong charCode;
 };
 
 // FtaFontSystem.h
