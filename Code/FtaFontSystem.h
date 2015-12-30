@@ -53,10 +53,13 @@ public:
 	// The object-space of the text is the 4th quadrant of the XY-plane.
 	bool DrawText( const wxString& text );
 
+	bool CalcTextLength( const wxString& text, GLfloat& length );
+
 	FT_Library& GetLibrary( void ) { return library; }
 
 private:
 
+	FtaFont* GetOrCreateCachedFont( void );
 	wxString MakeFontKey( const wxString& font );
 
 	wxString font;
@@ -79,6 +82,7 @@ public:
 	virtual bool Finalize( void );
 
 	virtual bool DrawText( const wxString& text );
+	virtual bool CalcTextLength( const wxString& text, GLfloat& length );
 
 private:
 
@@ -94,10 +98,13 @@ private:
 		void GetMetrics( FT_Glyph_Metrics& metrics ) const;
 	};
 
+	GLfloat CalcConversionFactor( void );
+
 	GlyphLink* GenerateGlyphChain( const wchar_t* charCodeString, GLfloat conversionFactor );
 	void KernGlyphChain( GlyphLink* glyphLink, GLfloat conversionFactor );
 	void RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy );
 	void DeleteGlyphChain( GlyphLink* glyphLink );
+	GLfloat CalcGlyphChainLength( GlyphLink* glyphLink );
 
 	FT_ULong MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphIndex );
 

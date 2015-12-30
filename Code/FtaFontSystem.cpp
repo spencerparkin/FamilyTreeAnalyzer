@@ -81,29 +81,7 @@ bool FtaFontSystem::DrawText( const wxString& text )
 		if( !initialized )
 			break;
 
-		if( font.IsEmpty() )
-			break;
-
-		wxString key = MakeFontKey( font );
-
-		FtaFont* cachedFont = nullptr;
-
-		FtaFontMap::iterator iter = fontMap.find( key );
-		if( iter != fontMap.end() )
-			cachedFont = iter->second;
-		else
-		{
-			cachedFont = new FtaFont( this );
-
-			if( !cachedFont->Initialize( font ) )
-			{
-				delete cachedFont;
-				break;
-			}
-
-			fontMap[ key ] = cachedFont;
-		}
-
+		FtaFont* cachedFont = GetOrCreateCachedFont();
 		if( !cachedFont )
 			break;
 
@@ -115,6 +93,54 @@ bool FtaFontSystem::DrawText( const wxString& text )
 	while( false );
 
 	return success;
+}
+
+bool FtaFontSystem::CalcTextLength( const wxString& text, GLfloat& length )
+{
+	bool success = false;
+
+	do
+	{
+		if( !initialized )
+			break;
+
+		FtaFont* cachedFont = GetOrCreateCachedFont();
+		if( !cachedFont )
+			break;
+
+		if( !cachedFont->CalcTextLength( text, length ) )
+			break;
+
+		success = true;
+	}
+	while( false );
+
+	return success;
+}
+
+FtaFont* FtaFontSystem::GetOrCreateCachedFont( void )
+{
+	FtaFont* cachedFont = nullptr;
+	
+	if( initialized && !font.IsEmpty() )
+	{
+		wxString key = MakeFontKey( font );
+
+		FtaFontMap::iterator iter = fontMap.find( key );
+		if( iter != fontMap.end() )
+			cachedFont = iter->second;
+		else
+		{
+			cachedFont = new FtaFont( this );
+
+			if( !cachedFont->Initialize( font ) )
+				delete cachedFont;
+			else
+				fontMap[ key ] = cachedFont;
+		}
+	}
+
+	return cachedFont;
 }
 
 wxString FtaFontSystem::MakeFontKey( const wxString& font )
@@ -309,8 +335,7 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 		glGetFloatv( GL_CURRENT_COLOR, color );
 		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
-		GLfloat conversionFactor = fontSystem->GetLineHeight() / GLfloat( lineHeightMetric );
-
+		GLfloat conversionFactor = CalcConversionFactor();
 		const wchar_t* charCodeString = text.wc_str();
 
 		glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
@@ -334,6 +359,44 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 	DeleteGlyphChain( glyphLink );
 
 	return success;
+}
+
+/*virtual*/ bool FtaFont::CalcTextLength( const wxString& text, GLfloat& length )
+{
+	bool success = false;
+	GlyphLink* glyphLink = nullptr;
+
+	do
+	{
+		length = 0.f;
+
+		if( !text.IsEmpty() )
+		{
+			GLfloat conversionFactor = CalcConversionFactor();
+			const wchar_t* charCodeString = text.wc_str();
+
+			glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
+			if( !glyphLink )
+				break;
+
+			if( kerningMap.size() > 0 )
+				KernGlyphChain( glyphLink, conversionFactor );
+
+			length = CalcGlyphChainLength( glyphLink );
+		}
+
+		success = true;
+	}
+	while( false );
+
+	delete glyphLink;
+
+	return true;
+}
+
+GLfloat FtaFont::CalcConversionFactor( void )
+{
+	return( fontSystem->GetLineHeight() / GLfloat( lineHeightMetric ) );
 }
 
 void FtaFont::GlyphLink::GetMetrics( FT_Glyph_Metrics& metrics ) const
@@ -457,6 +520,23 @@ void FtaFont::DeleteGlyphChain( GlyphLink* glyphLink )
 		delete glyphLink;
 		glyphLink = nextGlyphLink;
 	}
+}
+
+GLfloat FtaFont::CalcGlyphChainLength( GlyphLink* glyphLink )
+{
+	GLfloat length = 0.f;
+
+	while( glyphLink )
+	{
+		if( glyphLink->nextGlyphLink )
+			length += glyphLink->nextGlyphLink->dx;
+		else
+			length += glyphLink->x + glyphLink->w;
+
+		glyphLink = glyphLink->nextGlyphLink;
+	}
+
+	return length;
 }
 
 FtaGlyph::FtaGlyph( void )
