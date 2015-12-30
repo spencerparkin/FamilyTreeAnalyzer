@@ -13,6 +13,7 @@ class FtaGlyph;
 
 WX_DECLARE_STRING_HASH_MAP( FtaFont*, FtaFontMap );
 WX_DECLARE_HASH_MAP( FT_ULong, FtaGlyph*, wxIntegerHash, wxIntegerEqual, FtaGlyphMap );
+WX_DECLARE_HASH_MAP( FT_ULong, FT_Vector, wxIntegerHash, wxIntegerEqual, FtaKerningMap );
 
 // An instance of this class is a layer of software that sits between
 // our application and the free-type library.
@@ -94,12 +95,16 @@ private:
 	};
 
 	GlyphLink* GenerateGlyphChain( const wchar_t* charCodeString, GLfloat conversionFactor );
+	void KernGlyphChain( GlyphLink* glyphLink, GLfloat conversionFactor );
 	void RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy );
 	void DeleteGlyphChain( GlyphLink* glyphLink );
+
+	FT_ULong MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphIndex );
 
 	bool initialized;
 	FtaFontSystem* fontSystem;
 	FtaGlyphMap glyphMap;
+	FtaKerningMap kerningMap;
 	GLuint lineHeightMetric;
 };
 
@@ -110,15 +115,17 @@ public:
 	FtaGlyph( void );
 	virtual ~FtaGlyph( void );
 
-	bool Initialize( FT_GlyphSlot& glyphSlot );
+	bool Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex );
 	bool Finalize( void );
 
 	GLuint GetTexture( void ) { return texture; }
 	const FT_Glyph_Metrics& GetMetrics( void ) { return metrics; }
+	FT_UInt GetIndex( void ) { return glyphIndex; }
 
 private:
 
 	GLuint texture;
+	FT_UInt glyphIndex;
 	FT_Glyph_Metrics metrics;
 };
 

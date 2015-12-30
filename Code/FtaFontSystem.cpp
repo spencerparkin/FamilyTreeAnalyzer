@@ -137,7 +137,6 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		Finalize();
 }
 
-// TODO: Dare I tackle kerning?  It would make the text look a bit better.
 /*virtual*/ bool FtaFont::Initialize( const wxString& font )
 {
 	bool success = false;
@@ -151,7 +150,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		wxString fontFile = wxGetApp().GetResourceFolder() + "\\Fonts\\" + font;
 
 		FT_Error error = FT_New_Face( fontSystem->GetLibrary(), fontFile, 0, &face );
-		if( error != FT_Err_Ok )
+		if( error != FT_Err_Ok || !face )
 			break;
 
 		int i, j = -1;
@@ -182,11 +181,11 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		for( i = 0; charCodeString[i] != '\0'; i++ )
 		{
 			FT_ULong charCode = charCodeString[i];
-			FT_UInt glyph_index = FT_Get_Char_Index( face, charCode );
-			if( glyph_index == 0 )
+			FT_UInt glyphIndex = FT_Get_Char_Index( face, charCode );
+			if( glyphIndex == 0 )
 				continue;
 
-			error = FT_Load_Glyph( face, glyph_index, FT_LOAD_DEFAULT );
+			error = FT_Load_Glyph( face, glyphIndex, FT_LOAD_DEFAULT );
 			if( error != FT_Err_Ok )
 				break;
 
@@ -202,7 +201,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 			FtaGlyph* cachedGlyph = new FtaGlyph();
 			glyphMap[ charCode ] = cachedGlyph;
 
-			if( !cachedGlyph->Initialize( glyph ) )
+			if( !cachedGlyph->Initialize( glyph, glyphIndex ) )
 				break;
 
 			if( glyph->metrics.height == glyph->metrics.horiBearingY )
@@ -215,6 +214,33 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 
 		if( lineHeightMetric == 0 )
 			break;
+
+		kerningMap.clear();
+
+		if( FT_HAS_KERNING( face ) )
+		{
+			for( i = 0; charCodeString[i] != '\0'; i++ )
+			{
+				FT_ULong leftCharCode = charCodeString[i];
+				FT_UInt leftGlyphIndex = FT_Get_Char_Index( face, leftCharCode );
+				if( leftGlyphIndex == 0 )
+					continue;
+
+				for( j = 0; j < charCodeString[j] != '\0'; j++ )
+				{
+					FT_ULong rightCharCode = charCodeString[j];
+					FT_UInt rightGlyphIndex = FT_Get_Char_Index( face, rightCharCode );
+					if( rightGlyphIndex == 0 )
+						continue;
+
+					FT_Vector kerning;
+					FT_Get_Kerning( face, leftGlyphIndex, rightGlyphIndex, FT_KERNING_DEFAULT, &kerning );
+
+					FT_ULong key = MakeKerningKey( leftGlyphIndex, rightGlyphIndex );
+					kerningMap[ key ] = kerning;
+				}
+			}
+		}
 
 		initialized = true;
 
@@ -252,6 +278,16 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 	return success;
 }
 
+FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphIndex )
+{
+	FT_ULong left = leftGlyphIndex;
+	FT_ULong right = rightGlyphIndex;
+
+	left = left << 16;		// I thought that longs were 64-bit while ints were 32-bit...?
+
+	return( left | right );
+}
+
 // TODO: Add cached display-list optimization for static text.
 /*virtual*/ bool FtaFont::DrawText( const wxString& text )
 {
@@ -280,6 +316,9 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 		glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
 		if( !glyphLink )
 			break;
+
+		if( kerningMap.size() > 0 )
+			KernGlyphChain( glyphLink, conversionFactor );
 
 		// TODO: Manipulate and split glyph-chain according to desired justification here.
 
@@ -362,6 +401,28 @@ FtaFont::GlyphLink* FtaFont::GenerateGlyphChain( const wchar_t* charCodeString, 
 	return firstGlyphLink;
 }
 
+void FtaFont::KernGlyphChain( GlyphLink* glyphLink, GLfloat conversionFactor )
+{
+	GlyphLink* prevGlyphLink = nullptr;
+
+	while( glyphLink )
+	{
+		if( prevGlyphLink && prevGlyphLink->glyph && glyphLink->glyph )
+		{
+			FT_ULong key = MakeKerningKey( prevGlyphLink->glyph->GetIndex(), glyphLink->glyph->GetIndex() );
+			FtaKerningMap::iterator iter = kerningMap.find( key );
+			if( iter != kerningMap.end() )
+			{
+				FT_Vector kerning = iter->second;
+				glyphLink->dx += GLfloat( kerning.x ) * conversionFactor;
+			}
+		}
+
+		prevGlyphLink = glyphLink;
+		glyphLink = glyphLink->nextGlyphLink;
+	}
+}
+
 void FtaFont::RenderGlyphChain( GlyphLink* glyphLink, GLfloat ox, GLfloat oy )
 {
 	while( glyphLink )
@@ -401,6 +462,7 @@ void FtaFont::DeleteGlyphChain( GlyphLink* glyphLink )
 FtaGlyph::FtaGlyph( void )
 {
 	texture = 0;
+	glyphIndex = 0;
 }
 
 /*virtual*/ FtaGlyph::~FtaGlyph( void )
@@ -408,12 +470,14 @@ FtaGlyph::FtaGlyph( void )
 	Finalize();
 }
 
-bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
+bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot, FT_UInt glyphIndex )
 {
 	bool success = false;
 	
 	do
 	{
+		this->glyphIndex = glyphIndex;
+
 		FT_Bitmap& bitmap = glyphSlot->bitmap;
 		if( bitmap.pixel_mode != FT_PIXEL_MODE_GRAY )
 			break;
