@@ -11,7 +11,7 @@
 FtaFontSystem::FtaFontSystem( void )
 {
 	initialized = false;
-	font = "OpenSans-Regular.ttf"; //"Anonymous_Pro.ttf";
+	font = "ChanticleerRomanNF.ttf"; //"OpenSans-Regular.ttf"; //"Anonymous_Pro.ttf";
 	lineWidth = 0.f;
 	lineHeight = 5.f;
 	justification = JUSTIFY_LEFT;
@@ -141,7 +141,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 /*virtual*/ bool FtaFont::Initialize( const wxString& font )
 {
 	bool success = false;
-	FT_Face face;
+	FT_Face face = nullptr;
 
 	do
 	{
@@ -411,8 +411,7 @@ FtaGlyph::FtaGlyph( void )
 bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 {
 	bool success = false;
-	GLubyte* textureBuffer = nullptr;
-
+	
 	do
 	{
 		FT_Bitmap& bitmap = glyphSlot->bitmap;
@@ -432,34 +431,6 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 		GLubyte* bitmapBuffer = ( GLubyte* )bitmap.buffer;
 		if( bitmapBuffer != nullptr )
 		{
-			// TODO: We could probably save on memory by using smaller resolution here and maybe smaller size.
-			GLuint textureWidth = 128;
-			GLuint textureHeight = 128;
-			GLuint bytesPerTexel = 4;
-			textureBuffer = new GLubyte[ textureWidth * textureHeight * bytesPerTexel ];
-
-			// Flip the image and make it of appropriate dimensions for OpenGL.
-			for( GLuint i = 0; i < textureHeight; i++ )
-			{
-				GLfloat u = 1.f - GLfloat(i) / GLfloat( textureHeight - 1 );
-				GLuint bitmap_i = GLuint( u * GLfloat( height ) );
-				if( bitmap_i >= height )
-					bitmap_i = height - 1;
-
-				for( GLuint j = 0; j < textureWidth; j++ )
-				{
-					GLfloat v = GLfloat(j) / GLfloat( textureWidth - 1 );
-					GLuint bitmap_j = GLuint( v * GLfloat( width ) );
-					if( bitmap_j >= width )
-						bitmap_j = width - 1;
-				
-					GLubyte grey = bitmapBuffer[ bitmap_i * width + bitmap_j ];
-					GLubyte* texel = &textureBuffer[ ( i * textureWidth + j ) * bytesPerTexel ];
-					for( GLuint k = 0; k < bytesPerTexel; k++ )
-						texel[k] = grey;
-				}
-			}
-
 			glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
 			glGenTextures( 1, &texture );
@@ -470,25 +441,64 @@ bool FtaGlyph::Initialize( FT_GlyphSlot& glyphSlot )
 
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer );
-
-			GLenum error = glGetError();
-			if( error != GL_NO_ERROR )
+			GLuint bytesPerTexel = 4;
+			GLuint textureWidth = 128;
+			GLuint textureHeight = 128;
+			GLuint mipLevel = 0;
+			while( textureWidth > 0 && textureHeight > 0 )
 			{
-				const GLubyte* errorStr = gluErrorString( error );
-				errorStr = nullptr;
-				break;
+				GLubyte* textureBuffer = new GLubyte[ textureWidth * textureHeight * bytesPerTexel ];
+
+				// Flip the image and make it of appropriate dimensions for OpenGL.
+				for( GLuint i = 0; i < textureHeight; i++ )
+				{
+					GLfloat u = 1.f - GLfloat(i) / GLfloat( textureHeight - 1 );
+					GLuint bitmap_i = GLuint( u * GLfloat( height ) );
+					if( bitmap_i >= height )
+						bitmap_i = height - 1;
+
+					for( GLuint j = 0; j < textureWidth; j++ )
+					{
+						GLfloat v = GLfloat(j) / GLfloat( textureWidth - 1 );
+						GLuint bitmap_j = GLuint( v * GLfloat( width ) );
+						if( bitmap_j >= width )
+							bitmap_j = width - 1;
+
+						GLubyte grey = bitmapBuffer[ bitmap_i * width + bitmap_j ];
+						GLubyte* texel = &textureBuffer[ ( i * textureWidth + j ) * bytesPerTexel ];
+						for( GLuint k = 0; k < bytesPerTexel; k++ )
+							texel[k] = grey;
+					}
+				}
+
+				glTexImage2D( GL_TEXTURE_2D, mipLevel, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer );
+
+				delete[] textureBuffer;
+
+				GLenum error = glGetError();
+				if( error != GL_NO_ERROR )
+				{
+					const GLubyte* errorStr = gluErrorString( error );
+					errorStr = nullptr;
+					break;
+				}
+
+				mipLevel++;
+
+				textureWidth >>= 1;
+				textureHeight >>= 1;
 			}
+
+			if( textureWidth > 0 || textureHeight > 0 )
+				break;
 		}
 
 		success = true;
 	}
 	while( false );
-
-	delete[] textureBuffer;
 
 	return success;
 }
