@@ -12,6 +12,7 @@ class FtaFont;
 class FtaGlyph;
 
 WX_DECLARE_STRING_HASH_MAP( FtaFont*, FtaFontMap );
+WX_DECLARE_STRING_HASH_MAP( GLuint, FtaTextDisplayListMap );
 WX_DECLARE_HASH_MAP( FT_ULong, FtaGlyph*, wxIntegerHash, wxIntegerEqual, FtaGlyphMap );
 WX_DECLARE_HASH_MAP( FT_ULong, FT_Vector, wxIntegerHash, wxIntegerEqual, FtaKerningMap );
 
@@ -51,7 +52,10 @@ public:
 	// system should be used per context since the system caches texture objects and display lists.
 	// To position and orient text, the caller must setup the appropriate modelview matrix.
 	// The object-space of the text is the 4th quadrant of the XY-plane.
-	bool DrawText( const wxString& text );
+	// The given flag can be set to true in the case that the text will never change.  This causes
+	// us to use and cache a display list for rendering.  If the flag is falsely set for dynamic text,
+	// OpenGL may run out of display list memory and/or otherwise bog down!
+	bool DrawText( const wxString& text, bool staticText = false );
 
 	bool CalcTextLength( const wxString& text, GLfloat& length );
 
@@ -81,7 +85,7 @@ public:
 	virtual bool Initialize( const wxString& font );
 	virtual bool Finalize( void );
 
-	virtual bool DrawText( const wxString& text );
+	virtual bool DrawText( const wxString& text, bool staticText = false );
 	virtual bool CalcTextLength( const wxString& text, GLfloat& length );
 
 private:
@@ -112,6 +116,7 @@ private:
 	FtaFontSystem* fontSystem;
 	FtaGlyphMap glyphMap;
 	FtaKerningMap kerningMap;
+	FtaTextDisplayListMap textDisplayListMap;
 	GLuint lineHeightMetric;
 };
 

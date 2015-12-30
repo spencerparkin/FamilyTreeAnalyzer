@@ -72,7 +72,7 @@ bool FtaFontSystem::Finalize( void )
 	return success;
 }
 
-bool FtaFontSystem::DrawText( const wxString& text )
+bool FtaFontSystem::DrawText( const wxString& text, bool staticText /*= false*/ )
 {
 	bool success = false;
 
@@ -85,7 +85,7 @@ bool FtaFontSystem::DrawText( const wxString& text )
 		if( !cachedFont )
 			break;
 
-		if( !cachedFont->DrawText( text ) )
+		if( !cachedFont->DrawText( text, staticText ) )
 			break;
 
 		success = true;
@@ -314,11 +314,11 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 	return( left | right );
 }
 
-// TODO: Add cached display-list optimization for static text.
-/*virtual*/ bool FtaFont::DrawText( const wxString& text )
+/*virtual*/ bool FtaFont::DrawText( const wxString& text, bool staticText /*= false*/ )
 {
 	bool success = false;
 	GlyphLink* glyphLink = nullptr;
+	GLuint displayList = 0;
 
 	do
 	{
@@ -335,19 +335,44 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 		glGetFloatv( GL_CURRENT_COLOR, color );
 		glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color );
 
-		GLfloat conversionFactor = CalcConversionFactor();
-		const wchar_t* charCodeString = text.wc_str();
+		if( staticText )
+		{
+			FtaTextDisplayListMap::iterator iter = textDisplayListMap.find( text );
+			if( iter != textDisplayListMap.end() )
+			{
+				displayList = iter->second;
+				glCallList( displayList );
+			}
+		}
 
-		glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
-		if( !glyphLink )
-			break;
+		if( displayList == 0 )
+		{
+			GLfloat conversionFactor = CalcConversionFactor();
+			const wchar_t* charCodeString = text.wc_str();
 
-		if( kerningMap.size() > 0 )
-			KernGlyphChain( glyphLink, conversionFactor );
+			glyphLink = GenerateGlyphChain( charCodeString, conversionFactor );
+			if( !glyphLink )
+				break;
 
-		// TODO: Manipulate and split glyph-chain according to desired justification here.
+			if( kerningMap.size() > 0 )
+				KernGlyphChain( glyphLink, conversionFactor );
 
-		RenderGlyphChain( glyphLink, 0.f, 0.f );
+			// TODO: Manipulate and split glyph-chain according to desired justification here.
+
+			if( staticText )
+			{
+				displayList = glGenLists(1);
+				glNewList( displayList, GL_COMPILE_AND_EXECUTE );
+			}
+
+			RenderGlyphChain( glyphLink, 0.f, 0.f );
+
+			if( staticText )
+			{
+				glEndList();
+				textDisplayListMap[ text ] = displayList;
+			}
+		}
 
 		success = true;
 	}
