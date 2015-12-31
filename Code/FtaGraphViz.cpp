@@ -5,6 +5,11 @@
 #include "FtaApp.h"
 #include "graphviz/gvc.h"
 
+// TODO: Should the user be able to click on a node, and then ask to additionally graph
+//       the associated person's children, parents, etc?  This would cause the graph to
+//       regenerate.  This makes the visualization more interactive, just like what you're
+//       able to do when exploring your tree on familysearch.org.
+
 FtaGraphViz::FtaGraphViz( void )
 {
 }
