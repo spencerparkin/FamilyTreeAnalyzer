@@ -45,11 +45,13 @@ public:
 
 	// Make this box the smallest possible box containing the two given boxes.
 	// The result is undefined if either of the two given boxes is invalid.
+	// Either of the two given boxes may be this box.
 	void Combine( const FtaAxisAlignedBox& aab0, const FtaAxisAlignedBox& aab1 );
 
 	// Make this box the intersection of the two given boxes.  If either of the two
 	// given boxes is invalid, the result is undefind.  If the two given valid boxes
-	// have no intersection, then an invalid box is computed.
+	// have no intersection, then an invalid box is computed.  Either of the two given
+	// boxes may be this box.
 	void Intersect( const FtaAxisAlignedBox& aab0, const FtaAxisAlignedBox& aab1 );
 
 	// Scale this box about its center by the given scalar.  If the scalar is 2, then

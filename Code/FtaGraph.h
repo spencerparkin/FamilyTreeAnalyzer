@@ -25,7 +25,9 @@ public:
 	virtual bool Bind( void ) override;
 	virtual bool Unbind( void ) override;
 	virtual bool Animate( void ) override;
+	virtual bool CalcBoundingBox( FtaAxisAlignedBox& aab ) override;
 
+	bool LayoutIfNeeded( void );
 	void AddPerson( const wxString& personId );
 	void RemovePerson( const wxString& personId );
 
@@ -57,6 +59,7 @@ public:
 	virtual void Draw( GLenum renderMode ) = 0;
 	virtual bool Animate( void ) { return false; }
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
+	virtual bool CalcBoundingBox( FtaAxisAlignedBox& aab ) const = 0;
 
 protected:
 
@@ -72,6 +75,7 @@ public:
 	virtual void Draw( GLenum renderMode ) override;
 	virtual bool Animate( void ) override;
 	virtual bool ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue ) override;
+	virtual bool CalcBoundingBox( FtaAxisAlignedBox& aab ) const override { aab = this->aab; return true; }
 
 	wxString personId;
 	GLuint texture;
@@ -86,6 +90,7 @@ public:
 	virtual ~FtaGraphEdge( void );
 
 	virtual void Draw( GLenum renderMode ) override;
+	virtual bool CalcBoundingBox( FtaAxisAlignedBox& aab ) const override;
 
 	FtaGraphNode* tailNode;
 	FtaGraphNode* headNode;

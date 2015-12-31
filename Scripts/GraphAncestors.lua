@@ -33,5 +33,6 @@ personId = 'KWZC-XN7'
 CollectAncestors( personId, ancestors, 0, maxGen )
 
 fta.drawGraph( "graphviz", ancestors )
+fta.frameViz()
 
 -- GraphAncestors.lua

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "FtaCanvasPlugin.h"
+#include "FtaAxisAlignedBox.h"
 #include "c3ga/c3ga.h"
 #include <wx/glcanvas.h>
 
@@ -18,10 +19,10 @@ public:
 	virtual void PreRender( GLenum renderMode ) = 0;
 	virtual void PostRender( GLenum renderMode ) = 0;
 
+	virtual bool ViewBoundingBox( const FtaAxisAlignedBox& aab );
+
 	GLuint* GetHitBuffer( void ) { return hitBuffer; }
 	GLuint GetHitBufferSize( void ) const { return hitBufferSize; }
-
-	// TODO: Every camera should support a routine that positions the camera in a way to view a given bounds.
 
 protected:
 

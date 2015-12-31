@@ -69,6 +69,22 @@ void FtaCanvas::SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlu
 	}
 }
 
+bool FtaCanvas::FrameVisualization( void )
+{
+	if( !( viz && camera ) )
+		return false;
+
+	FtaAxisAlignedBox aab;
+	if( !viz->CalcBoundingBox( aab ) )
+		return false;
+
+	if( !camera->ViewBoundingBox( aab ) )
+		return false;
+
+	Refresh();
+	return true;
+}
+
 void FtaCanvas::OnPaint( wxPaintEvent& event )
 {
 	if( !camera )

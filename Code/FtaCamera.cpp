@@ -83,4 +83,10 @@ void FtaCamera::ProcessHitBuffer( bool freeHitBuffer /*= true*/ )
 	}
 }
 
+/*virtual*/ bool FtaCamera::ViewBoundingBox( const FtaAxisAlignedBox& aab )
+{
+	// TODO: Write this after I've rewritten all the camera stuff/model.
+	return false;
+}
+
 // FtaCamera.cpp

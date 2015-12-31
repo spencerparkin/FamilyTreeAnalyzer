@@ -169,6 +169,9 @@
     <ClInclude Include="Code\FtaAxisAlignedBox.h">
       <Filter>Code</Filter>
     </ClInclude>
+    <ClInclude Include="Code\FtaFrameVizFunction.h">
+      <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Code\FtaApp.cpp">
@@ -311,6 +314,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaAxisAlignedBox.cpp">
       <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaFrameVizFunction.cpp">
+      <Filter>Code\LuaFunctions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

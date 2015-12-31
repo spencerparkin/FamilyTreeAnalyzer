@@ -28,6 +28,8 @@ public:
 	FtaCamera* GetCamera( void ) { return camera; }
 	void SetCamera( FtaCamera* camera );
 
+	bool FrameVisualization( void );
+
 	bool TimerUpdate( void );
 
 	double GetFPS( void ) { return framesPerSecond; }

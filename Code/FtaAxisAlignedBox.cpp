@@ -20,15 +20,15 @@ FtaAxisAlignedBox::~FtaAxisAlignedBox( void )
 bool FtaAxisAlignedBox::IsValid( void ) const
 {
 	if( min.get_e1() > max.get_e1() )
-		return true;
+		return false;
 
 	if( min.get_e2() > max.get_e2() )
-		return true;
+		return false;
 
 	if( min.get_e3() > max.get_e3() )
-		return true;
+		return false;
 
-	return false;
+	return true;
 }
 
 bool FtaAxisAlignedBox::IsDegenerate( void ) const
@@ -54,24 +54,40 @@ c3ga::vectorE3GA FtaAxisAlignedBox::GetCenter( void ) const
 
 void FtaAxisAlignedBox::Combine( const FtaAxisAlignedBox& aab0, const FtaAxisAlignedBox& aab1 )
 {
-	min.m_e1 = MIN( aab0.min.m_e1, aab1.min.m_e1 );
-	min.m_e2 = MIN( aab0.min.m_e2, aab1.min.m_e2 );
-	min.m_e3 = MIN( aab0.min.m_e3, aab1.min.m_e3 );
+	double min_e1 = MIN( aab0.min.m_e1, aab1.min.m_e1 );
+	double min_e2 = MIN( aab0.min.m_e2, aab1.min.m_e2 );
+	double min_e3 = MIN( aab0.min.m_e3, aab1.min.m_e3 );
 
-	max.m_e1 = MAX( aab0.max.m_e1, aab1.max.m_e1 );
-	max.m_e2 = MAX( aab0.max.m_e2, aab1.max.m_e2 );
-	max.m_e3 = MAX( aab0.max.m_e3, aab1.max.m_e3 );
+	double max_e1 = MAX( aab0.max.m_e1, aab1.max.m_e1 );
+	double max_e2 = MAX( aab0.max.m_e2, aab1.max.m_e2 );
+	double max_e3 = MAX( aab0.max.m_e3, aab1.max.m_e3 );
+
+	min.m_e1 = min_e1;
+	min.m_e2 = min_e2;
+	min.m_e3 = min_e3;
+
+	max.m_e1 = max_e1;
+	max.m_e2 = max_e2;
+	max.m_e3 = max_e3;
 }
 
 void FtaAxisAlignedBox::Intersect( const FtaAxisAlignedBox& aab0, const FtaAxisAlignedBox& aab1 )
 {
-	min.m_e1 = MAX( aab0.min.m_e1, aab1.min.m_e1 );
-	min.m_e2 = MAX( aab0.min.m_e2, aab1.min.m_e2 );
-	min.m_e3 = MAX( aab0.min.m_e3, aab1.min.m_e3 );
+	double min_e1 = MAX( aab0.min.m_e1, aab1.min.m_e1 );
+	double min_e2 = MAX( aab0.min.m_e2, aab1.min.m_e2 );
+	double min_e3 = MAX( aab0.min.m_e3, aab1.min.m_e3 );
 
-	max.m_e1 = MIN( aab0.max.m_e1, aab1.max.m_e1 );
-	max.m_e2 = MIN( aab0.max.m_e2, aab1.max.m_e2 );
-	max.m_e3 = MIN( aab0.max.m_e3, aab1.max.m_e3 );
+	double max_e1 = MIN( aab0.max.m_e1, aab1.max.m_e1 );
+	double max_e2 = MIN( aab0.max.m_e2, aab1.max.m_e2 );
+	double max_e3 = MIN( aab0.max.m_e3, aab1.max.m_e3 );
+
+	min.m_e1 = min_e1;
+	min.m_e2 = min_e2;
+	min.m_e3 = min_e3;
+
+	max.m_e1 = max_e1;
+	max.m_e2 = max_e2;
+	max.m_e3 = max_e3;
 }
 
 void FtaAxisAlignedBox::Scale( double scale )

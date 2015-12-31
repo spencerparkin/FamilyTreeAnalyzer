@@ -15,4 +15,9 @@ FtaVisualization::FtaVisualization( void )
 	return false;
 }
 
+/*virtual*/ bool FtaVisualization::CalcBoundingBox( FtaAxisAlignedBox& aab )
+{
+	return false;
+}
+
 // FtaVisualization.cpp

@@ -27,6 +27,7 @@
     <ClInclude Include="Code\FtaFillCacheFunction.h" />
     <ClInclude Include="Code\FtaFontSystem.h" />
     <ClInclude Include="Code\FtaFrame.h" />
+    <ClInclude Include="Code\FtaFrameVizFunction.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonIdsFunction.h" />
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="Code\FtaFillCacheFunction.cpp" />
     <ClCompile Include="Code\FtaFontSystem.cpp" />
     <ClCompile Include="Code\FtaFrame.cpp" />
+    <ClCompile Include="Code\FtaFrameVizFunction.cpp" />
     <ClCompile Include="Code\FtaGetAllCachedPersonIdsFunction.cpp" />
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />

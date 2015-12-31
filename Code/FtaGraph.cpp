@@ -87,15 +87,8 @@ void FtaGraph::DeleteGraphElementList( void )
 
 /*virtual*/ bool FtaGraph::Draw( GLenum renderMode )
 {
-	if( layoutNeeded )
-	{
-		DeleteGraphElementList();
-
-		if( !Layout() )
-			return false;
-
-		layoutNeeded = false;
-	}
+	if( !LayoutIfNeeded() )
+		return false;
 
 	FtaGraphElementList::iterator iter = graphElementList.begin();
 	while( iter != graphElementList.end() )
@@ -106,6 +99,49 @@ void FtaGraph::DeleteGraphElementList( void )
 	}
 
 	return false;
+}
+
+/*virtual*/ bool FtaGraph::CalcBoundingBox( FtaAxisAlignedBox& aab )
+{
+	if( !LayoutIfNeeded() )
+		return false;
+
+	aab.max.set( c3ga::vectorE3GA::coord_e1_e2_e3, -1.0, -1.0, -1.0 );
+	aab.min.set( c3ga::vectorE3GA::coord_e1_e2_e3, 1.0, 1.0, 1.0 );
+
+	FtaGraphElementList::iterator iter = graphElementList.begin();
+	while( iter != graphElementList.end() )
+	{
+		FtaGraphElement* element = *iter;
+		
+		FtaAxisAlignedBox elementAab;
+		if( !element->CalcBoundingBox( elementAab ) )
+			return false;
+
+		if( !aab.IsValid() )
+			aab = elementAab;
+		else
+			aab.Combine( aab, elementAab );
+
+		iter++;
+	}
+
+	return true;
+}
+
+bool FtaGraph::LayoutIfNeeded( void )
+{
+	if( layoutNeeded )
+	{
+		DeleteGraphElementList();
+
+		if( !Layout() )
+			return false;
+
+		layoutNeeded = false;
+	}
+	
+	return true;
 }
 
 void FtaGraph::AddPerson( const wxString& personId )
@@ -316,11 +352,12 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 	glPushMatrix();
 	glTranslatef( aab.min.m_e1, aab.min.m_e2, aab.max.m_e3 );
 	glColor3f( 0.f, 0.f, 0.f );
+	fontSystem->SetFont( "ChanticleerRomanNF.ttf" );
 	fontSystem->SetWordWrap( false );
 	fontSystem->SetJustification( FtaFontSystem::JUSTIFY_CENTER );
 	fontSystem->SetLineWidth( aab.GetWidth() );
 	fontSystem->SetLineHeight( aab.GetHeight() / 8.f );
-	fontSystem->DrawText( person->GetName(), true );
+	fontSystem->DrawText( person->GetName(), true );	// Maybe draw first name at bottom, last name at top?
 	glPopMatrix();
 	glEnable( GL_DEPTH_TEST );
 }
@@ -351,6 +388,11 @@ FtaGraphEdge::FtaGraphEdge( FtaGraph* graph ) : FtaGraphElement( graph )
 {
 	// TODO: We could do CGA-based edge-routing here using a divde-and-conqur algorithm.
 	//       A derivative of this class, however, may use dot-generated edge-spline data, which would be better.
+}
+
+/*virtual*/ bool FtaGraphEdge::CalcBoundingBox( FtaAxisAlignedBox& aab ) const
+{
+	return false;
 }
 
 // FtaGraph.cpp
