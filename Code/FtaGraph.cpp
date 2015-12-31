@@ -307,8 +307,22 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 	// TODO: Since the nodes have a 3D appearance, start using lighting?
 	// TODO: Draw textured quad here.
 
-	glColor3f( 0.5f, 0.5f, 0.5f );
+	glColor3f( 0.9f, 0.9f, 0.9f );
 	aab.Draw( false );
+
+	FtaFontSystem* fontSystem = graph->canvas->GetFontSystem();
+
+	glDisable( GL_DEPTH_TEST );
+	glPushMatrix();
+	glTranslatef( aab.min.m_e1, aab.min.m_e2, aab.max.m_e3 );
+	glColor3f( 0.f, 0.f, 0.f );
+	fontSystem->SetWordWrap( false );
+	fontSystem->SetJustification( FtaFontSystem::JUSTIFY_CENTER );
+	fontSystem->SetLineWidth( aab.GetWidth() );
+	fontSystem->SetLineHeight( aab.GetHeight() / 8.f );
+	fontSystem->DrawText( person->GetName(), true );
+	glPopMatrix();
+	glEnable( GL_DEPTH_TEST );
 }
 
 /*virtual*/ bool FtaGraphNode::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )

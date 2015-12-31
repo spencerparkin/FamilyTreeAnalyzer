@@ -16,6 +16,7 @@ FtaFontSystem::FtaFontSystem( void )
 	lineHeight = 5.f;
 	baseLineDelta = -7.f;
 	justification = JUSTIFY_LEFT;
+	wordWrap = false;
 }
 
 /*virtual*/ FtaFontSystem::~FtaFontSystem( void )
@@ -397,21 +398,24 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 
 			if( fontSystem->GetLineWidth() > 0.f )
 			{
-				while( true )
+				if( fontSystem->GetWordWrap() )
 				{
-					glyphLink = BreakGlyphChain( glyphLink );
-					if( !glyphLink )
-						break;
-
-					while( !glyphLink->glyph || glyphLink->glyph->GetCharCode() == ' ' )
+					while( true )
 					{
-						GlyphLink* deleteGlyphLink = glyphLink;
-						glyphLink = glyphLink->nextGlyphLink;
-						delete deleteGlyphLink;
-					}
+						glyphLink = BreakGlyphChain( glyphLink );
+						if( !glyphLink )
+							break;
 
-					glyphLink->dx = 0.f;
-					glyphChainVector.push_back( glyphLink );
+						while( !glyphLink->glyph || glyphLink->glyph->GetCharCode() == ' ' )
+						{
+							GlyphLink* deleteGlyphLink = glyphLink;
+							glyphLink = glyphLink->nextGlyphLink;
+							delete deleteGlyphLink;
+						}
+
+						glyphLink->dx = 0.f;
+						glyphChainVector.push_back( glyphLink );
+					}
 				}
 
 				if( fontSystem->GetJustification() != FtaFontSystem::JUSTIFY_LEFT )
@@ -678,8 +682,6 @@ FtaFont::GlyphLink* FtaFont::BreakGlyphChain( GlyphLink* glyphLink )
 void FtaFont::JustifyGlyphChain( GlyphLink* glyphLink )
 {
 	GLfloat length = CalcGlyphChainLength( glyphLink );
-	wxASSERT( length <= fontSystem->GetLineWidth() );
-
 	GLfloat delta = fontSystem->GetLineWidth() - length;
 
 	switch( fontSystem->GetJustification() )

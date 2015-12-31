@@ -51,6 +51,9 @@ public:
 	void SetFont( const wxString& font ) { this->font = font; }
 	const wxString& GetFont( void ) { return font; }
 
+	void SetWordWrap( bool wordWrap ) { this->wordWrap = wordWrap; }
+	bool GetWordWrap( void ) { return wordWrap; }
+
 	// When called, we assume that an OpenGL context is already bound.  Only one font
 	// system should be used per context since the system caches texture objects and display lists.
 	// To position and orient text, the caller must setup the appropriate modelview matrix.
@@ -77,6 +80,7 @@ private:
 	GLfloat lineWidth, lineHeight;
 	GLfloat baseLineDelta;
 	Justification justification;
+	bool wordWrap;
 	bool initialized;
 	FT_Library library;
 	FtaFontMap fontMap;

@@ -32,6 +32,8 @@ public:
 
 	double GetFPS( void ) { return framesPerSecond; }
 
+	FtaFontSystem* GetFontSystem( void ) { return fontSystem; }
+
 private:
 
 	void SwapPlugin( FtaCanvasPlugin*& curPlugin, FtaCanvasPlugin* newPlugin );
