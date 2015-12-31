@@ -220,14 +220,17 @@ bool FtaGraphViz::GenerateGraphForDrawing( Agraph_t* G )
 		wxArrayString stringArray;
 		ParseArray( stringArray, rectString, ',' );
 		wxASSERT( stringArray.Count() == 4 );
-		stringArray[0].ToDouble( &graphNode->minRect.m_e1 );
-		stringArray[1].ToDouble( &graphNode->minRect.m_e2 );
-		stringArray[2].ToDouble( &graphNode->maxRect.m_e1 );
-		stringArray[3].ToDouble( &graphNode->maxRect.m_e2 );
-		
+		stringArray[0].ToDouble( &graphNode->aab.min.m_e1 );
+		stringArray[1].ToDouble( &graphNode->aab.min.m_e2 );
+		stringArray[2].ToDouble( &graphNode->aab.max.m_e1 );
+		stringArray[3].ToDouble( &graphNode->aab.max.m_e2 );
+				
 		// TODO: Why can't I tell GraphViz to scale it down?
-		graphNode->minRect *= scale;
-		graphNode->maxRect *= scale;
+		graphNode->aab.min *= scale;
+		graphNode->aab.max *= scale;
+
+		graphNode->aab.min.m_e3 = -1.f;
+		graphNode->aab.max.m_e3 = 1.f;
 
 		graphElementList.push_back( graphNode );
 

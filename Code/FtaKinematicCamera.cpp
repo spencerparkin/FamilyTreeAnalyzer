@@ -35,6 +35,8 @@ FtaKinematicCamera::FtaKinematicCamera( void )
 	glEnable( GL_DEPTH_TEST );
 
 	SetupViewMatrices( renderMode );
+
+	// TODO: Setup lighting.
 }
 
 /*virtual*/ void FtaKinematicCamera::PostRender( GLenum renderMode )

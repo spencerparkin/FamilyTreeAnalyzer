@@ -15,6 +15,7 @@
     <ClInclude Include="Code\FtaAmLoggedInFunction.h" />
     <ClInclude Include="Code\FtaApp.h" />
     <ClInclude Include="Code\FtaAsyncRequest.h" />
+    <ClInclude Include="Code\FtaAxisAlignedBox.h" />
     <ClInclude Include="Code\FtaCamera.h" />
     <ClInclude Include="Code\FtaCanvas.h" />
     <ClInclude Include="Code\FtaCanvasPlugin.h" />
@@ -64,6 +65,7 @@
     <ClCompile Include="Code\FtaAmLoggedInFunction.cpp" />
     <ClCompile Include="Code\FtaApp.cpp" />
     <ClCompile Include="Code\FtaAsyncRequest.cpp" />
+    <ClCompile Include="Code\FtaAxisAlignedBox.cpp" />
     <ClCompile Include="Code\FtaCamera.cpp" />
     <ClCompile Include="Code\FtaCanvas.cpp" />
     <ClCompile Include="Code\FtaCanvasPlugin.cpp" />

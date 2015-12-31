@@ -5,6 +5,7 @@
 #include "FtaContainers.h"
 #include "FtaVisualization.h"
 #include "FtaAsyncRequest.h"
+#include "FtaAxisAlignedBox.h"
 #include "c3ga/c3ga.h"
 
 class FtaGraphElement;
@@ -75,7 +76,7 @@ public:
 	wxString personId;
 	GLuint texture;
 	int textureRequestSignature;
-	c3ga::vectorE3GA minRect, maxRect;	// TODO: Should probably put this in an FtaBox class.
+	FtaAxisAlignedBox aab;
 };
 
 class FtaGraphEdge : public FtaGraphElement

@@ -286,6 +286,7 @@ FtaFont::FtaFont( FtaFontSystem* fontSystem )
 					if( rightGlyphIndex == 0 )
 						continue;
 
+					// TODO: I'm probably getting the kerning vector in the wrong units.
 					FT_Vector kerning;
 					FT_Get_Kerning( face, leftGlyphIndex, rightGlyphIndex, FT_KERNING_DEFAULT, &kerning );
 
