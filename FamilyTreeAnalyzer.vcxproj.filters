@@ -151,9 +151,6 @@
     <ClInclude Include="Code\FtaCanvasPlugin.h">
       <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="Code\FtaKinematicCamera.h">
-      <Filter>Code\Cameras</Filter>
-    </ClInclude>
     <ClInclude Include="Code\FtaCanvas.h">
       <Filter>Code</Filter>
     </ClInclude>
@@ -171,6 +168,9 @@
     </ClInclude>
     <ClInclude Include="Code\FtaFrameVizFunction.h">
       <Filter>Code\LuaFunctions</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\FtaBasicCamera.h">
+      <Filter>Code\Cameras</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -300,9 +300,6 @@
     <ClCompile Include="Code\FtaCanvas.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="Code\FtaKinematicCamera.cpp">
-      <Filter>Code\Cameras</Filter>
-    </ClCompile>
     <ClCompile Include="Code\FtaImageRequest.cpp">
       <Filter>Code\AsyncRequests</Filter>
     </ClCompile>
@@ -317,6 +314,9 @@
     </ClCompile>
     <ClCompile Include="Code\FtaFrameVizFunction.cpp">
       <Filter>Code\LuaFunctions</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\FtaBasicCamera.cpp">
+      <Filter>Code\Cameras</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

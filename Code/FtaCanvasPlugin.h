@@ -17,6 +17,7 @@ public:
 	virtual bool Unbind( void ) = 0;
 
 	virtual bool Animate( void );
+	virtual bool GetHUDString( wxString& hudString );
 
 	FtaCanvas* canvas;
 };

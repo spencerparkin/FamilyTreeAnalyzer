@@ -16,4 +16,9 @@ FtaCanvasPlugin::FtaCanvasPlugin( void )
 	return false;
 }
 
+/*virtual*/ bool FtaCanvasPlugin::GetHUDString( wxString& hudString )
+{
+	return false;
+}
+
 // FtaCanvasPlugin.cpp

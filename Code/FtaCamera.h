@@ -21,19 +21,24 @@ public:
 
 	virtual bool ViewBoundingBox( const FtaAxisAlignedBox& aab );
 
+	virtual bool GetHUDString( wxString& hudString ) override;
+
 	GLuint* GetHitBuffer( void ) { return hitBuffer; }
 	GLuint GetHitBufferSize( void ) const { return hitBufferSize; }
+
+	void SetFovi( GLfloat fovi ) { this->fovi = fovi; }
+	GLfloat GetFovi( void ) { return fovi; }
 
 protected:
 
 	void SetupViewMatrices( GLenum renderMode );
+	void BuildCameraFrame( c3ga::vectorE3GA& xAxis, c3ga::vectorE3GA& yAxis, c3ga::vectorE3GA& zAxis );
 
 	void PrepareHitBuffer( void );
 	void ProcessHitBuffer( bool freeHitBuffer = true );
 
-	// TODO: This is stupid and needs to be rewritten.
-	c3ga::vectorE3GA eye;
-	c3ga::rotorE3GA orient;
+	GLfloat fovi;
+	c3ga::vectorE3GA eye, up, target;
 
 	GLuint* hitBuffer;
 	GLuint hitBufferSize;

@@ -32,7 +32,7 @@
     <ClInclude Include="Code\FtaGetAllCachedPersonsFunction.h" />
     <ClInclude Include="Code\FtaGetPersonFunction.h" />
     <ClInclude Include="Code\FtaGraph.h" />
-    <ClInclude Include="Code\FtaKinematicCamera.h" />
+    <ClInclude Include="Code\FtaBasicCamera.h" />
     <ClInclude Include="Code\FtaVisualization.h" />
     <ClInclude Include="Code\FtaVizPanel.h" />
     <ClInclude Include="Code\FtaGraphViz.h" />
@@ -82,7 +82,7 @@
     <ClCompile Include="Code\FtaGetAllCachedPersonsFunction.cpp" />
     <ClCompile Include="Code\FtaGetPersonFunction.cpp" />
     <ClCompile Include="Code\FtaGraph.cpp" />
-    <ClCompile Include="Code\FtaKinematicCamera.cpp" />
+    <ClCompile Include="Code\FtaBasicCamera.cpp" />
     <ClCompile Include="Code\FtaVisualization.cpp" />
     <ClCompile Include="Code\FtaVizPanel.cpp" />
     <ClCompile Include="Code\FtaGraphViz.cpp" />

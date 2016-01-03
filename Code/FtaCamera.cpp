@@ -10,9 +10,11 @@ FtaCamera::FtaCamera( void )
 	hitBuffer = nullptr;
 	hitBufferSize = 0;
 
-	eye.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 20.f );
+	SetFovi( 60.f );
 
-	orient.set( c3ga::rotorE3GA::coord_scalar_e1e2_e2e3_e3e1, 1.0, 0.0, 0.0, 0.0 );
+	eye.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, 20.0 );
+	up.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 1.f, 0.f );
+	target.set( c3ga::vectorE3GA::coord_e1_e2_e3, 0.f, 0.f, 0.0 );
 }
 
 /*virtual*/ FtaCamera::~FtaCamera( void )
@@ -34,23 +36,22 @@ void FtaCamera::SetupViewMatrices( GLenum renderMode )
 		//gluPickMatrix( GLdouble( mousePos.x ), GLdouble( viewport[3] - mousePos.y - 1 ), 2.0, 2.0, viewport );
 	}
 
-	GLfloat foviAngle = 60.f;
-	gluPerspective( foviAngle, aspectRatio, 0.1, 1000.0 );
+	gluPerspective( fovi, aspectRatio, 0.1, 1000.0 );
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	
-	c3ga::vectorE3GA up( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 1.0, 0.0 );
-	c3ga::vectorE3GA forward( c3ga::vectorE3GA::coord_e1_e2_e3, 0.0, 0.0, -1.0 );
-
-	c3ga::applyUnitVersor( orient, up );
-	c3ga::applyUnitVersor( orient, forward );
-
-	c3ga::vectorE3GA target = eye + forward;
-
 	gluLookAt( eye.get_e1(), eye.get_e2(), eye.get_e3(),
 				target.get_e1(), target.get_e2(), target.get_e3(),
 				up.get_e1(), up.get_e2(), up.get_e3() );
+}
+
+// Build a right-handed system about the camera's eye with the -Z-axis facing target.
+void FtaCamera::BuildCameraFrame( c3ga::vectorE3GA& xAxis, c3ga::vectorE3GA& yAxis, c3ga::vectorE3GA& zAxis )
+{
+	zAxis = c3ga::unit( eye - target );
+	xAxis = c3ga::gp( c3ga::op( zAxis, up ), c3ga::I3 );
+	xAxis = c3ga::unit( xAxis );
+	yAxis = c3ga::gp( c3ga::op( xAxis, zAxis ), c3ga::I3 );
 }
 
 void FtaCamera::PrepareHitBuffer( void )
@@ -87,6 +88,15 @@ void FtaCamera::ProcessHitBuffer( bool freeHitBuffer /*= true*/ )
 {
 	// TODO: Write this after I've rewritten all the camera stuff/model.
 	return false;
+}
+
+/*virtual*/ bool FtaCamera::GetHUDString( wxString& hudString )
+{
+	c3ga::vectorE3GA look = c3ga::unit( target - eye );
+	hudString = wxString::Format( "eye: < %1.2f, %1.2f, %1.2f >, look: < %1.2f, %1.2f, %1.2f >",
+										eye.m_e1, eye.m_e2, eye.m_e3,
+										look.m_e1, look.m_e2, look.m_e3 );
+	return true;
 }
 
 // FtaCamera.cpp

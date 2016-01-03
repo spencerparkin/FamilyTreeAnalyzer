@@ -2,14 +2,14 @@
 
 #include "FtaCanvas.h"
 #include "FtaCamera.h"
-#include "FtaKinematicCamera.h"
+#include "FtaBasicCamera.h"
 #include "FtaCanvasPlugin.h"
 #include <wx/image.h>
 #include <gl/GLU.h>
 
 int FtaCanvas::attributeList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 
-FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList )
+FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attributeList, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS )
 {
 	lastFrameTimeSeconds = 0.0;
 	framesPerSecond = 0.0;
@@ -22,7 +22,7 @@ FtaCanvas::FtaCanvas( wxWindow* parent ) : wxGLCanvas( parent, wxID_ANY, attribu
 	viz = nullptr;
 	camera = nullptr;
 
-	SetCamera( new FtaKinematicCamera() );
+	SetCamera( new FtaBasicCamera() );
 
 	Bind( wxEVT_PAINT, &FtaCanvas::OnPaint, this );
 	Bind( wxEVT_SIZE, &FtaCanvas::OnSize, this );
