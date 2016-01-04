@@ -348,18 +348,37 @@ FtaGraphNode::FtaGraphNode( FtaGraph* graph ) : FtaGraphElement( graph )
 
 	FtaFontSystem* fontSystem = graph->canvas->GetFontSystem();
 
+	fontSystem->SetLineHeight( aab.GetHeight() / 10.f );
+	fontSystem->SetWordWrap( true );
+	fontSystem->SetJustification( FtaFontSystem::JUSTIFY_CENTER );
+	fontSystem->SetFont( "ChanticleerRomanNF.ttf" );
+	fontSystem->SetLineWidth( aab.GetWidth() );
+	fontSystem->SetBaseLineDelta( -fontSystem->GetLineHeight() * 1.5f );
+
+	glPushAttrib( GL_LIGHTING_BIT | GL_ENABLE_BIT );
+	glDisable( GL_LIGHTING );
 	glDisable( GL_DEPTH_TEST );
 	glPushMatrix();
-	glTranslatef( aab.min.m_e1, aab.min.m_e2, aab.max.m_e3 );
+
+	GLfloat x = aab.min.m_e1;
+	GLfloat y = aab.min.m_e2;
+	GLfloat z = aab.max.m_e3;
+
+	GLfloat length;
+	fontSystem->CalcTextLength( person->GetName(), length );
+	while( length > fontSystem->GetLineWidth() )
+	{
+		y -= fontSystem->GetBaseLineDelta();
+		length -= fontSystem->GetLineWidth();
+	}
+
+	glTranslatef( x, y, z );
 	glColor3f( 0.f, 0.f, 0.f );
-	fontSystem->SetFont( "ChanticleerRomanNF.ttf" );
-	fontSystem->SetWordWrap( false );
-	fontSystem->SetJustification( FtaFontSystem::JUSTIFY_CENTER );
-	fontSystem->SetLineWidth( aab.GetWidth() );
-	fontSystem->SetLineHeight( aab.GetHeight() / 8.f );
-	fontSystem->DrawText( person->GetName(), true );	// Maybe draw first name at bottom, last name at top?
+
+	fontSystem->DrawText( person->GetName(), true );
+
 	glPopMatrix();
-	glEnable( GL_DEPTH_TEST );
+	glPopAttrib();
 }
 
 /*virtual*/ bool FtaGraphNode::ProcessResponse( FtaAsyncRequest* request, wxJSONValue* responseValue )

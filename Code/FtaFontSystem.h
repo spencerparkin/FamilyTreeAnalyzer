@@ -69,6 +69,9 @@ public:
 	// This ignores wrapping.
 	bool CalcTextLength( const wxString& text, GLfloat& length );
 
+	// Tell us if a display list is cached for the given string.
+	bool DisplayListCached( const wxString& text );
+
 	FT_Library& GetLibrary( void ) { return library; }
 
 private:
@@ -99,6 +102,7 @@ public:
 
 	virtual bool DrawText( const wxString& text, bool staticText = false );
 	virtual bool CalcTextLength( const wxString& text, GLfloat& length );
+	virtual bool DisplayListCached( const wxString& text );
 
 private:
 

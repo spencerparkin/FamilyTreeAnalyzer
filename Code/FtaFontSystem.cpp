@@ -146,6 +146,18 @@ bool FtaFontSystem::CalcTextLength( const wxString& text, GLfloat& length )
 	return success;
 }
 
+bool FtaFontSystem::DisplayListCached( const wxString& text )
+{
+	if( !initialized )
+		return false;
+
+	FtaFont* cachedFont = GetOrCreateCachedFont();
+	if( !cachedFont )
+		return false;
+
+	return cachedFont->DisplayListCached( text );
+}
+
 FtaFont* FtaFontSystem::GetOrCreateCachedFont( void )
 {
 	FtaFont* cachedFont = nullptr;
@@ -351,6 +363,12 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 	return( left | right );
 }
 
+/*virtual*/ bool FtaFont::DisplayListCached( const wxString& text )
+{
+	FtaTextDisplayListMap::iterator iter = textDisplayListMap.find( text );
+	return( iter == textDisplayListMap.end() ? false : true );
+}
+
 /*virtual*/ bool FtaFont::DrawText( const wxString& text, bool staticText /*= false*/ )
 {
 	bool success = false;
@@ -493,7 +511,7 @@ FT_ULong FtaFont::MakeKerningKey( FT_UInt leftGlyphIndex, FT_UInt rightGlyphInde
 	}
 	while( false );
 
-	delete glyphLink;
+	DeleteGlyphChain( glyphLink );
 
 	return true;
 }
