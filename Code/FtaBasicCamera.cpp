@@ -10,7 +10,7 @@
 
 FtaBasicCamera::FtaBasicCamera( void )
 {
-	moveUnitsPerSecond = 10.0;
+	moveUnitsPerSecond = 30.0;
 }
 
 /*virtual*/ FtaBasicCamera::~FtaBasicCamera( void )

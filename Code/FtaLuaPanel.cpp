@@ -28,6 +28,7 @@ FtaLuaPanel::FtaLuaPanel( void )
 }
 
 // TODO: Support line numbers and perhaps ctrl-G and ctrl-F.
+// TODO: Support cut/copy/paste.
 /*virtual*/ bool FtaLuaPanel::MakeControls( void )
 {
 	textCtrl = new wxStyledTextCtrl( this, wxID_ANY );

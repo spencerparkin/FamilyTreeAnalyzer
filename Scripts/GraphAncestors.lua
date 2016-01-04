@@ -29,7 +29,7 @@ end
 
 local ancestors = {}
 local personId = fta.whoAmI()
-personId = 'KWZC-XN7'
+personId = 'KWZH-7P6'
 CollectAncestors( personId, ancestors, 0, maxGen )
 
 fta.drawGraph( "graphviz", ancestors )
