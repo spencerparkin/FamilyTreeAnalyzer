@@ -326,5 +326,8 @@
     <None Include="Scripts\PrintAllAPIHelp.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Scripts\GraphCache.lua">
+      <Filter>Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>

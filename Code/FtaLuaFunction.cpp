@@ -80,6 +80,7 @@ bool FtaLuaFunction::functionHelp = false;
 {
 	lua_State* L =  wxGetApp().GetLuaState();
 
+	// Oops, we need to look for it in the fta table; this won't work.
 	lua_getglobal( L, functionName );
 	FtaLuaFunction** userData = ( FtaLuaFunction** )luaL_testudata( L, -1, FTA_LUA_FUNCTION );
 	if( !userData )

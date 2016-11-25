@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\GraphAncestors.lua" />
+    <None Include="Scripts\GraphCache.lua" />
     <None Include="Scripts\PrintAllAPIHelp.lua" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
